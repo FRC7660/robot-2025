@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -112,6 +113,17 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     @Override
     public void periodic() {
+
+        for (int module = 0; module < modules.length; module += 1) {
+            SmartDashboard.putNumber(switch (module) {
+                case 0 -> "Front Left Encoder";
+                case 1 -> "Front Right Encoder";
+                case 2 -> "Back Left Encoder";
+                case 3 -> "Back Right Encoder";
+                default -> "None";
+            }, modules[module].getAngle().getRadians());
+        }
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
