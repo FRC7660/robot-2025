@@ -57,6 +57,11 @@ public class DriveConstants {
     public static final int frontRightTurnCanId = 6; //FIXME
     public static final int backRightTurnCanId = 8; //FIXME
 
+    public static final int frontLeftEncoderID = 9;
+    public static final int backLeftEncoderID = 10;
+    public static final int frontRightEncoderID = 11;
+    public static final int backRightEncoderID = 12;
+
     // Drive motor configuration
     public static final int driveMotorCurrentLimit = 60; //FIXME
     public static final double wheelRadiusMeters = Units.inchesToMeters(1.5); //FIXME
