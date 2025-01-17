@@ -113,6 +113,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Gyro Positoin", rawGyroRotation.getRadians());
 
         for (int module = 0; module < modules.length; module += 1) {
             SmartDashboard.putNumber(switch (module) {
@@ -121,7 +122,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 case 2 -> "Back Left Encoder";
                 case 3 -> "Back Right Encoder";
                 default -> "None";
-            }, modules[module].getAngle().getRadians());
+            }, modules[module].getAngle().getRadians() * 2.0 * Math.PI);
         }
 
         odometryLock.lock(); // Prevents odometry updates while reading data
