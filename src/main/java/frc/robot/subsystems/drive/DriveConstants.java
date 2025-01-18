@@ -39,10 +39,10 @@ public class DriveConstants {
     };
 
     // Zeroed rotation values for each module, see setup instructions
-    public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0); //FIXME IN RADIANS
-    public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0); //FIXME IN RADIANS
-    public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0); //FIXME IN RADIANS
-    public static final Rotation2d backRightZeroRotation = new Rotation2d(1.98650 / 2.0 / Math.PI); //FIXME IN RADIANS
+    public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.764404296875); //FIXME IN RADIANS
+    public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.83349609375); //FIXME IN RADIANS
+    public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.632568359375); //FIXME IN RADIANS
+    public static final Rotation2d backRightZeroRotation = new Rotation2d(0.00659261179794993); //FIXME IN RADIANS
 
     // Device CAN IDs
     public static final int pigeonCanId = 9;
@@ -86,21 +86,22 @@ public class DriveConstants {
     public static final double driveSimKv = 0.0789;
 
     // Turn motor configuration
-    public static final boolean turnInverted = false; //FIXME
+    public static final boolean turnInverted = false;
     public static final int turnMotorCurrentLimit = 20;
     public static final double turnMotorReduction = 150.0 / 7.0;
     public static final DCMotor turnGearbox = DCMotor.getNeo550(1); //FIXME
 
     // Turn encoder configuration
-    public static final boolean turnEncoderInverted = true; //FIXME
+    public static final boolean turnEncoderInverted = true;
     public static final double turnEncoderPositionFactor = 2 * Math.PI; // Rotations -> Radians
     public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
     // Turn PID configuration
-    public static final double turnKp = 2.0; //FIXME
-    public static final double turnKd = 0.0; //FIXME
-    public static final double turnSimP = 8.0; //FIXME
-    public static final double turnSimD = 0.0; //FIXME
+    public static final double turnKp = 0.05; // Adjust this value as needed
+    public static final double turnKi = 0; // Add this value and adjust as needed
+    public static final double turnKd = 0;  // Adjust this value as needed
+    public static final double turnSimP = 8.0; 
+    public static final double turnSimD = 0.0; 
     public static final double turnPIDMinInput = 0; // Radians
     public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 

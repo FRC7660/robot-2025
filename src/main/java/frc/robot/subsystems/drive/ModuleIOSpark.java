@@ -16,6 +16,8 @@ package frc.robot.subsystems.drive;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -32,8 +34,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
@@ -45,10 +53,13 @@ public class ModuleIOSpark implements ModuleIO {
     private final Rotation2d zeroRotation;
 
     // Hardware objects
-    private final SparkBase driveMotor;
-    private final SparkBase turnSpark;
+    private final SparkMax driveMotor;
+    private final SparkMax turnSpark;
     private final RelativeEncoder driveEncoder;
-    private final CANcoder turnEncoder;
+    private final RelativeEncoder turnRelativeEncoder;
+    private final CANcoder cancoder;
+    private final StatusSignal<Angle> turnAbsolutePosition;
+    private final PIDController turnPID;
 
     // Closed loop controllers
     private final SparkClosedLoopController driveController;
@@ -63,7 +74,12 @@ public class ModuleIOSpark implements ModuleIO {
     private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
     private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
 
+    private final int moduleNumber;
+    private Rotation2d rotation;
+
     public ModuleIOSpark(int module) {
+        moduleNumber = module;
+        rotation = new Rotation2d();
         zeroRotation = switch (module) {
             case 0 -> frontLeftZeroRotation;
             case 1 -> frontRightZeroRotation;
@@ -88,7 +104,7 @@ public class ModuleIOSpark implements ModuleIO {
                     default -> 0;
                 },
                 MotorType.kBrushless);
-        turnEncoder = new CANcoder(switch (module) {
+        cancoder = new CANcoder(switch (module) {
                 case 0 -> frontLeftEncoderID;
                 case 1 -> frontRightEncoderID;
                 case 2 -> backLeftEncoderID;
@@ -96,9 +112,11 @@ public class ModuleIOSpark implements ModuleIO {
                 default -> 0;
         });
         driveEncoder = driveMotor.getEncoder();
+        turnRelativeEncoder = turnSpark.getEncoder();
         driveController = driveMotor.getClosedLoopController();
         turnController = turnSpark.getClosedLoopController();
-
+        turnPID = new PIDController(turnKp, turnKi, turnKd);
+        turnPID.enableContinuousInput(turnPIDMinInput, turnPIDMaxInput); // Ensure continuous input is enabled
         // Configure drive motor
         var driveConfig = new SparkFlexConfig();
         driveConfig
@@ -148,7 +166,7 @@ public class ModuleIOSpark implements ModuleIO {
                 .averageDepth(2);
         turnConfig
                 .closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .positionWrappingEnabled(true)
                 .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
                 .pidf(turnKp, 0.0, turnKd, 0.0);
@@ -166,12 +184,28 @@ public class ModuleIOSpark implements ModuleIO {
                 5,
                 () -> turnSpark.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
+        turnRelativeEncoder.setPosition(0.0);
+
+        cancoder.getConfigurator().apply(new CANcoderConfiguration());
+        turnAbsolutePosition = cancoder.getAbsolutePosition();
+
         // Create odometry queues
+        turnSpark.getEncoder().setPosition(cancoder.getPosition().getValueAsDouble() * DriveConstants.turnEncoderPositionFactor);
         timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
         drivePositionQueue = SparkOdometryThread.getInstance().registerSignal(driveMotor, driveEncoder::getPosition);
-        turnPositionQueue = SparkOdometryThread.getInstance().registerSignal(turnSpark, turnEncoder.getAbsolutePosition()::getValueAsDouble);
+        turnPositionQueue = SparkOdometryThread.getInstance().registerSignal(turnSpark, cancoder.getAbsolutePosition()::getValueAsDouble);
     }
 
+    public double getTurnPosition(){
+        double turnPosition = MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * turnEncoderPositionFactor, turnPIDMinInput, turnPIDMaxInput);
+        turnPosition %= 2 * Math.PI;
+        return turnPosition;
+    }
+
+    public double getTurnVelocity(){
+        double turnVelocity = (turnSpark.getEncoder().getVelocity()) / turnEncoderVelocityFactor;
+        return turnVelocity;
+    }
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
         // Update drive inputs
@@ -189,15 +223,22 @@ public class ModuleIOSpark implements ModuleIO {
         sparkStickyFault = false;
         ifOk(
                 turnSpark,
-                turnEncoder.getAbsolutePosition()::getValueAsDouble,
+                () -> MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI, turnPIDMinInput, turnPIDMaxInput),
                 (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
-        ifOk(turnSpark, turnEncoder.getVelocity()::getValueAsDouble, (value) -> inputs.turnVelocityRadPerSec = value);
+        ifOk(turnSpark, cancoder.getVelocity()::getValueAsDouble, (value) -> inputs.turnVelocityRadPerSec = value);
         ifOk(
                 turnSpark,
                 new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
                 (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
         ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
         inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
+
+        turnAbsolutePosition.refresh();
+        inputs.turnVelocityRadPerSec =
+            Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity())
+                / turnEncoderVelocityFactor;
+        inputs.turnAppliedVolts = turnSpark.getAppliedOutput() * turnSpark.getBusVoltage();
+        inputs.turnCurrentAmps = turnSpark.getOutputCurrent();
 
         // Update odometry inputs
         inputs.odometryTimestamps =
@@ -231,8 +272,26 @@ public class ModuleIOSpark implements ModuleIO {
 
     @Override
     public void setTurnPosition(Rotation2d rotation) {
-        double setpoint =
-                MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-        turnController.setReference(setpoint, ControlType.kPosition);
+        this.rotation = rotation;
+        double absolutePosition = MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI, turnPIDMinInput, turnPIDMaxInput);
+        double setpoint = MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+        double output = turnPID.calculate(absolutePosition, setpoint);
+        output = MathUtil.clamp(output, -1, 1);
+        turnSpark.set(output);
+        if (moduleNumber == 0){
+                SmartDashboard.putNumber("Output", output);
+        }
+    }
+
+    @Override
+    public void putMyNumbers(){
+        double absolutePosition = MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI, turnPIDMinInput, turnPIDMaxInput);
+        double setpoint = MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+        if (moduleNumber == 0){
+                SmartDashboard.putNumber("Setpoint", setpoint);
+                SmartDashboard.putNumber("Actual", absolutePosition);
+                SmartDashboard.putNumber("Absolute Position", cancoder.getAbsolutePosition().getValueAsDouble());
+                SmartDashboard.putNumber("Setpoint pre-Mod", rotation.plus(zeroRotation).getRadians()); 
+        }
     }
 }

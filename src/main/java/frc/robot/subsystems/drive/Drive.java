@@ -113,7 +113,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Gyro Positoin", rawGyroRotation.getRadians());
+        SmartDashboard.putNumber("Gyro Position", rawGyroRotation.getRadians());
 
         for (int module = 0; module < modules.length; module += 1) {
             SmartDashboard.putNumber(switch (module) {
