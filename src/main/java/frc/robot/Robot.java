@@ -138,6 +138,9 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
+
+        //Reset the gyro to zero
+        robotContainer.getDrive().resetGyro();
     }
 
     /** This function is called periodically during operator control. */

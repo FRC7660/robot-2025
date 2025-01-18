@@ -85,7 +85,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
         // Start odometry thread
         SparkOdometryThread.getInstance().start();
-        resetOdometry(new Pose2d());
 
         // Configure AutoBuilder for PathPlanner
         AutoBuilder.configure(
@@ -312,5 +311,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     /** Returns the maximum angular speed in radians per sec. */
     public double getMaxAngularSpeedRadPerSec() {
         return maxSpeedMetersPerSec / driveBaseRadius;
+    }
+
+    public void resetGyro(){
+        gyroIO.reset();
     }
 }

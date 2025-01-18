@@ -170,4 +170,8 @@ public class RobotContainer {
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     }
+
+    public Drive getDrive(){
+        return drive;
+    }
 }
