@@ -117,6 +117,7 @@ public class ModuleIOSpark implements ModuleIO {
         turnController = turnSpark.getClosedLoopController();
         turnPID = new PIDController(turnKp, turnKi, turnKd);
         turnPID.enableContinuousInput(turnPIDMinInput, turnPIDMaxInput); // Ensure continuous input is enabled
+        turnPID.setTolerance(10);
         // Configure drive motor
         var driveConfig = new SparkFlexConfig();
         driveConfig
@@ -275,7 +276,11 @@ public class ModuleIOSpark implements ModuleIO {
         this.rotation = rotation;
         double absolutePosition = MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI, turnPIDMinInput, turnPIDMaxInput);
         double setpoint = MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-        double output = turnPID.calculate(absolutePosition, setpoint);
+        turnPID.setP(turnKp);
+        turnPID.setI(turnKi);
+        turnPID.setD(turnKd);
+        turnPID.setTolerance(0.1, 0.1);
+        double output = turnPID.calculate(setpoint, absolutePosition);
         output = MathUtil.clamp(output, -1, 1);
         turnSpark.set(output);
         if (moduleNumber == 0){
@@ -287,10 +292,10 @@ public class ModuleIOSpark implements ModuleIO {
     public void putMyNumbers(){
         double absolutePosition = MathUtil.inputModulus((cancoder.getAbsolutePosition().getValueAsDouble()) * 2 * Math.PI, turnPIDMinInput, turnPIDMaxInput);
         double setpoint = MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+        SmartDashboard.putNumber("Absolute Position" + moduleNumber, absolutePosition);
         if (moduleNumber == 0){
                 SmartDashboard.putNumber("Setpoint", setpoint);
                 SmartDashboard.putNumber("Actual", absolutePosition);
-                SmartDashboard.putNumber("Absolute Position", cancoder.getAbsolutePosition().getValueAsDouble());
                 SmartDashboard.putNumber("Setpoint pre-Mod", rotation.plus(zeroRotation).getRadians()); 
         }
     }

@@ -44,9 +44,8 @@ public class Module {
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
-        if (this.index == 0){
-            this.io.putMyNumbers();
-        }
+
+        this.io.putMyNumbers();
 
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
@@ -64,7 +63,7 @@ public class Module {
 
     /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
     public void runSetpoint(SwerveModuleState state) {
-        //state.optimize(getAngle());
+        state.optimize(getAngle());
         state.cosineScale(inputs.turnPosition);
 
         // Apply setpoints

@@ -85,6 +85,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
         // Start odometry thread
         SparkOdometryThread.getInstance().start();
+        resetOdometry(new Pose2d());
 
         // Configure AutoBuilder for PathPlanner
         AutoBuilder.configure(
