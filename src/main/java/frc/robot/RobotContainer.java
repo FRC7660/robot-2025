@@ -55,13 +55,21 @@ public class RobotContainer {
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
-                drive = new Drive(
-                        new GyroIONavX(),
-                        new ModuleIOSpark(0),
-                        new ModuleIOSpark(1),
-                        new ModuleIOSpark(2),
-                        new ModuleIOSpark(3));
-
+                if (DriveConstants.talonDriveMotors == true){
+                        drive = new Drive(
+                                new GyroIONavX(),
+                                new ModuleIOMixed(0),//toggle these between ModuleIOMixed.java and ModuleIOSpark.java to switch between Talon and Neo 
+                                new ModuleIOMixed(1),
+                                new ModuleIOMixed(2),
+                                new ModuleIOMixed(3));
+                } else {
+                        drive = new Drive(
+                                new GyroIONavX(),
+                                new ModuleIOSpark(0),//toggle these between ModuleIOMixed.java and ModuleIOSpark.java to switch between Talon and Neo 
+                                new ModuleIOSpark(1),
+                                new ModuleIOSpark(2),
+                                new ModuleIOSpark(3));
+                }
                 this.vision = new Vision(
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
