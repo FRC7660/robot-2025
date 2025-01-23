@@ -15,6 +15,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -74,6 +75,9 @@ public class DriveConstants {
             2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
     public static final double driveEncoderVelocityFactor =
             (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
+
+    public static final double slipCurrent = 120.0;
+    public static final ClosedLoopOutputType driveMotorClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
     // Drive PID configuration
     public static final double driveKp = 0.0; //FIXME
