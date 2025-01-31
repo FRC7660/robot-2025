@@ -5,24 +5,23 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Index;
+import frc.robot.subsystems.Funnel;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class LiftIndex extends Command {
+public class LiftFunnel extends Command {
   /** Creates a new LiftIndex. */
+  private final Funnel funnel;
 
-  private final Index index;
-
-  public LiftIndex(Index index) {
+  public LiftFunnel(Funnel funnel) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.index = index;
+    this.funnel = funnel;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("Index is lifting");
-    index.start;
+    System.out.println("Funnel is lifting");
+    funnel.wind();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

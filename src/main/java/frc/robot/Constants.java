@@ -34,4 +34,10 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static class Funnel {
+    public static int winchID = 51;
+    public static double winchSpeed = 0.50;
+    public static int limit = 10;
+  }
 }
