@@ -14,9 +14,9 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.TestAuto;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
@@ -134,6 +135,12 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    TestAuto testCommand = new TestAuto("Byting Command");
+    TestAuto testEventMarker = new TestAuto("Byting Event Marker");
+    // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("BytingCommand", testCommand);
+    // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
 
     // Configure the button bindings
     configureButtonBindings();
