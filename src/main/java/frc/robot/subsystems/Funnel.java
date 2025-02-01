@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +28,7 @@ public class Funnel extends SubsystemBase {
   private SparkMaxSim motorWinchSim;
 
   public Funnel() {
-    if(Constants.currentMode == Constants.Mode.SIM){
+    if (Constants.currentMode == Constants.Mode.SIM) {
       motorWinchSim = new SparkMaxSim(motorWinch, DCMotor.getNEO(1));
     }
     encoderWinch = motorWinch.getEncoder();
@@ -38,7 +37,6 @@ public class Funnel extends SubsystemBase {
     motorWinch.configure(
         configWinch, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     encoderWinch.setPosition(0); // improve later if time, possibly set when enabled
-
   }
 
   public void wind() {
@@ -55,9 +53,12 @@ public class Funnel extends SubsystemBase {
 
   public Boolean limitReached() {
     double position = encoderWinch.getPosition();
+    System.out.println("Value:" + position);
     if (position > Constants.Funnel.limit) {
+      System.out.println("Limit Reached");
       return true;
     } else if (position < -Constants.Funnel.limit) {
+      System.out.println("Limit Reached");
       return true;
     }
     return false;
@@ -73,7 +74,7 @@ public class Funnel extends SubsystemBase {
     SmartDashboard.putNumber("Funnel-Pos", encoderWinch.getPosition());
   }
 
-  public void simulationPeriodic(){
+  public void simulationPeriodic() {
     double velo = motorWinch.get() * 1.0;
     double voltage = RoboRioSim.getVInVoltage();
     motorWinchSim.iterate(velo, voltage, Constants.simCycleTime);

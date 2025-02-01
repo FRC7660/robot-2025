@@ -15,8 +15,6 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import java.sql.Driver;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -173,7 +171,7 @@ public class RobotContainer {
     // Lock to 0° when A button is held
 
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
-    a.whileTrue(new LiftFunnel(funnel));
+    a.onTrue(new LiftFunnel(funnel));
 
     controller
         .a()
