@@ -38,6 +38,10 @@ public class Funnel extends SubsystemBase {
     motorWinch.set(-Constants.Funnel.winchSpeed);
   }
 
+  public void stop() {
+    motorWinch.set(0);
+  }
+
   public Boolean limitReached() {
     double position = encoderWinch.getPosition();
     if (position > Constants.Funnel.limit) {
@@ -52,7 +56,7 @@ public class Funnel extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (limitReached()) {
-      motorWinch.set(0);
+      stop();
     }
   }
 }
