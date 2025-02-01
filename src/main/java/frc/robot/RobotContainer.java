@@ -15,6 +15,8 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import java.sql.Driver;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,9 +26,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.TestAuto;
+import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
@@ -47,9 +52,13 @@ public class RobotContainer {
   private final Vision vision;
   private final LEDlive ledLive;
   private SwerveDriveSimulation driveSimulation = null;
+  private final Funnel funnel = new Funnel();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+
+  private final XboxController driver = new XboxController(0);
+  private final XboxController coDriver = new XboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -162,6 +171,10 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to 0° when A button is held
+
+    JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
+    a.whileTrue(new LiftFunnel(funnel));
+
     controller
         .a()
         .whileTrue(
