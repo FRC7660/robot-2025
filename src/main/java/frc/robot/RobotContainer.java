@@ -26,9 +26,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ManualElevator;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.elevator.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.subsystems.LEDsubsystem.*;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -44,10 +47,12 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private final LEDlive ledLive;
+    private final Elevator elevator;
     private SwerveDriveSimulation driveSimulation = null;
 
-    // Controller
+    // Controllers
     private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController coDriverController = new CommandXboxController(1);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -55,6 +60,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         ledLive = new LEDlive();
+        elevator = new Elevator();
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -118,6 +124,9 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        // Configure the elevator
+        configureElevatorHeights();
     }
 
     /**
@@ -129,6 +138,10 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+
+        // Default command for Elevator
+        elevator.setDefaultCommand(
+                elevator.runManualCommand(() -> coDriverController.getLeftY()));
 
         // Lock to 0° when A button is held
         controller
@@ -148,6 +161,14 @@ public class RobotContainer {
                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     }
+
+    private void configureElevatorHeights() {
+        // Set height to L1 when aux1 button is pressed
+        controller.button(1)
+                .onTrue(Commands.run(elevator::setL1,elevator));
+
+    }
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
