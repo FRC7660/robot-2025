@@ -53,7 +53,6 @@ public class Funnel extends SubsystemBase {
 
   public Boolean limitReached() {
     double position = encoderWinch.getPosition();
-    System.out.println("Value:" + position);
     if (position > Constants.Funnel.limit) {
       System.out.println("Limit Reached");
       return true;
@@ -68,7 +67,7 @@ public class Funnel extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (limitReached()) {
-      stop();
+      motorWinch.set(0);
     }
 
     SmartDashboard.putNumber("Funnel-Pos", encoderWinch.getPosition());

@@ -37,6 +37,12 @@ public final class Constants {
     REPLAY
   }
 
+  public static class Climb {
+    public static int MotorClimbID = 61;
+    public static double climbSpeed = 0.50;
+    public static double climbEncoderLimit = 1;
+  }
+
   public static class Funnel {
     public static int winchID = 51;
     public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
