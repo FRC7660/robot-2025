@@ -28,7 +28,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LiftFunnel;
+import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
@@ -51,6 +53,7 @@ public class RobotContainer {
   private final LEDlive ledLive;
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
+  private final Climb climb = new Climb();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -172,6 +175,9 @@ public class RobotContainer {
 
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
     a.onTrue(new LiftFunnel(funnel));
+
+    JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
+    b.onTrue(new LowerClimb(climb));
 
     controller
         .a()
