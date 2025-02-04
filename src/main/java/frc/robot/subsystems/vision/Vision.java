@@ -68,7 +68,7 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     return;
   }
-  
+
   public void realPeriodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
