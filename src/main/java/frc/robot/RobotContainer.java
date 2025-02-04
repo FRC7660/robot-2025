@@ -62,6 +62,7 @@ public class RobotContainer {
   private final XboxController coDriver = new XboxController(1);
 
   // Dashboard inputs
+
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -128,6 +129,12 @@ public class RobotContainer {
     }
 
     // Set up auto routines
+    // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
+    TestAuto testCommand = new TestAuto("Byting Command");
+    TestAuto testEventMarker = new TestAuto("Byting Event Marker");
+    // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("BytingCommand", testCommand);
+
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -145,12 +152,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    TestAuto testCommand = new TestAuto("Byting Command");
-    TestAuto testEventMarker = new TestAuto("Byting Event Marker");
-    // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("BytingCommand", testCommand);
-    // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
 
     // Configure the button bindings
     configureButtonBindings();
