@@ -17,6 +17,8 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -120,19 +122,6 @@ public class RobotContainer {
                 (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Set up SysId routines
-        autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
         // Configure the button bindings
         configureButtonBindings();
 
@@ -146,7 +135,7 @@ public class RobotContainer {
 
         // Default command for Elevator
         elevator.setDefaultCommand(
-                elevator.runManualCommand(() -> coDriverController.getLeftY()));
+                elevator.runManualCommand(() -> MathUtil.applyDeadband(coDriverController.getLeftY(),0.1)));
 
         // Lock to 0° when A button is held
         controller
@@ -177,24 +166,25 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-  }
+
+    // Configure the elevator
+    configureElevatorHeights();
+    }
 
     private void configureElevatorHeights() {
-        // Set height to L1 when aux1 button is pressed
-        controller.button(1)
-                .onTrue(Commands.run(elevator::setL1,elevator));
-
+        // Set height to ZERO when coDriver button 1 is pressed
+        coDriverController.a()
+            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1),elevator));
+        coDriverController.x()
+            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2),elevator));
+        coDriverController.y()
+            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3),elevator));
+        coDriverController.b()
+            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4),elevator));
+        coDriverController.button(9)
+            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO),elevator));
     }
 
-
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
