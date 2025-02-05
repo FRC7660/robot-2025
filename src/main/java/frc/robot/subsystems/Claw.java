@@ -24,7 +24,7 @@ public class Claw extends SubsystemBase {
 
   private SparkMaxSim motorClawSim;
 
-  private DigitalInput clawBreakBeam = new DigitalInput(Constants.Claw.clawBeam);
+  private DigitalInput clawBreakBeam = new DigitalInput(Constants.Claw.clawBeam); //need to clarify what true vs false means!!!
 
   public Claw() {}
 
