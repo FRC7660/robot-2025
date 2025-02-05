@@ -17,7 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ManualElevator;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
@@ -39,8 +37,6 @@ import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.subsystems.LEDsubsystem.*;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -57,14 +53,14 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final LEDlive ledLive;
-  private final Elevator elevator;   
+  private final Elevator elevator;
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
   private final Climb climb = new Climb();
 
-    // Controllers
-    private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandXboxController coDriverController = new CommandXboxController(1);
+  // Controllers
+  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController coDriverController = new CommandXboxController(1);
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
@@ -73,20 +69,21 @@ public class RobotContainer {
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    public RobotContainer() {
-        ledLive = new LEDlive();
-        elevator = new Elevator();
-        switch (Constants.currentMode) {
-            case REAL:
-                // Real robot, instantiate hardware IO implementations
-                drive = new Drive(
-                        new GyroIONavX(),
-                        new ModuleIOSpark(0),
-                        new ModuleIOSpark(1),
-                        new ModuleIOSpark(2),
-                        new ModuleIOSpark(3),
-                        (pose) -> {});
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    ledLive = new LEDlive();
+    elevator = new Elevator();
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIONavX(),
+                new ModuleIOSpark(0),
+                new ModuleIOSpark(1),
+                new ModuleIOSpark(2),
+                new ModuleIOSpark(3),
+                (pose) -> {});
 
         this.vision =
             new Vision(
@@ -150,15 +147,20 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // Default command for Elevator
-        elevator.setDefaultCommand(
-                elevator.runManualCommand(() -> MathUtil.applyDeadband(coDriverController.getLeftY(),0.1)));
+    // Default command for Elevator
+    elevator.setDefaultCommand(
+        elevator.runManualCommand(
+            () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
 
-        // Lock to 0° when A button is held
-        controller
-                .a()
-                .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
+    // Lock to 0° when A button is held
+    controller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -180,21 +182,26 @@ public class RobotContainer {
 
     // Configure the elevator
     configureElevatorHeights();
-    }
+  }
 
-    private void configureElevatorHeights() {
-        // Set height to ZERO when coDriver button 1 is pressed
-        coDriverController.a()
-            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1),elevator));
-        coDriverController.x()
-            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2),elevator));
-        coDriverController.y()
-            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3),elevator));
-        coDriverController.b()
-            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4),elevator));
-        coDriverController.button(9)
-            .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO),elevator));
-    }
+  private void configureElevatorHeights() {
+    // Set height to ZERO when coDriver button 1 is pressed
+    coDriverController
+        .a()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1), elevator));
+    coDriverController
+        .x()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2), elevator));
+    coDriverController
+        .y()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3), elevator));
+    coDriverController
+        .b()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4), elevator));
+    coDriverController
+        .button(9)
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO), elevator));
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by

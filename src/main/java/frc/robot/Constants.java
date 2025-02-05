@@ -49,8 +49,12 @@ public final class Constants {
     public static double limit = 1;
   }
 
-  public enum ElevatorState{
-    L1,L2,L3,L4,ZERO
+  public enum ElevatorState {
+    L1,
+    L2,
+    L3,
+    L4,
+    ZERO
   }
 
   public static final Double l1height = 25.0;

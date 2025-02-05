@@ -7,16 +7,14 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkRelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -25,10 +23,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorState;
-
 import java.util.function.DoubleSupplier;
 
-//import com.revrobotics.CANSparkLowLevel.MotorType;
+// import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Elevator extends SubsystemBase {
 
@@ -44,31 +41,31 @@ public class Elevator extends SubsystemBase {
   private RelativeEncoder motorAlphaEncoder = motorAlpha.getEncoder();
   private RelativeEncoder motorBetaEncoder = motorBeta.getEncoder();
 
-  private SparkMaxSim motorSim = new SparkMaxSim(motorAlpha,DCMotor.getNeo550(1));
+  private SparkMaxSim motorSim = new SparkMaxSim(motorAlpha, DCMotor.getNeo550(1));
   private SparkRelativeEncoderSim motorSimEncoder = motorSim.getRelativeEncoderSim();
 
-  private PIDController elevatorPid = new PIDController(
-    Constants.elevatorP,Constants.elevatorI,Constants.elevatorD);
+  private PIDController elevatorPid =
+      new PIDController(Constants.elevatorP, Constants.elevatorI, Constants.elevatorD);
 
   public void raise() {
     motorAlpha.set(.5 * alphaInversion);
-    motorBeta.set(.5*betaInversion);
+    motorBeta.set(.5 * betaInversion);
   }
 
   public void lower() {
     motorAlpha.set(-.5 * alphaInversion);
-    motorBeta.set(-.5*betaInversion);
+    motorBeta.set(-.5 * betaInversion);
   }
 
-  public void setMotors(double speed,boolean overrideInversion) {
+  public void setMotors(double speed, boolean overrideInversion) {
     Double speedMulti = 0.2;
     Double outputSpeed = speed;
-    if (overrideInversion == true){
+    if (overrideInversion == true) {
       motorAlpha.set(outputSpeed * speedMulti);
       motorBeta.set(outputSpeed * speedMulti);
     } else {
       motorAlpha.set(outputSpeed * speedMulti * alphaInversion);
-      motorBeta.set(outputSpeed * speedMulti *betaInversion);
+      motorBeta.set(outputSpeed * speedMulti * betaInversion);
     }
     SmartDashboard.putNumber("Motor Alpha OutputSpeed", outputSpeed);
   }
@@ -86,44 +83,42 @@ public class Elevator extends SubsystemBase {
   public void setState(ElevatorState state) {
     Double output;
     System.out.println("state is " + state);
-    switch(state){
+    switch (state) {
       case L1:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.l1height);
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l1height);
         break;
       case L2:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.l2height);
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l2height);
         break;
       case L3:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.l3height);
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l3height);
         break;
       case L4:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.l4height);
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l4height);
         break;
       case ZERO:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.zeroHeight);
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.zeroHeight);
         break;
-      
-      default:
-        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(),Constants.l1height);
-        break;      
-    }
-    setMotors(output*0.2,true);
 
+      default:
+        output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l1height);
+        break;
+    }
+    setMotors(output * 0.2, true);
   }
 
   public Command runManualCommand(DoubleSupplier inputSpeed) {
 
-    return this.runOnce(() -> setMotors(inputSpeed.getAsDouble(),false));
+    return this.runOnce(() -> setMotors(inputSpeed.getAsDouble(), false));
   }
 
   public Elevator() {
     // Clockwise - up, Counter - down, same for both motors
     // Gear ratio - 6:1
-    //motorSim.setPosition(5);
-    
+    // motorSim.setPosition(5);
 
     motorAlphaEncoder.setPosition(50);
-    System.out.println("Motor Position:"+motorAlphaEncoder.getPosition());
+    System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
 
     alphaConfig.softLimit.forwardSoftLimit(100);
     alphaConfig.softLimit.reverseSoftLimit(0);
@@ -134,7 +129,8 @@ public class Elevator extends SubsystemBase {
 
     motorAlpha.configure(
         alphaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    motorBeta.configure(betaConfig,ResetMode.kNoResetSafeParameters,PersistMode.kNoPersistParameters);
+    motorBeta.configure(
+        betaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
