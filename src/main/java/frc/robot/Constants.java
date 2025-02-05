@@ -24,6 +24,8 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
+  public static final double simCycleTime = 0.05;
+
   public static enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -35,10 +37,16 @@ public final class Constants {
     REPLAY
   }
 
+  public static class Climb {
+    public static int MotorClimbID = 61;
+    public static double climbSpeed = 0.50;
+    public static double climbEncoderLimit = 1;
+  }
+
   public static class Funnel {
     public static int winchID = 51;
-    public static double winchSpeed = 0.50;
-    public static int limit = 10;
+    public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
+    public static double limit = 1;
   }
 
   public enum ElevatorState{

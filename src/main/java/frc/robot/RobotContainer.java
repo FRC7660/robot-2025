@@ -26,10 +26,15 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ManualElevator;
+import frc.robot.commands.LiftFunnel;
+import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.*;
@@ -48,18 +53,24 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // Subsystems
-    private final Drive drive;
-    private final Vision vision;
-    private final LEDlive ledLive;
-    private final Elevator elevator;
-    private SwerveDriveSimulation driveSimulation = null;
+  // Subsystems
+  private final Drive drive;
+  private final Vision vision;
+  private final LEDlive ledLive;
+  private final Elevator elevator;   
+  private SwerveDriveSimulation driveSimulation = null;
+  private final Funnel funnel = new Funnel();
+  private final Climb climb = new Climb();
 
     // Controllers
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandXboxController coDriverController = new CommandXboxController(1);
 
+  private final XboxController driver = new XboxController(0);
+  private final XboxController coDriver = new XboxController(1);
+
   // Dashboard inputs
+
   private final LoggedDashboardChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -131,6 +142,12 @@ public class RobotContainer {
     }
 
     // Set up auto routines
+    // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
+    TestAuto testCommand = new TestAuto("Byting Command");
+    TestAuto testEventMarker = new TestAuto("Byting Event Marker");
+    // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("BytingCommand", testCommand);
+
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Default command for Elevator
@@ -157,12 +174,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    TestAuto testCommand = new TestAuto("Byting Command");
-    TestAuto testEventMarker = new TestAuto("Byting Event Marker");
-    // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("BytingCommand", testCommand);
-    // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -201,6 +212,13 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to 0° when A button is held
+
+    JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
+    a.onTrue(new LiftFunnel(funnel));
+
+    JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
+    b.onTrue(new LowerClimb(climb));
+
     controller
         .a()
         .whileTrue(
