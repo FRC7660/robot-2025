@@ -31,6 +31,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.commands.releaseCoral;
+import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
@@ -57,6 +59,7 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
   private final Climb climb = new Climb();
+  private final Claw claw = new Claw();
 
   // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -225,6 +228,9 @@ public class RobotContainer {
 
     JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
     b.onTrue(new LowerClimb(climb));
+
+    JoystickButton x = new JoystickButton(driver, XboxController.Button.kX.value);
+    x.onTrue(new releaseCoral(claw));
 
     controller
         .a()
