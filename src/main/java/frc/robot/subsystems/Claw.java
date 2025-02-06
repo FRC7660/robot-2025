@@ -6,8 +6,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -26,7 +29,14 @@ public class Claw extends SubsystemBase {
 
   private DigitalInput clawBreakBeam = new DigitalInput(Constants.Claw.clawBeam); //need to clarify what true vs false means!!!
 
-  public Claw() {}
+  public Claw() {
+    configClaw = new SparkMaxConfig();
+    encoderClaw = motorClaw.getEncoder();
+    configClaw.idleMode(IdleMode.kBrake);
+    motorClaw.configure(
+        configClaw, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    encoderClaw.setPosition(0);
+  }
 
   public void start(){
     motorClaw.set(Constants.Claw.clawSpeed);

@@ -16,12 +16,13 @@ public class releaseCoral extends Command {
   public releaseCoral(Claw claw) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.claw = claw;
+    addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(claw.getClawSensorHit()){ //need to clarify/fix to return correct boolean!
+    if(claw.getClawSensorHit()){ 
     System.out.println("Coral is released");
     claw.start();
     }
@@ -33,15 +34,14 @@ public class releaseCoral extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    if(claw.getClawSensorHit()){ //need to clarify/fix to return correct boolean!
-      claw.stop();
-    }
+  public void end(boolean interrupted) { 
+    System.out.println("Coral is released");  
+    claw.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return claw.getClawSensorHit(); //need to make this look for false instead of true!
+    return ! claw.getClawSensorHit(); 
   }
 }
