@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -29,7 +28,8 @@ public class Claw extends SubsystemBase {
 
   private SparkMaxSim motorClawSim;
 
-  private DigitalInput clawBreakBeam = new DigitalInput(Constants.Claw.clawBeam); //need to clarify what true vs false means!!!
+  private DigitalInput clawBreakBeam =
+      new DigitalInput(Constants.Claw.clawBeam); // need to clarify what true vs false means!!!
 
   public Claw() {
     configClaw = new SparkMaxConfig();
@@ -39,16 +39,16 @@ public class Claw extends SubsystemBase {
         configClaw, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     encoderClaw.setPosition(0);
 
-     if (Constants.currentMode == Constants.Mode.SIM) {
+    if (Constants.currentMode == Constants.Mode.SIM) {
       motorClawSim = new SparkMaxSim(motorClaw, DCMotor.getNEO(1));
     }
   }
 
-  public void start(){
+  public void start() {
     motorClaw.set(Constants.Claw.clawSpeed);
   }
 
-  public void stop(){
+  public void stop() {
     motorClaw.set(0);
   }
 
@@ -63,7 +63,6 @@ public class Claw extends SubsystemBase {
     SmartDashboard.putNumber("Claw-Motor", encoderClaw.getPosition());
   }
 
-  
   public void simulationPeriodic() {
     double velo = motorClaw.get() * 1.0;
     double voltage = RoboRioSim.getVInVoltage();

@@ -11,7 +11,6 @@ import frc.robot.subsystems.Claw;
 public class releaseCoral extends Command {
   /** Creates a new releaseCoral. */
   private final Claw claw;
-  
 
   public releaseCoral(Claw claw) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -22,9 +21,9 @@ public class releaseCoral extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(claw.getClawSensorHit()){ 
-    System.out.println("Coral is released");
-    claw.start();
+    if (claw.getClawSensorHit()) {
+      System.out.println("Coral is released");
+      claw.start();
     }
   }
 
@@ -34,14 +33,14 @@ public class releaseCoral extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) { 
-    System.out.println("Coral is released");  
+  public void end(boolean interrupted) {
+    System.out.println("Coral is released");
     claw.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ! claw.getClawSensorHit(); 
+    return !claw.getClawSensorHit();
   }
 }
