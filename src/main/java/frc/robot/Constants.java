@@ -40,7 +40,7 @@ public final class Constants {
   public static class Claw {
     public static int motorClawID = 71;
     public static double clawSpeed = 0.50;
-    public static final int clawBeam = 1;
+    public static final int clawBeam = 0;
   }
 
   public static class Climb {
