@@ -24,8 +24,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LiftFunnel;
@@ -67,6 +70,7 @@ public class RobotContainer {
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
+  private final CommandGenericHID buttonBox = new CommandGenericHID(1);
 
   // Dashboard inputs
 
@@ -256,6 +260,49 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+  }
+
+  private void configurebuttonBox() {
+    Trigger button1 = buttonBox.button(1);
+    button1.onTrue(new PrintCommand("button 1 pressed"));
+    button1.onFalse(new PrintCommand("button 1 released"));
+    Trigger button2 = buttonBox.button(2);
+    button2.onTrue(new PrintCommand("Button 2 Pressed"));
+    button2.onFalse(new PrintCommand("Button 2 Released"));
+    Trigger button3 = buttonBox.button(3);
+    button3.onTrue(new PrintCommand("Button 3 Pressed"));
+    button3.onFalse(new PrintCommand("Button 3 Released"));
+    Trigger button4 = buttonBox.button(4);
+    button4.onTrue(new PrintCommand("Button 4 Pressed"));
+    button4.onFalse(new PrintCommand("Button 4 Released"));
+    Trigger button5 = buttonBox.button(5);
+    button5.onTrue(new PrintCommand("Button 5 Pressed"));
+    button5.onFalse(new PrintCommand("Button 5 Released"));
+    Trigger button6 = buttonBox.button(6);
+    button6.onTrue(new PrintCommand("Button 6 Pressed"));
+    button6.onFalse(new PrintCommand("Button 6 Released"));
+    Trigger button7 = buttonBox.button(7);
+    button7.onTrue(new PrintCommand("Button 7 Pressed"));
+    button7.onFalse(new PrintCommand("Button 7 Released"));
+    Trigger button8 = buttonBox.button(8);
+    button8.onTrue(new PrintCommand("Button 8 Pressed"));
+    button8.onFalse(new PrintCommand("Button 8 Released"));
+    Trigger button9 = buttonBox.button(9);
+    button9.onTrue(new PrintCommand("Button 9 Pressed"));
+    button9.onFalse(new PrintCommand("Button 9 Released"));
+    Trigger button10 = buttonBox.button(10);
+    button10.onTrue(new PrintCommand("Button 10 Pressed"));
+    button10.onFalse(new PrintCommand("Button 10 Released"));
+
+    /*
+    ArrayList<Trigger> buttons = new ArrayList<Trigger>(10);
+    for (int i = 0; i < buttons.size(); i++) {
+        Trigger button = buttonBox.button(i+1);
+        button.onTrue(new PrintCommand("Button " + i +1 + " Pressed"));
+        button.onFalse(new PrintCommand("Button " + i +1 +"" Released"));
+
+    }
+    */
   }
 
   /**
