@@ -17,6 +17,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.elevator.*;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -51,12 +53,14 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final LEDlive ledLive;
+  private final Elevator elevator;
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
   private final Climb climb = new Climb();
 
-  // Controller
+  // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController coDriverController = new CommandXboxController(1);
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
@@ -68,6 +72,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     ledLive = new LEDlive();
+    elevator = new Elevator();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -125,6 +130,11 @@ public class RobotContainer {
                 (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
+        // Configure the button bindings
+        configureButtonBindings();
+
+        // Configure the elevator
+        configureElevatorHeights();
         break;
     }
 
@@ -137,6 +147,20 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
+    // Default command for Elevator
+    elevator.setDefaultCommand(
+        elevator.runManualCommand(
+            () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
+
+    // Lock to 0° when A button is held
+    controller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -155,6 +179,28 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Configure the elevator
+    configureElevatorHeights();
+  }
+
+  private void configureElevatorHeights() {
+    // Set height to ZERO when coDriver button 1 is pressed
+    coDriverController
+        .a()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1), elevator));
+    coDriverController
+        .x()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2), elevator));
+    coDriverController
+        .y()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3), elevator));
+    coDriverController
+        .b()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4), elevator));
+    coDriverController
+        .button(9)
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO), elevator));
   }
 
   /**
