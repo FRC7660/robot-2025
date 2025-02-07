@@ -37,6 +37,12 @@ public final class Constants {
     REPLAY
   }
 
+public static class Arm {
+  public static int motorArmID = 81;
+  public static double armSpeed = 0.50;
+  public static double armEncoderLimit = 1;
+}
+
   public static class Claw {
     public static int motorClawID = 71;
     public static double clawSpeed = 0.50;
