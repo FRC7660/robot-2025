@@ -70,7 +70,7 @@ public class RobotContainer {
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
-  private final CommandGenericHID buttonBox = new CommandGenericHID(1);
+  private final CommandGenericHID buttonBox = new CommandGenericHID(2);
 
   // Dashboard inputs
 
