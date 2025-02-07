@@ -37,7 +37,7 @@ public final class Constants {
     REPLAY
   }
 
-  public static class Claw{
+  public static class Claw {
     public static int motorClawID = 71;
     public static double clawSpeed = 0.50;
     public static final int clawBeam = 1;
