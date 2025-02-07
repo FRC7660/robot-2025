@@ -13,7 +13,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -36,6 +38,10 @@ public class Claw extends SubsystemBase {
     motorClaw.configure(
         configClaw, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     encoderClaw.setPosition(0);
+
+     if (Constants.currentMode == Constants.Mode.SIM) {
+      motorClawSim = new SparkMaxSim(motorClaw, DCMotor.getNEO(1));
+    }
   }
 
   public void start(){
@@ -54,5 +60,13 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
+    SmartDashboard.putNumber("Claw-Motor", encoderClaw.getPosition());
+  }
+
+  
+  public void simulationPeriodic() {
+    double velo = motorClaw.get() * 1.0;
+    double voltage = RoboRioSim.getVInVoltage();
+    motorClawSim.iterate(velo, voltage, Constants.simCycleTime);
   }
 }
