@@ -54,9 +54,10 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
     SmartDashboard.putNumber("Claw-Motor", motorClaw.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Claw Velo", motorClaw.get() );
   }
 
   public void simulationPeriodic() {
-    motorClawSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+    motorClawSim.setSupplyVoltage(RobotController.getBatteryVoltage());//need to fix sim capabilites, find talon version of iterate function
   }
 }
