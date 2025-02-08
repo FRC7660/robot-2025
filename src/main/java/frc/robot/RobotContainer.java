@@ -159,15 +159,6 @@ public class RobotContainer {
         elevator.runManualCommand(
             () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -217,6 +208,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    configurebuttonBox();
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         Constants.absoluteDrive
@@ -272,36 +264,36 @@ public class RobotContainer {
   }
 
   private void configurebuttonBox() {
-    Trigger button1 = buttonBox.button(1);
-    button1.onTrue(new PrintCommand("button 1 pressed"));
-    button1.onFalse(new PrintCommand("button 1 released"));
-    Trigger button2 = buttonBox.button(2);
-    button2.onTrue(new PrintCommand("Button 2 Pressed"));
-    button2.onFalse(new PrintCommand("Button 2 Released"));
-    Trigger button3 = buttonBox.button(3);
-    button3.onTrue(new PrintCommand("Button 3 Pressed"));
-    button3.onFalse(new PrintCommand("Button 3 Released"));
-    Trigger button4 = buttonBox.button(4);
-    button4.onTrue(new PrintCommand("Button 4 Pressed"));
-    button4.onFalse(new PrintCommand("Button 4 Released"));
-    Trigger button5 = buttonBox.button(5);
-    button5.onTrue(new PrintCommand("Button 5 Pressed"));
-    button5.onFalse(new PrintCommand("Button 5 Released"));
-    Trigger button6 = buttonBox.button(6);
-    button6.onTrue(new PrintCommand("Button 6 Pressed"));
-    button6.onFalse(new PrintCommand("Button 6 Released"));
-    Trigger button7 = buttonBox.button(7);
-    button7.onTrue(new PrintCommand("Button 7 Pressed"));
-    button7.onFalse(new PrintCommand("Button 7 Released"));
-    Trigger button8 = buttonBox.button(8);
-    button8.onTrue(new PrintCommand("Button 8 Pressed"));
-    button8.onFalse(new PrintCommand("Button 8 Released"));
-    Trigger button9 = buttonBox.button(9);
-    button9.onTrue(new PrintCommand("Button 9 Pressed"));
-    button9.onFalse(new PrintCommand("Button 9 Released"));
-    Trigger button10 = buttonBox.button(10);
-    button10.onTrue(new PrintCommand("Button 10 Pressed"));
-    button10.onFalse(new PrintCommand("Button 10 Released"));
+    Trigger button1 = buttonBox.button(Constants.ButtonBox.bottomLeft);
+    button1.onTrue(new PrintCommand("Bottom Left pressed"));
+    button1.onFalse(new PrintCommand("Bottom Left released"));
+    Trigger button2 = buttonBox.button(Constants.ButtonBox.lowerLeft);
+    button2.onTrue(new PrintCommand("Lower Left Pressed"));
+    button2.onFalse(new PrintCommand("Lower Left Released"));
+    Trigger button3 = buttonBox.button(Constants.ButtonBox.upperLeft);
+    button3.onTrue(new PrintCommand("Upper Left Pressed"));
+    button3.onFalse(new PrintCommand("Upper Left Released"));
+    Trigger button4 = buttonBox.button(Constants.ButtonBox.topLeft);
+    button4.onTrue(new PrintCommand("Top Left Pressed"));
+    button4.onFalse(new PrintCommand("Top Left Released"));
+    Trigger button5 = buttonBox.button(Constants.ButtonBox.bottomRight);
+    button5.onTrue(new PrintCommand("Bottom Right Pressed"));
+    button5.onFalse(new PrintCommand("Bottom Right Released"));
+    Trigger button6 = buttonBox.button(Constants.ButtonBox.lowerRight);
+    button6.onTrue(new PrintCommand("Lower Right Pressed"));
+    button6.onFalse(new PrintCommand("Lower Right Released"));
+    Trigger button7 = buttonBox.button(Constants.ButtonBox.upperRight);
+    button7.onTrue(new PrintCommand("Upper Right Pressed"));
+    button7.onFalse(new PrintCommand("Upper Right Released"));
+    Trigger button8 = buttonBox.button(Constants.ButtonBox.topRight);
+    button8.onTrue(new PrintCommand("Top Right Pressed"));
+    button8.onFalse(new PrintCommand("Top Right Released"));
+    Trigger button9 = buttonBox.button(Constants.ButtonBox.p1);
+    button9.onTrue(new PrintCommand("p1 Pressed"));
+    button9.onFalse(new PrintCommand("p1 Released"));
+    Trigger button10 = buttonBox.button(Constants.ButtonBox.p2);
+    button10.onTrue(new PrintCommand("p2 Pressed"));
+    button10.onFalse(new PrintCommand("p2 Released"));
 
     /*
     ArrayList<Trigger> buttons = new ArrayList<Trigger>(10);

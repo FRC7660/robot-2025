@@ -55,6 +55,19 @@ public final class Constants {
     public static double limit = 1;
   }
 
+  public static class ButtonBox {
+    public static int bottomLeft = 1;
+    public static int lowerLeft = 2;
+    public static int upperLeft = 3;
+    public static int topLeft = 4;
+    public static int bottomRight = 5;
+    public static int lowerRight = 6;
+    public static int upperRight = 7;
+    public static int topRight = 8;
+    public static int p1 = 9;
+    public static int p2 = 10;
+  }
+
   public enum ElevatorState {
     L1,
     L2,
@@ -72,6 +85,11 @@ public final class Constants {
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
+
+  public static class Elevator {
+    public static final Double lowerLimit = 0.0;
+    public static final Double upperLimit = 100.0;
+  }
 
   public static final boolean absoluteDrive = true;
 }

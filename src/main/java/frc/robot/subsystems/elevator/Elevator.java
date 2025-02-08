@@ -18,6 +18,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,8 +42,8 @@ public class Elevator extends SubsystemBase {
   private RelativeEncoder motorAlphaEncoder = motorAlpha.getEncoder();
   private RelativeEncoder motorBetaEncoder = motorBeta.getEncoder();
 
-  private SparkMaxSim motorSim = new SparkMaxSim(motorAlpha, DCMotor.getNeo550(1));
-  private SparkRelativeEncoderSim motorSimEncoder = motorSim.getRelativeEncoderSim();
+  private SparkMaxSim motorSim;
+  private SparkRelativeEncoderSim motorSimEncoder;
 
   private PIDController elevatorPid =
       new PIDController(Constants.elevatorP, Constants.elevatorI, Constants.elevatorD);
@@ -120,8 +121,8 @@ public class Elevator extends SubsystemBase {
     motorAlphaEncoder.setPosition(50);
     System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
 
-    alphaConfig.softLimit.forwardSoftLimit(100);
-    alphaConfig.softLimit.reverseSoftLimit(0);
+    alphaConfig.softLimit.forwardSoftLimit(Constants.Elevator.upperLimit);
+    alphaConfig.softLimit.reverseSoftLimit(Constants.Elevator.lowerLimit);
     alphaConfig.softLimit.forwardSoftLimitEnabled(true);
     alphaConfig.softLimit.reverseSoftLimitEnabled(true);
     alphaConfig.idleMode(IdleMode.kBrake);
@@ -131,6 +132,11 @@ public class Elevator extends SubsystemBase {
         alphaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     motorBeta.configure(
         betaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      motorSim = new SparkMaxSim(motorAlpha, DCMotor.getNeo550(1));
+      motorSimEncoder = motorSim.getRelativeEncoderSim();
+    }
   }
 
   @Override
@@ -139,7 +145,19 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
     SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
-    // SmartDashboard.putNumber("Motor Sim Position",
-    //   motorSim.getRelativeEncoderSim().getPosition());
+  }
+
+  public void simulationPeriodic() {
+    double velo = motorAlpha.get() * 15;
+    double voltage = RoboRioSim.getVInVoltage();
+    if (motorSim.getPosition() + velo < Constants.Elevator.lowerLimit
+        || motorSim.getPosition() + velo > Constants.Elevator.upperLimit) {
+      motorAlpha.set(0);
+      velo = 0;
+    }
+    motorSim.iterate(velo, voltage, Constants.simCycleTime);
+    SmartDashboard.putNumber("Motor Sim Position", motorSim.getRelativeEncoderSim().getPosition());
+    SmartDashboard.putNumber("Sim Velo", velo);
+    SmartDashboard.putNumber("Sim Voltage", voltage);
   }
 }
