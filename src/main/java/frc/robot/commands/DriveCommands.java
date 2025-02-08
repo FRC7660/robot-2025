@@ -337,10 +337,11 @@ public class DriveCommands {
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
               // Calculate angular speed
-              double omega = (headingMagnitude > 0.5) ? 
-                    angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians())
-                    :0;
+              double omega =
+                  (headingMagnitude > 0.5)
+                      ? angleController.calculate(
+                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians())
+                      : 0;
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =

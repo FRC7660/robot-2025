@@ -54,7 +54,7 @@ public final class Constants {
     public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
   }
-  
+
   public enum ElevatorState {
     L1,
     L2,
@@ -72,6 +72,6 @@ public final class Constants {
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
-  
+
   public static final boolean absoluteDrive = true;
 }
