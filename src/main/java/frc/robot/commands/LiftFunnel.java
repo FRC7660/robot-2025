@@ -15,6 +15,7 @@ public class LiftFunnel extends Command {
   public LiftFunnel(Funnel funnel) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.funnel = funnel;
+    addRequirements(funnel);
   }
 
   // Called when the command is initially scheduled.
