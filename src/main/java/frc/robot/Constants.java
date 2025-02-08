@@ -66,4 +66,10 @@ public final class Constants {
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
+
+  public static class Elevator {
+    public static final Double lowerLimit = 0.0;
+    public static final Double upperLimit = 100.0;
+  }
+
 }

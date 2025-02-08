@@ -152,15 +152,6 @@ public class RobotContainer {
         elevator.runManualCommand(
             () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -218,22 +209,11 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
-
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
     a.onTrue(new LiftFunnel(funnel));
 
     JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
     b.onTrue(new LowerClimb(climb));
-
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
