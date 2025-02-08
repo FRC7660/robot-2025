@@ -4,16 +4,14 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,26 +19,26 @@ import frc.robot.Constants;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
-  private SparkMax motorClaw = new SparkMax(Constants.Claw.motorClawID, MotorType.kBrushless);
+   private final CANBus kCANBus = new CANBus("canivore");
 
-  private RelativeEncoder encoderClaw;
-  private SparkMaxConfig configClaw;
 
-  private SparkMaxSim motorClawSim;
+  private TalonFX motorClaw = new TalonFX(71, kCANBus); 
+
+
+
+ private TalonFXSimState motorClawSim;
 
   private DigitalInput clawBreakBeam =
-      new DigitalInput(Constants.Claw.clawBeam); // need to clarify what true vs false means!!!
+      new DigitalInput(Constants.Claw.clawBeam); // true = beam broken(coral present), false = beam not broken
 
   public Claw() {
-    configClaw = new SparkMaxConfig();
-    encoderClaw = motorClaw.getEncoder();
-    configClaw.idleMode(IdleMode.kBrake);
-    motorClaw.configure(
-        configClaw, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-    encoderClaw.setPosition(0);
+
+    motorClaw.setNeutralMode(NeutralModeValue.Brake);
+
+    motorClaw.setPosition(0);
 
     if (Constants.currentMode == Constants.Mode.SIM) {
-      motorClawSim = new SparkMaxSim(motorClaw, DCMotor.getNEO(1));
+      motorClawSim = new TalonFXSimState(motorClaw);
     }
   }
 
@@ -60,12 +58,10 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
-    SmartDashboard.putNumber("Claw-Motor", encoderClaw.getPosition());
+    SmartDashboard.putNumber("Claw-Motor", motorClaw.getPosition().getValueAsDouble());
   }
 
   public void simulationPeriodic() {
-    double velo = motorClaw.get() * 1.0;
-    double voltage = RoboRioSim.getVInVoltage();
-    motorClawSim.iterate(velo, voltage, Constants.simCycleTime);
+    motorClawSim.setSupplyVoltage(RobotController.getBatteryVoltage());
   }
 }

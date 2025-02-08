@@ -4,16 +4,13 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -21,23 +18,20 @@ import frc.robot.Constants;
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
 
-  private SparkMax motorArm = new SparkMax(Constants.Arm.motorArmID, MotorType.kBrushless);
-  private RelativeEncoder encoderArm;
-  private SparkMaxConfig configArm;
+  private final CANBus kCANBus = new CANBus("canivore");
 
-  private SparkMaxSim motorArmSim;
+  private TalonFX motorArm = new TalonFX(81, kCANBus); 
+
+  private TalonFXSimState motorArmSim;
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
-      motorArmSim = new SparkMaxSim(motorArm, DCMotor.getNEO(1));
+      motorArmSim = new TalonFXSimState(motorArm);
     }
 
-    encoderArm = motorArm.getEncoder();
-    configArm = new SparkMaxConfig();
-    configArm.idleMode(IdleMode.kBrake);
-    motorArm.configure(
-        configArm, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-    encoderArm.setPosition(0);
+    motorArm.setPosition(0);
+
+    motorArm.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void raise(){
@@ -51,7 +45,11 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Arm-Pos", encoderArm.getPosition());
-    SmartDashboard.putNumber("Arm-Velo", encoderArm.getVelocity());
+    SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
+  }
+
+   public void simulationPeriodic() {
+    motorArmSim.setSupplyVoltage(RobotController.getBatteryVoltage());
   }
 }
