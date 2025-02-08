@@ -166,13 +166,21 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
-
-    // Lock to 0° when A button is held
+        Constants.absoluteDrive
+            ? DriveCommands.joystickDriveAtAngle(
+                // Absolute Drive
+                drive,
+                () -> controller.getLeftX(),
+                () -> -controller.getLeftY(),
+                () -> -controller.getRightX(),
+                () -> controller.getRightY())
+            :
+            // Field Drive
+            DriveCommands.joystickDrive(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX()));
 
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
     a.onTrue(new LiftFunnel(funnel));
@@ -180,26 +188,18 @@ public class RobotContainer {
     JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
     b.onTrue(new LowerClimb(climb));
 
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
-
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro / odometry
     final Runnable resetGyro =
-        Constants.currentMode == Constants.Mode.SIM
+        Constants.currentMode == Constants.Mode.SIM // this is an IF statement
+            // simulation
             ? () ->
                 drive.resetOdometry(
                     driveSimulation
                         .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-            // simulation
+            // real
             : () ->
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro

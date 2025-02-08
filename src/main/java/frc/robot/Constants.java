@@ -48,4 +48,5 @@ public final class Constants {
     public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
   }
+  public static final boolean absoluteDrive = true;
 }
