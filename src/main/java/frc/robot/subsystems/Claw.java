@@ -4,32 +4,27 @@
 
 package frc.robot.subsystems;
 
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
-   private final CANBus kCANBus = new CANBus("canivore");
+  private final CANBus kCANBus = new CANBus("canivore");
 
+  private TalonFX motorClaw = new TalonFX(71, kCANBus);
 
-  private TalonFX motorClaw = new TalonFX(71, kCANBus); 
-
-
-
- private TalonFXSimState motorClawSim;
+  private TalonFXSimState motorClawSim;
 
   private DigitalInput clawBreakBeam =
-      new DigitalInput(Constants.Claw.clawBeam); // true = beam broken(coral present), false = beam not broken
+      new DigitalInput(
+          Constants.Claw.clawBeam); // true = beam broken(coral present), false = beam not broken
 
   public Claw() {
 

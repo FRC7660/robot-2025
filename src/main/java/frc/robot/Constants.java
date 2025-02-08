@@ -37,10 +37,10 @@ public final class Constants {
     REPLAY
   }
 
-public static class Arm {
-  public static double armSpeed = 0.50;
-  public static double armEncoderLimit = 1;
-}
+  public static class Arm {
+    public static double armSpeed = 0.50;
+    public static double armEncoderLimit = 1;
+  }
 
   public static class Claw {
     public static double clawSpeed = 0.50;
