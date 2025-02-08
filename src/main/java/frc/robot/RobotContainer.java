@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
@@ -225,6 +226,9 @@ public class RobotContainer {
 
     JoystickButton x = new JoystickButton(driver, XboxController.Button.kX.value);
     x.onTrue(new releaseCoral(claw));
+
+    JoystickButton y = new JoystickButton(driver, XboxController.Button.kY.value);
+    y.onTrue(new IntakeCoral(claw));
 
     controller
         .a()
