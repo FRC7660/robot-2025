@@ -5,24 +5,26 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Claw;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class LowerClimb extends Command {
-  /** Creates a new LowerClimb. */
-  private final Climb climb;
+public class releaseCoral extends Command {
+  /** Creates a new releaseCoral. */
+  private final Claw claw;
 
-  public LowerClimb(Climb climb) {
+  public releaseCoral(Claw claw) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.climb = climb;
-    addRequirements(climb);
+    this.claw = claw;
+    addRequirements(claw);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("Climb is lowering");
-    climb.lower();
+    if (claw.getClawSensorHit()) {
+      System.out.println("Coral is released");
+      claw.start();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -32,12 +34,13 @@ public class LowerClimb extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climb.stop();
+    System.out.println("Coral is released");
+    claw.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return climb.climbFinished();
+    return !claw.getClawSensorHit();
   }
 }

@@ -37,6 +37,12 @@ public final class Constants {
     REPLAY
   }
 
+  public static class Claw {
+    public static int motorClawID = 71;
+    public static double clawSpeed = 0.50;
+    public static final int clawBeam = 0;
+  }
+
   public static class Climb {
     public static int MotorClimbID = 61;
     public static double climbSpeed = 0.50;
@@ -48,5 +54,24 @@ public final class Constants {
     public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
   }
+  
+  public enum ElevatorState {
+    L1,
+    L2,
+    L3,
+    L4,
+    ZERO
+  }
+
+  public static final Double l1height = 25.0;
+  public static final Double l2height = 50.0;
+  public static final Double l3height = 75.0;
+  public static final Double l4height = 100.0;
+  public static final Double zeroHeight = 0.0;
+
+  public static final Double elevatorP = 0.1;
+  public static final Double elevatorI = 0.0;
+  public static final Double elevatorD = 0.0;
+  
   public static final boolean absoluteDrive = true;
 }

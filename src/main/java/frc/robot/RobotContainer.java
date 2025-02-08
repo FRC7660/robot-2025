@@ -17,23 +17,30 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.commands.releaseCoral;
+import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.elevator.*;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -51,15 +58,19 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final LEDlive ledLive;
+  private final Elevator elevator;
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
   private final Climb climb = new Climb();
+  private final Claw claw = new Claw();
 
-  // Controller
+  // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController coDriverController = new CommandXboxController(1);
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
+  private final CommandGenericHID buttonBox = new CommandGenericHID(2);
 
   // Dashboard inputs
 
@@ -68,6 +79,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     ledLive = new LEDlive();
+    elevator = new Elevator();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -125,6 +137,11 @@ public class RobotContainer {
                 (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
+        // Configure the button bindings
+        configureButtonBindings();
+
+        // Configure the elevator
+        configureElevatorHeights();
         break;
     }
 
@@ -137,6 +154,20 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
+    // Default command for Elevator
+    elevator.setDefaultCommand(
+        elevator.runManualCommand(
+            () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
+
+    // Lock to 0° when A button is held
+    controller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -155,6 +186,28 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Configure the elevator
+    configureElevatorHeights();
+  }
+
+  private void configureElevatorHeights() {
+    // Set height to ZERO when coDriver button 1 is pressed
+    coDriverController
+        .a()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1), elevator));
+    coDriverController
+        .x()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2), elevator));
+    coDriverController
+        .y()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3), elevator));
+    coDriverController
+        .b()
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4), elevator));
+    coDriverController
+        .button(9)
+        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO), elevator));
   }
 
   /**
@@ -188,6 +241,18 @@ public class RobotContainer {
     JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
     b.onTrue(new LowerClimb(climb));
 
+    JoystickButton x = new JoystickButton(driver, XboxController.Button.kX.value);
+    x.onTrue(new releaseCoral(claw));
+
+    controller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> new Rotation2d()));
+
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -204,6 +269,49 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+  }
+
+  private void configurebuttonBox() {
+    Trigger button1 = buttonBox.button(1);
+    button1.onTrue(new PrintCommand("button 1 pressed"));
+    button1.onFalse(new PrintCommand("button 1 released"));
+    Trigger button2 = buttonBox.button(2);
+    button2.onTrue(new PrintCommand("Button 2 Pressed"));
+    button2.onFalse(new PrintCommand("Button 2 Released"));
+    Trigger button3 = buttonBox.button(3);
+    button3.onTrue(new PrintCommand("Button 3 Pressed"));
+    button3.onFalse(new PrintCommand("Button 3 Released"));
+    Trigger button4 = buttonBox.button(4);
+    button4.onTrue(new PrintCommand("Button 4 Pressed"));
+    button4.onFalse(new PrintCommand("Button 4 Released"));
+    Trigger button5 = buttonBox.button(5);
+    button5.onTrue(new PrintCommand("Button 5 Pressed"));
+    button5.onFalse(new PrintCommand("Button 5 Released"));
+    Trigger button6 = buttonBox.button(6);
+    button6.onTrue(new PrintCommand("Button 6 Pressed"));
+    button6.onFalse(new PrintCommand("Button 6 Released"));
+    Trigger button7 = buttonBox.button(7);
+    button7.onTrue(new PrintCommand("Button 7 Pressed"));
+    button7.onFalse(new PrintCommand("Button 7 Released"));
+    Trigger button8 = buttonBox.button(8);
+    button8.onTrue(new PrintCommand("Button 8 Pressed"));
+    button8.onFalse(new PrintCommand("Button 8 Released"));
+    Trigger button9 = buttonBox.button(9);
+    button9.onTrue(new PrintCommand("Button 9 Pressed"));
+    button9.onFalse(new PrintCommand("Button 9 Released"));
+    Trigger button10 = buttonBox.button(10);
+    button10.onTrue(new PrintCommand("Button 10 Pressed"));
+    button10.onFalse(new PrintCommand("Button 10 Released"));
+
+    /*
+    ArrayList<Trigger> buttons = new ArrayList<Trigger>(10);
+    for (int i = 0; i < buttons.size(); i++) {
+        Trigger button = buttonBox.button(i+1);
+        button.onTrue(new PrintCommand("Button " + i +1 + " Pressed"));
+        button.onFalse(new PrintCommand("Button " + i +1 +"" Released"));
+
+    }
+    */
   }
 
   /**
