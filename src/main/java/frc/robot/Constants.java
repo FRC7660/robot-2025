@@ -39,7 +39,8 @@ public final class Constants {
 
   public static class Arm {
     public static double armSpeed = 0.50;
-    public static double armEncoderLimit = 1;
+    public static double armEncoderUpperLimit = 1;
+    public static double armEncoderLowerLimit = 0;
   }
 
   public static class Claw {
