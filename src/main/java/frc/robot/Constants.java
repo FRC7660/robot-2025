@@ -72,4 +72,6 @@ public final class Constants {
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
+
+  public static final boolean absoluteDrive = true;
 }

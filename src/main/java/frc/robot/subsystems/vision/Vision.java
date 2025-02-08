@@ -64,12 +64,12 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  @Override
-  public void periodic() {
+  public void fakePeriodic() {
     return;
   }
 
-  public void realPeriodic() {
+  @Override
+  public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + i, inputs[i]);

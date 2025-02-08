@@ -219,6 +219,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
+        Constants.absoluteDrive ? DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> controller.getRightX(),
+            () -> -controller.getRightY()
+        ) :
         DriveCommands.joystickDrive(
             drive,
             () -> -controller.getLeftY(),
