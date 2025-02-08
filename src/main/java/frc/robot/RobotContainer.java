@@ -24,8 +24,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
@@ -68,6 +71,7 @@ public class RobotContainer {
 
   private final XboxController driver = new XboxController(0);
   private final XboxController coDriver = new XboxController(1);
+  private final CommandGenericHID buttonBox = new CommandGenericHID(2);
 
   // Dashboard inputs
 
@@ -156,15 +160,6 @@ public class RobotContainer {
         elevator.runManualCommand(
             () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -214,6 +209,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    configurebuttonBox();
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -221,8 +217,6 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-
-    // Lock to 0° when A button is held
 
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
     a.onTrue(new LiftFunnel(funnel));
@@ -260,6 +254,49 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+  }
+
+  private void configurebuttonBox() {
+    Trigger button1 = buttonBox.button(Constants.ButtonBox.bottomLeft);
+    button1.onTrue(new PrintCommand("Bottom Left pressed"));
+    button1.onFalse(new PrintCommand("Bottom Left released"));
+    Trigger button2 = buttonBox.button(Constants.ButtonBox.lowerLeft);
+    button2.onTrue(new PrintCommand("Lower Left Pressed"));
+    button2.onFalse(new PrintCommand("Lower Left Released"));
+    Trigger button3 = buttonBox.button(Constants.ButtonBox.upperLeft);
+    button3.onTrue(new PrintCommand("Upper Left Pressed"));
+    button3.onFalse(new PrintCommand("Upper Left Released"));
+    Trigger button4 = buttonBox.button(Constants.ButtonBox.topLeft);
+    button4.onTrue(new PrintCommand("Top Left Pressed"));
+    button4.onFalse(new PrintCommand("Top Left Released"));
+    Trigger button5 = buttonBox.button(Constants.ButtonBox.bottomRight);
+    button5.onTrue(new PrintCommand("Bottom Right Pressed"));
+    button5.onFalse(new PrintCommand("Bottom Right Released"));
+    Trigger button6 = buttonBox.button(Constants.ButtonBox.lowerRight);
+    button6.onTrue(new PrintCommand("Lower Right Pressed"));
+    button6.onFalse(new PrintCommand("Lower Right Released"));
+    Trigger button7 = buttonBox.button(Constants.ButtonBox.upperRight);
+    button7.onTrue(new PrintCommand("Upper Right Pressed"));
+    button7.onFalse(new PrintCommand("Upper Right Released"));
+    Trigger button8 = buttonBox.button(Constants.ButtonBox.topRight);
+    button8.onTrue(new PrintCommand("Top Right Pressed"));
+    button8.onFalse(new PrintCommand("Top Right Released"));
+    Trigger button9 = buttonBox.button(Constants.ButtonBox.p1);
+    button9.onTrue(new PrintCommand("p1 Pressed"));
+    button9.onFalse(new PrintCommand("p1 Released"));
+    Trigger button10 = buttonBox.button(Constants.ButtonBox.p2);
+    button10.onTrue(new PrintCommand("p2 Pressed"));
+    button10.onFalse(new PrintCommand("p2 Released"));
+
+    /*
+    ArrayList<Trigger> buttons = new ArrayList<Trigger>(10);
+    for (int i = 0; i < buttons.size(); i++) {
+        Trigger button = buttonBox.button(i+1);
+        button.onTrue(new PrintCommand("Button " + i +1 + " Pressed"));
+        button.onFalse(new PrintCommand("Button " + i +1 +"" Released"));
+
+    }
+    */
   }
 
   /**
