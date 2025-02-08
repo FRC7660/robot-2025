@@ -66,7 +66,6 @@ public final class Constants {
     public static int topRight = 8;
     public static int p1 = 9;
     public static int p2 = 10;
-
   }
 
   public enum ElevatorState {
