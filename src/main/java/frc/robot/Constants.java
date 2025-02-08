@@ -90,4 +90,6 @@ public final class Constants {
     public static final Double lowerLimit = 0.0;
     public static final Double upperLimit = 100.0;
   }
+
+  public static final boolean absoluteDrive = true;
 }
