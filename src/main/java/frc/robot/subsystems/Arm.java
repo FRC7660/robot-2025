@@ -47,7 +47,9 @@ public class Arm extends SubsystemBase {
   }
 
   public void simulationPeriodic() {
-    motorArmSim.setSupplyVoltage(RobotController.getBatteryVoltage());//need to fix sim capabilites, find talon version of iterate function
+    motorArmSim.setSupplyVoltage(
+        RobotController
+            .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
+    // function
   }
-  
 }
