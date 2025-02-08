@@ -15,6 +15,8 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import java.lang.invoke.ConstantCallSite;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
@@ -159,15 +161,6 @@ public class RobotContainer {
         elevator.runManualCommand(
             () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -225,8 +218,6 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-
-    // Lock to 0° when A button is held
 
     JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
     a.onTrue(new LiftFunnel(funnel));
