@@ -74,7 +74,6 @@ public class RobotContainer {
   private final CommandGenericHID buttonBox = new CommandGenericHID(2);
 
   // Dashboard inputs
-
   private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
