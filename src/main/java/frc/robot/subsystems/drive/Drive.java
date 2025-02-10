@@ -321,7 +321,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   /** Resets the current odometry pose. */
   public void resetOdometry(Pose2d pose) {
     resetSimulationPoseCallBack.accept(pose);
-    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    poseEstimator.resetPosition(
+        rawGyroRotation.rotateBy(new Rotation2d(Constants.absoluteDrive ? Math.PI / 2 : Math.PI)),
+        getModulePositions(),
+        pose);
   }
 
   /** Adds a new timestamped vision measurement. */
