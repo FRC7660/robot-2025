@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
@@ -66,12 +66,9 @@ public class RobotContainer {
   private final Claw claw = new Claw();
 
   // Controllers
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController coDriverController = new CommandXboxController(1);
-
-  private final XboxController driver = new XboxController(0);
-  private final XboxController coDriver = new XboxController(1);
-  private final CommandGenericHID buttonBox = new CommandGenericHID(2);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandGenericHID buttonBox = new CommandGenericHID(1);
+  private final CommandXboxController testController = new CommandXboxController(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -137,11 +134,6 @@ public class RobotContainer {
                 (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
-        // Configure the button bindings
-        configureButtonBindings();
-
-        // Configure the elevator
-        configureElevatorHeights();
         break;
     }
 
@@ -156,8 +148,7 @@ public class RobotContainer {
 
     // Default command for Elevator
     elevator.setDefaultCommand(
-        elevator.runManualCommand(
-            () -> MathUtil.applyDeadband(coDriverController.getLeftY(), 0.1)));
+        elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -177,28 +168,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-
-    // Configure the elevator
-    configureElevatorHeights();
-  }
-
-  private void configureElevatorHeights() {
-    // Set height to ZERO when coDriver button 1 is pressed
-    coDriverController
-        .a()
-        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L1), elevator));
-    coDriverController
-        .x()
-        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L2), elevator));
-    coDriverController
-        .y()
-        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L3), elevator));
-    coDriverController
-        .b()
-        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.L4), elevator));
-    coDriverController
-        .button(9)
-        .whileTrue(Commands.run(() -> elevator.setState(Constants.ElevatorState.ZERO), elevator));
   }
 
   /**
@@ -215,41 +184,25 @@ public class RobotContainer {
             ? DriveCommands.joystickDriveAtAngle(
                 // Absolute Drive
                 drive,
-                () -> controller.getLeftX(),
-                () -> -controller.getLeftY(),
-                () -> -controller.getRightX(),
-                () -> controller.getRightY())
+                () -> driverController.getLeftX(),
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getRightX(),
+                () -> driverController.getRightY())
             :
             // Field Drive
             DriveCommands.joystickDrive(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX()));
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX()));
 
-    JoystickButton a = new JoystickButton(driver, XboxController.Button.kA.value);
-    a.onTrue(new LiftFunnel(funnel));
-
-    JoystickButton b = new JoystickButton(driver, XboxController.Button.kB.value);
-    b.onTrue(new LowerClimb(climb));
-
-    JoystickButton x = new JoystickButton(driver, XboxController.Button.kX.value);
-    x.onTrue(new releaseCoral(claw));
-
-    JoystickButton y = new JoystickButton(driver, XboxController.Button.kY.value);
-    y.onTrue(new IntakeCoral(claw));
-
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+    driverController.a().onTrue(new LiftFunnel(funnel));
+    driverController.b().onTrue(new LowerClimb(climb));
+    driverController.x().onTrue(new releaseCoral(claw));
+    driverController.y().onTrue(new IntakeCoral(claw));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    testController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro / odometry
     final Runnable resetGyro =
@@ -263,40 +216,88 @@ public class RobotContainer {
             : () ->
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+  }
+
+  private void setUpBoxButton(int inputButton) {
+    Trigger buttonXtrigger = buttonBox.button(inputButton);
+    String buttonName;
+    Constants.ElevatorState height;
+    boolean left;
+    switch (inputButton) {
+
+      // LEFT SIDE PRESETS
+      case Constants.ButtonBox.bottomLeft:
+        buttonName = "bottom left";
+        height = ElevatorState.L1;
+        left = true;
+        break;
+      case Constants.ButtonBox.lowerLeft:
+        buttonName = "lower left";
+        height = ElevatorState.L2;
+        left = true;
+        break;
+      case Constants.ButtonBox.upperLeft:
+        buttonName = "upper left";
+        height = ElevatorState.L3;
+        left = true;
+        break;
+      case Constants.ButtonBox.topLeft:
+        buttonName = "top left";
+        height = ElevatorState.L4;
+        left = true;
+        break;
+
+      // RIGHT SIDE PRESETS
+      case Constants.ButtonBox.bottomRight:
+        buttonName = "bottom right";
+        height = ElevatorState.L1;
+        left = false;
+        break;
+      case Constants.ButtonBox.lowerRight:
+        buttonName = "lower right";
+        height = ElevatorState.L2;
+        left = false;
+        break;
+      case Constants.ButtonBox.upperRight:
+        buttonName = "upper right";
+        height = ElevatorState.L3;
+        left = false;
+        break;
+      case Constants.ButtonBox.topRight:
+        buttonName = "top right";
+        height = ElevatorState.L4;
+        left = false;
+        break;
+
+      // ERROR
+      default:
+        buttonName = "NONEXISTENT";
+        height = ElevatorState.ZERO;
+        left = false;
+        break;
+    }
+    buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
+    buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
+    buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
 
   private void configurebuttonBox() {
-    Trigger button1 = buttonBox.button(Constants.ButtonBox.bottomLeft);
-    button1.onTrue(new PrintCommand("Bottom Left pressed"));
-    button1.onFalse(new PrintCommand("Bottom Left released"));
-    Trigger button2 = buttonBox.button(Constants.ButtonBox.lowerLeft);
-    button2.onTrue(new PrintCommand("Lower Left Pressed"));
-    button2.onFalse(new PrintCommand("Lower Left Released"));
-    Trigger button3 = buttonBox.button(Constants.ButtonBox.upperLeft);
-    button3.onTrue(new PrintCommand("Upper Left Pressed"));
-    button3.onFalse(new PrintCommand("Upper Left Released"));
-    Trigger button4 = buttonBox.button(Constants.ButtonBox.topLeft);
-    button4.onTrue(new PrintCommand("Top Left Pressed"));
-    button4.onFalse(new PrintCommand("Top Left Released"));
-    Trigger button5 = buttonBox.button(Constants.ButtonBox.bottomRight);
-    button5.onTrue(new PrintCommand("Bottom Right Pressed"));
-    button5.onFalse(new PrintCommand("Bottom Right Released"));
-    Trigger button6 = buttonBox.button(Constants.ButtonBox.lowerRight);
-    button6.onTrue(new PrintCommand("Lower Right Pressed"));
-    button6.onFalse(new PrintCommand("Lower Right Released"));
-    Trigger button7 = buttonBox.button(Constants.ButtonBox.upperRight);
-    button7.onTrue(new PrintCommand("Upper Right Pressed"));
-    button7.onFalse(new PrintCommand("Upper Right Released"));
-    Trigger button8 = buttonBox.button(Constants.ButtonBox.topRight);
-    button8.onTrue(new PrintCommand("Top Right Pressed"));
-    button8.onFalse(new PrintCommand("Top Right Released"));
-    Trigger button9 = buttonBox.button(Constants.ButtonBox.p1);
-    button9.onTrue(new PrintCommand("p1 Pressed"));
-    button9.onFalse(new PrintCommand("p1 Released"));
-    Trigger button10 = buttonBox.button(Constants.ButtonBox.p2);
-    button10.onTrue(new PrintCommand("p2 Pressed"));
-    button10.onFalse(new PrintCommand("p2 Released"));
+    setUpBoxButton(Constants.ButtonBox.bottomLeft);
+    setUpBoxButton(Constants.ButtonBox.lowerLeft);
+    setUpBoxButton(Constants.ButtonBox.upperLeft);
+    setUpBoxButton(Constants.ButtonBox.topLeft);
+    setUpBoxButton(Constants.ButtonBox.bottomRight);
+    setUpBoxButton(Constants.ButtonBox.lowerRight);
+    setUpBoxButton(Constants.ButtonBox.upperRight);
+    setUpBoxButton(Constants.ButtonBox.topRight);
+
+    Trigger tp1 = buttonBox.button(Constants.ButtonBox.p1);
+    tp1.onTrue(new PrintCommand("p1 Pressed"));
+    tp1.onFalse(new PrintCommand("p1 Released"));
+    Trigger tp2 = buttonBox.button(Constants.ButtonBox.p2);
+    tp2.onTrue(new PrintCommand("p2 Pressed"));
+    tp2.onFalse(new PrintCommand("p2 Released"));
 
     /*
     ArrayList<Trigger> buttons = new ArrayList<Trigger>(10);
