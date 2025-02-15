@@ -45,7 +45,7 @@ public final class Constants {
 
   public static class Claw {
     public static double clawSpeed = 0.50;
-    public static final int clawBeam = 2;
+    public static final int clawBeam = 4;
   }
 
   public static class Climb {
@@ -94,6 +94,7 @@ public final class Constants {
   public static class Elevator {
     public static final Double lowerLimit = 0.0;
     public static final Double upperLimit = 100.0;
+    public static final int lowerlimitID = 3;
   }
 
   public static final boolean absoluteDrive = true;
