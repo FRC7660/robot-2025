@@ -39,13 +39,12 @@ public final class Constants {
 
   public static class Arm {
     public static double armSpeed = 0.50;
-    public static double armEncoderUpperLimit = 1;
-    public static double armEncoderLowerLimit = 0;
+    public static double armEncoderLowerLimit = 4;
   }
 
   public static class Claw {
     public static double clawSpeed = 0.50;
-    public static final int clawBeam = 0;
+    public static final int clawBeam = 2;
   }
 
   public static class Climb {
