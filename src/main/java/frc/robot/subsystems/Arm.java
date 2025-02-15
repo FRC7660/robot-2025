@@ -39,15 +39,6 @@ public class Arm extends SubsystemBase {
     motorArm.set(0);
   }
 
-  public Boolean armAtMax() {
-    double position = motorArm.getPosition().getValueAsDouble();
-    if (position > Constants.Arm.armEncoderUpperLimit) {
-      System.out.println("Upper Arm Limit Reached");
-      return true;
-    }
-    return false;
-  }
-
   public Boolean armAtMin() {
     double position = motorArm.getPosition().getValueAsDouble();
     if (position < Constants.Arm.armEncoderLowerLimit) {
