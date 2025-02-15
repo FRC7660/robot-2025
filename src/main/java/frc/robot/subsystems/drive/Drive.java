@@ -163,9 +163,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   public void setDriveStyle() {
-    boolean current = getDriveStyle();
+    boolean current = !getDriveStyle();
     this.setDefaultCommand(current ? joystickDriveAtAngle : joystickDrive);
+    SmartDashboard.putBoolean("DRIVE SWITCH", current);
     Constants.absoluteDrive = current;
+    System.out.println("DRIVE SWITCH ATTEMPTED");
   }
 
   @Override

@@ -112,7 +112,7 @@ public class LEDlive extends SubsystemBase {
   }
 
   /** Called once at the beginning of the robot program. */
-  public LEDlive() {
+  public LEDlive(Drive drive) {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);
@@ -126,6 +126,8 @@ public class LEDlive extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+
+    this.drive = drive;
   }
 
   @Override

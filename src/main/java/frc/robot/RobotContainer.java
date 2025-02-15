@@ -75,8 +75,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    ledLive = new LEDlive();
-    elevator = new Elevator();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -140,6 +138,9 @@ public class RobotContainer {
         break;
     }
 
+    ledLive = new LEDlive(drive);
+    elevator = new Elevator();
+
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
     TestAuto testCommand = new TestAuto("Byting Command");
@@ -175,7 +176,8 @@ public class RobotContainer {
 
   private void setDriveStyleSwitch() {
     Trigger styleSwitch = new Trigger(() -> drive.getDriveStyle());
-    styleSwitch.onChange(Commands.runOnce(() -> drive.setDriveStyle(), drive));
+    //styleSwitch.onChange(Commands.runOnce(() -> drive.setDriveStyle(), drive));
+    driverController.leftBumper().onTrue(Commands.runOnce(() -> drive.setDriveStyle(), drive));
   }
 
   /**
