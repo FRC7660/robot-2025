@@ -16,10 +16,7 @@ import frc.robot.Constants;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
-  private final CANBus kCANBus = new CANBus("canivore");
-
-  private TalonFX motorClaw = new TalonFX(71, kCANBus);
-
+  private TalonFX motorClaw = new TalonFX(71);
   private TalonFXSimState motorClawSim;
 
   private DigitalInput clawBreakBeam =
@@ -27,14 +24,12 @@ public class Claw extends SubsystemBase {
           Constants.Claw.clawBeam); // true = beam broken(coral present), false = beam not broken
 
   public Claw() {
-
-    motorClaw.setNeutralMode(NeutralModeValue.Brake);
-
-    motorClaw.setPosition(0);
-
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorClawSim = new TalonFXSimState(motorClaw);
     }
+
+    motorClaw.setNeutralMode(NeutralModeValue.Brake);
+    motorClaw.setPosition(0);
   }
 
   public void start() {
@@ -53,14 +48,15 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
-    SmartDashboard.putNumber("Claw-Motor", motorClaw.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Claw Velo", motorClaw.get());
+    if (Constants.currentMode != Constants.Mode.SIM) {
+      SmartDashboard.putNumber("Claw-Motor", motorClaw.getPosition().getValueAsDouble());
+      SmartDashboard.putNumber("Claw Velo", motorClaw.getVelocity().getValueAsDouble());
+    }
   }
 
   public void simulationPeriodic() {
     motorClawSim.setSupplyVoltage(
-        RobotController
-            .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
-    // function
+        RobotController.getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
   }
+
 }
