@@ -15,19 +15,14 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private final CANBus kCANBus = new CANBus("canivore");
-
-  private TalonFX motorArm = new TalonFX(81, kCANBus);
-
+  private TalonFX motorArm = new TalonFX(81);
   private TalonFXSimState motorArmSim;
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorArmSim = new TalonFXSimState(motorArm);
     }
-
     motorArm.setPosition(0);
-
     motorArm.setNeutralMode(NeutralModeValue.Brake);
   }
 
@@ -66,8 +61,6 @@ public class Arm extends SubsystemBase {
 
   public void simulationPeriodic() {
     motorArmSim.setSupplyVoltage(
-        RobotController
-            .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
-    // function
+        RobotController.getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
   }
 }
