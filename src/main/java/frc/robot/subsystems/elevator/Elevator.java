@@ -30,12 +30,14 @@ import java.util.function.DoubleSupplier;
 
 public class Elevator extends SubsystemBase {
 
-  public final SparkMax motorAlpha = new SparkMax(3, MotorType.kBrushless);
-  public final SparkMax motorBeta = new SparkMax(0, MotorType.kBrushless);
+  public final SparkMax motorAlpha =
+      new SparkMax(Constants.Elevator.motorAplphaID, MotorType.kBrushless);
+  public final SparkMax motorBeta =
+      new SparkMax(Constants.Elevator.motorBetaID, MotorType.kBrushless);
   public int alphaInversion = -1; // The factor by which a motor's rotation should be applied
   public int betaInversion = -1;
-  public DigitalInput bottomLimit = new DigitalInput(1);
-  public DigitalInput topLimit = new DigitalInput(2);
+  public DigitalInput bottomLimit = new DigitalInput(Constants.Elevator.lowerlimitID);
+  public DigitalInput topLimit = new DigitalInput(10);
   public SparkMaxConfig alphaConfig = new SparkMaxConfig();
   public SparkMaxConfig betaConfig = new SparkMaxConfig();
 
@@ -105,7 +107,7 @@ public class Elevator extends SubsystemBase {
         output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l1height);
         break;
     }
-    setMotors(output * 0.2, true);
+    setMotors(output * 0.1, true);
   }
 
   public Command runManualCommand(DoubleSupplier inputSpeed) {
@@ -145,6 +147,7 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
     SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
+    SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
   }
 
   public void simulationPeriodic() {

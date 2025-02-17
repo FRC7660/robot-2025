@@ -40,12 +40,12 @@ public final class Constants {
   public static class Arm {
     public static double armSpeed = 0.50;
     public static double armEncoderUpperLimit = 1;
-    public static double armEncoderLowerLimit = 0;
+    public static double armEncoderLowerLimit = 4;
   }
 
   public static class Claw {
     public static double clawSpeed = 0.50;
-    public static final int clawBeam = 0;
+    public static final int clawBeam = 4;
   }
 
   public static class Climb {
@@ -94,6 +94,9 @@ public final class Constants {
   public static class Elevator {
     public static final Double lowerLimit = 0.0;
     public static final Double upperLimit = 100.0;
+    public static final int lowerlimitID = 3;
+    public static final int motorAplphaID = 51;
+    public static final int motorBetaID = 52;
   }
 
   public static final boolean absoluteDrive = true;

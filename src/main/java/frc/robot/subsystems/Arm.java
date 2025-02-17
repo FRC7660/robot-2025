@@ -8,6 +8,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +21,8 @@ public class Arm extends SubsystemBase {
   private TalonFX motorArm = new TalonFX(81, kCANBus);
 
   private TalonFXSimState motorArmSim;
+
+  private Encoder encoder = new Encoder(2, 1);
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
@@ -62,6 +65,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Arm-Encoder", encoder.get());
   }
 
   public void simulationPeriodic() {
