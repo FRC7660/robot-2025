@@ -36,6 +36,7 @@ import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
@@ -62,6 +63,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
+  private final Arm arm = new Arm();
   private final Climb climb = new Climb();
   private final Claw claw = new Claw();
 

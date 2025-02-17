@@ -22,7 +22,7 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
-  private Encoder encoder = new Encoder(1, 2);
+  private Encoder encoder = new Encoder(2, 1);
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
