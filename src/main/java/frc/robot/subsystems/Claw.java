@@ -31,8 +31,8 @@ public class Claw extends SubsystemBase {
     motorClaw.setPosition(0);
 
     clawBreakBeam =
-      new DigitalInput(
-          Constants.Claw.clawBeam); // false = beam broken(coral present), true = beam not broken
+        new DigitalInput(
+            Constants.Claw.clawBeam); // false = beam broken(coral present), true = beam not broken
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorClawSim = new TalonFXSimState(motorClaw);
@@ -48,7 +48,7 @@ public class Claw extends SubsystemBase {
   }
 
   public boolean getClawSensorHit() {
-    return !clawBreakBeam.get(); //false = coral not present, true = coral present
+    return !clawBreakBeam.get(); // false = coral not present, true = coral present
   }
 
   @Override

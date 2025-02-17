@@ -30,8 +30,10 @@ import java.util.function.DoubleSupplier;
 
 public class Elevator extends SubsystemBase {
 
-  public final SparkMax motorAlpha = new SparkMax(Constants.Elevator.motorAplphaID, MotorType.kBrushless);
-  public final SparkMax motorBeta = new SparkMax(Constants.Elevator.motorBetaID, MotorType.kBrushless);
+  public final SparkMax motorAlpha =
+      new SparkMax(Constants.Elevator.motorAplphaID, MotorType.kBrushless);
+  public final SparkMax motorBeta =
+      new SparkMax(Constants.Elevator.motorBetaID, MotorType.kBrushless);
   public int alphaInversion = -1; // The factor by which a motor's rotation should be applied
   public int betaInversion = -1;
   public DigitalInput bottomLimit = new DigitalInput(Constants.Elevator.lowerlimitID);
