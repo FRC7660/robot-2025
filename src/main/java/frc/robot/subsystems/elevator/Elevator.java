@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase {
         output = elevatorPid.calculate(motorAlphaEncoder.getPosition(), Constants.l1height);
         break;
     }
-    setMotors(output * 0.2, true);
+    setMotors(output * 0.1, true);
   }
 
   public Command runManualCommand(DoubleSupplier inputSpeed) {
