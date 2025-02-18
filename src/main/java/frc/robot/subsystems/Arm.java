@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -16,9 +15,7 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private final CANBus kCANBus = new CANBus("canivore");
-
-  private TalonFX motorArm = new TalonFX(81, kCANBus);
+  private TalonFX motorArm = new TalonFX(81);
 
   private TalonFXSimState motorArmSim;
 
