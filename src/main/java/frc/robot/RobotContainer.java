@@ -77,8 +77,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    ledLive = new LEDlive();
-    elevator = new Elevator();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -89,7 +87,8 @@ public class RobotContainer {
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3),
-                (pose) -> {});
+                (pose) -> {},
+                driverController);
 
         this.vision =
             new Vision(
@@ -113,7 +112,8 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[1]),
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+                driveSimulation::setSimulationWorldPose,
+                driverController);
 
         vision =
             new Vision(
@@ -133,11 +133,15 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                (pose) -> {});
+                (pose) -> {},
+                driverController);
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
         break;
     }
+
+    ledLive = new LEDlive(drive);
+    elevator = new Elevator();
 
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
@@ -172,6 +176,13 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
+  private void setDriveStyleSwitch() {
+    // Trigger is broken due to shuffleboard errors; may work when they are resolved
+    // Trigger styleSwitch = new Trigger(() -> drive.getDriveStyle());
+    // styleSwitch.onChange(Commands.runOnce(() -> drive.setDriveStyle(), drive));
+    driverController.leftBumper().onTrue(Commands.runOnce(() -> drive.setDriveStyle(), drive));
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -180,23 +191,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     configurebuttonBox();
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        Constants.absoluteDrive
-            ? DriveCommands.joystickDriveAtAngle(
-                // Absolute Drive
-                drive,
-                () -> driverController.getLeftX(),
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getRightX(),
-                () -> driverController.getRightY())
-            :
-            // Field Drive
-            DriveCommands.joystickDrive(
-                drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+    // Default command, decides between absolute and field drive using the absouteDrive constant
+    setDriveStyleSwitch();
 
     driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.b().onTrue(new LowerClimb(climb));

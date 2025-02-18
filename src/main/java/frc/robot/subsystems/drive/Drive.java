@@ -42,9 +42,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -61,6 +63,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+
+  private CommandXboxController controller;
+  private final Command joystickDriveAtAngle;
+  private final Command joystickDrive;
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -82,7 +88,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      Consumer<Pose2d> resetSimulationPoseCallBack) {
+      Consumer<Pose2d> resetSimulationPoseCallBack,
+      CommandXboxController controller) {
+    this.controller = controller;
     this.gyroIO = gyroIO;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
     modules[0] = new Module(flModuleIO, 0);
@@ -128,6 +136,38 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    SmartDashboard.putBoolean("DRIVE SWITCH", Constants.absoluteDrive);
+    this.joystickDriveAtAngle =
+        DriveCommands.joystickDriveAtAngle(
+            // Absolute Drive
+            this,
+            () -> controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getRightX(),
+            () -> controller.getRightY());
+
+    // Field Drive
+    this.joystickDrive =
+        DriveCommands.joystickDrive(
+            this,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX());
+
+    setDriveStyle();
+  }
+
+  public boolean getDriveStyle() {
+    return SmartDashboard.getBoolean("DRIVE SWITCH", true);
+  }
+
+  public void setDriveStyle() {
+    boolean current = !getDriveStyle();
+    this.setDefaultCommand(current ? joystickDriveAtAngle : joystickDrive);
+    SmartDashboard.putBoolean("DRIVE SWITCH", current);
+    Constants.absoluteDrive = current;
+    System.out.println("DRIVE SWITCH ATTEMPTED");
   }
 
   @Override

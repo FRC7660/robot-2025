@@ -12,13 +12,16 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
-// possibly unneeded
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class LEDlive extends SubsystemBase {
+  // Subsystems
+  private Drive drive;
+
   public int ticks = 0;
   private final AddressableLED m_led;
   private final AddressableLEDBuffer m_ledBuffer;
@@ -109,7 +112,7 @@ public class LEDlive extends SubsystemBase {
   }
 
   /** Called once at the beginning of the robot program. */
-  public LEDlive() {
+  public LEDlive(Drive drive) {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);
@@ -123,33 +126,45 @@ public class LEDlive extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+
+    this.drive = drive;
   }
 
   @Override
   public void periodic() {
     ticks += 1;
-    ticks %= 50000; // will (hopefully) limit ticks to 50000 and then reset it to 0
+    ticks %= 50000; // will limit ticks to 50000 and then reset it to 0
     // System.out.println(ticks);
 
-    // Value for testing conditions
-    int testVal = 5;
+    // Value for testing conditions, set to 0 to ignore
+    int testVal = 0;
 
     // Update the buffer
     LEDPattern xColor = m_white;
-    if (testVal == 1) {
-      xColor = blink(staggerBasic(Color.kRed), 80, ticks);
-    }
-    if (testVal == 2) {
-      xColor = staggerBasic(Color.kBlue);
-    }
-    if (testVal == 3) {
-      xColor = blink(m_green, 80, ticks);
-    }
-    if (testVal == 4) {
-      xColor = m_scrollingRainbow;
-    }
-    if (testVal == 5) {
-      xColor = LEDPattern.kOff;
+    if (testVal > 0) {
+      if (testVal == 1) {
+        xColor = blink(staggerBasic(Color.kRed), 80, ticks);
+      }
+      if (testVal == 2) {
+        xColor = staggerBasic(Color.kBlue);
+      }
+      if (testVal == 3) {
+        xColor = blink(m_green, 80, ticks);
+      }
+      if (testVal == 4) {
+        xColor = m_scrollingRainbow;
+      }
+      if (testVal == 5) {
+        xColor = LEDPattern.kOff;
+      }
+    } else {
+
+      // Apply pattern based on current drive style (true = absolute)
+      if (drive.getDriveStyle() == true) {
+        xColor = m_green;
+      } else {
+        xColor = staggerBasic(Color.kGreen);
+      }
     }
 
     // System.out.println(xColor); // Use this print function if LEDs are not currently testable

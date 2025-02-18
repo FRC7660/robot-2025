@@ -99,5 +99,5 @@ public final class Constants {
     public static final int motorBetaID = 52;
   }
 
-  public static final boolean absoluteDrive = true;
+  public static boolean absoluteDrive = false;
 }

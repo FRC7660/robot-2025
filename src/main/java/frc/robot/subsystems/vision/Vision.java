@@ -66,7 +66,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    return;
+    realPeriodic();
   }
 
   public void realPeriodic() {
