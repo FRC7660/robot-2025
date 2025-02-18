@@ -214,7 +214,8 @@ public class ModuleIOMixed implements ModuleIO {
     // Create drive status signals
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
-        SparkOdometryThread.getInstance().registerSignal(() ->driveTalon.getPosition().getValueAsDouble());
+        SparkOdometryThread.getInstance()
+            .registerSignal(() -> driveTalon.getPosition().getValueAsDouble());
     driveVelocity = driveTalon.getVelocity();
     driveAppliedVolts = driveTalon.getMotorVoltage();
     driveCurrent = driveTalon.getStatorCurrent();
