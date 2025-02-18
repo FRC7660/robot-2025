@@ -15,7 +15,7 @@ import frc.robot.Constants;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
-  private TalonFX motorClaw = new TalonFX(71);
+  private TalonFX motorClaw = new TalonFX(Constants.Claw.motorID);
 
   private TalonFXSimState motorClawSim;
 
