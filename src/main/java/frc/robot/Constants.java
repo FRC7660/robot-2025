@@ -61,16 +61,16 @@ public final class Constants {
   }
 
   public static class ButtonBox {
-    public static int bottomLeft = 1;
-    public static int lowerLeft = 2;
-    public static int upperLeft = 3;
-    public static int topLeft = 4;
-    public static int bottomRight = 5;
-    public static int lowerRight = 6;
-    public static int upperRight = 7;
-    public static int topRight = 8;
-    public static int p1 = 9;
-    public static int p2 = 10;
+    public static final int bottomLeft = 1;
+    public static final int lowerLeft = 2;
+    public static final int upperLeft = 3;
+    public static final int topLeft = 4;
+    public static final int bottomRight = 5;
+    public static final int lowerRight = 6;
+    public static final int upperRight = 7;
+    public static final int topRight = 8;
+    public static final int p1 = 9;
+    public static final int p2 = 10;
   }
 
   public enum ElevatorState {
