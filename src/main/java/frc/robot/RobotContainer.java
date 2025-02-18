@@ -178,8 +178,8 @@ public class RobotContainer {
 
   private void setDriveStyleSwitch() {
     // Trigger is broken due to shuffleboard errors; may work when they are resolved
-    //Trigger styleSwitch = new Trigger(() -> drive.getDriveStyle());
-    //styleSwitch.onChange(Commands.runOnce(() -> drive.setDriveStyle(), drive));
+    // Trigger styleSwitch = new Trigger(() -> drive.getDriveStyle());
+    // styleSwitch.onChange(Commands.runOnce(() -> drive.setDriveStyle(), drive));
     driverController.leftBumper().onTrue(Commands.runOnce(() -> drive.setDriveStyle(), drive));
   }
 
