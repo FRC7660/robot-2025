@@ -30,7 +30,7 @@ public class DriveConstants {
 
   public static boolean talonDriveMotors = true;
 
-  public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxSpeedMetersPerSec = 14;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(26.5);
   public static final double wheelBase = Units.inchesToMeters(26.5);
@@ -45,13 +45,13 @@ public class DriveConstants {
 
   // Zeroed rotation values for each module, see setup instructions
   public static final Rotation2d frontLeftZeroRotation =
-      new Rotation2d(4.864253078385368); // FIXME IN RADIANS
+      new Rotation2d(1.47108757558233);
   public static final Rotation2d frontRightZeroRotation =
-      new Rotation2d(5.203262832508095); // FIXME IN RADIANS
+      new Rotation2d(2.504990626617252);
   public static final Rotation2d backLeftZeroRotation =
-      new Rotation2d(3.926990816987241); // FIXME IN RADIANS
+      new Rotation2d(5.378136642327058);
   public static final Rotation2d backRightZeroRotation =
-      new Rotation2d(2.030990563160589); // FIXME IN RADIANS
+      new Rotation2d(0.366621408304668);
 
   // Device CAN IDs
   public static final int pigeonCanId = 9;

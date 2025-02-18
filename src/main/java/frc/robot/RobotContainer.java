@@ -194,9 +194,9 @@ public class RobotContainer {
             // Field Drive
             DriveCommands.joystickDrive(
                 drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+                () -> driverController.getLeftY(),
+                () -> driverController.getLeftX(),
+                () -> driverController.getRightX()));
 
     driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.b().onTrue(new LowerClimb(climb));

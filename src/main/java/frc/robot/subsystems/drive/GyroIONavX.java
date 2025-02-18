@@ -35,14 +35,14 @@ public class GyroIONavX implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = navX.isConnected();
-    inputs.yawPosition = Rotation2d.fromDegrees(navX.getAngle());
+    inputs.yawPosition = Rotation2d.fromDegrees(-navX.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(navX.getRawGyroZ());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions =
         yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value).unaryMinus())
+            .map((Double value) -> Rotation2d.fromDegrees(value))
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
@@ -51,6 +51,6 @@ public class GyroIONavX implements GyroIO {
   @Override
   public void reset() {
     navX.reset();
-    navX.setAngleAdjustment(180);
+    navX.setAngleAdjustment(270);
   }
 }
