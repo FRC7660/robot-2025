@@ -85,10 +85,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOSpark(0),
-                new ModuleIOSpark(1),
-                new ModuleIOSpark(2),
-                new ModuleIOSpark(3),
+                new ModuleIOMixed(0),
+                new ModuleIOMixed(1),
+                new ModuleIOMixed(2),
+                new ModuleIOMixed(3),
                 (pose) -> {});
 
         this.vision =
