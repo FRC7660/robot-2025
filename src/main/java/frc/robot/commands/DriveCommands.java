@@ -47,6 +47,7 @@ public class DriveCommands {
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+  private static Rotation2d targetAngle = new Rotation2d();
 
   private DriveCommands() {}
 
@@ -325,11 +326,10 @@ public class DriveCommands {
 
               Supplier<Rotation2d> rotationSupplier =
                   () -> {
-                    if (headingMagnitude > 0.5) {
-                      return new Rotation2d(headingX.getAsDouble(), headingY.getAsDouble());
-                    } else {
-                      return drive.getRotation();
+                    if (headingMagnitude > DriveConstants.driveDeadband) {
+                      targetAngle = new Rotation2d(headingX.getAsDouble(), headingY.getAsDouble());
                     }
+                    return targetAngle;
                   };
 
               // Get linear velocity
