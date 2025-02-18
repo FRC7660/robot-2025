@@ -41,11 +41,13 @@ public final class Constants {
     public static double armSpeed = 0.50;
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
+    public static final int motorID = 81;
   }
 
   public static class Claw {
     public static double clawSpeed = 0.50;
     public static final int clawBeam = 4;
+    public static final int motorID = 71;
   }
 
   public static class Climb {
