@@ -45,7 +45,7 @@
     "rotation": -125.78897345918334
   },
   "reversed": false,
-  "folder": "Side... to Feeder",
+  "folder": "Feeder to Side __",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -61.21075492017531
