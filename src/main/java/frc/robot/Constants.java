@@ -44,7 +44,7 @@ public final class Constants {
   }
 
   public static class Claw {
-    public static double clawSpeed = 0.50;
+    public static double clawSpeed = 0.2;
     public static final int clawBeam = 4;
   }
 
