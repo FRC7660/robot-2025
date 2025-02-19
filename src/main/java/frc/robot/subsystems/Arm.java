@@ -15,7 +15,7 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private TalonFX motorArm = new TalonFX(81);
+  private TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
 
   private TalonFXSimState motorArmSim;
 
