@@ -32,8 +32,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
-import frc.robot.commands.LiftFunnel;
-import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;

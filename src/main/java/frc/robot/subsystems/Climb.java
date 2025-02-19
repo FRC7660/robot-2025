@@ -61,7 +61,7 @@ public class Climb extends SubsystemBase {
     motorClimb.set(0);
   }
 
-  public boolean getClimbLimit(){
+  public boolean getClimbLimit() {
     return !climbLimit.get();
   }
 

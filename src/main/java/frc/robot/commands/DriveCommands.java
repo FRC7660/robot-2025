@@ -327,8 +327,10 @@ public class DriveCommands {
               Supplier<Rotation2d> rotationSupplier =
                   () -> {
                     if (headingMagnitude > 0.5) {
-                      targetRotation = new Rotation2d(headingX.getAsDouble(), headingY.getAsDouble());
-                    } return targetRotation;
+                      targetRotation =
+                          new Rotation2d(headingX.getAsDouble(), headingY.getAsDouble());
+                    }
+                    return targetRotation;
                   };
 
               // Get linear velocity
@@ -336,8 +338,9 @@ public class DriveCommands {
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
               // Calculate angular speed
-              double omega = -angleController.calculate(
-                          drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              double omega =
+                  -angleController.calculate(
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
