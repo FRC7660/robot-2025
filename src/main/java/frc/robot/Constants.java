@@ -52,6 +52,7 @@ public final class Constants {
     public static int MotorClimbID = 31;
     public static double climbSpeed = 0.50;
     public static double climbEncoderLimit = 1;
+    public static int climbSwitchID = 5;
   }
 
   public static class Funnel {
