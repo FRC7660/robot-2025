@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start Point to Side 5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Side 5 to Feeder"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Start Point to Side __ to Feeder",
+  "choreoAuto": false
+}
