@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +19,7 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
-  private Encoder encoder = new Encoder(2, 1);
+  private DutyCycleEncoder encoder = new DutyCycleEncoder(2);
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {

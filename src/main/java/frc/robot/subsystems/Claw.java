@@ -4,9 +4,13 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,7 +19,7 @@ import frc.robot.Constants;
 
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
-  private TalonFX motorClaw = new TalonFX(Constants.Claw.motorID);
+  private SparkFlex motorClaw = new SparkFlex(54, MotorType.kBrushless);
 
   private TalonFXSimState motorClawSim;
 
@@ -23,17 +27,18 @@ public class Claw extends SubsystemBase {
 
   public Claw() {
 
-    motorClaw.setNeutralMode(NeutralModeValue.Brake);
-
-    motorClaw.setPosition(0);
+    SparkFlexConfig config = new SparkFlexConfig();
+    config.idleMode(IdleMode.kBrake);
+    config.inverted(true);
+    motorClaw.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     clawBreakBeam =
         new DigitalInput(
             Constants.Claw.clawBeam); // false = beam broken(coral present), true = beam not broken
 
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      motorClawSim = new TalonFXSimState(motorClaw);
-    }
+    // if (Constants.currentMode == Constants.Mode.SIM) {
+    //   motorClawSim = new TalonFXSimState(motorClaw);
+    // }
   }
 
   public void start() {
@@ -52,7 +57,6 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
-    SmartDashboard.putNumber("Claw-Motor", motorClaw.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Claw Velo", motorClaw.get());
   }
 

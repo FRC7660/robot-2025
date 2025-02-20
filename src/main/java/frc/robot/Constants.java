@@ -41,19 +41,20 @@ public final class Constants {
     public static double armSpeed = 0.50;
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
-    public static final int motorID = 81;
+    public static final int motorID = 53;
   }
 
   public static class Claw {
-    public static double clawSpeed = 0.50;
+    public static double clawSpeed = 0.2;
     public static final int clawBeam = 4;
-    public static final int motorID = 71;
+    public static final int motorID = 54;
   }
 
   public static class Climb {
     public static int MotorClimbID = 31;
     public static double climbSpeed = 0.50;
     public static double climbEncoderLimit = 1;
+    public static int climbSwitchID = 5;
   }
 
   public static class Funnel {
@@ -101,5 +102,5 @@ public final class Constants {
     public static final int motorBetaID = 52;
   }
 
-  public static final boolean absoluteDrive = true;
+  public static final boolean absoluteDrive = false;
 }

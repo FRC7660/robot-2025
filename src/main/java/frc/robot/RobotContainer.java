@@ -33,8 +33,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
-import frc.robot.commands.LiftFunnel;
-import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
@@ -192,23 +190,26 @@ public class RobotContainer {
                 drive,
                 () -> driverController.getLeftX(),
                 () -> -driverController.getLeftY(),
-                () -> -driverController.getRightX(),
-                () -> driverController.getRightY())
+                () -> driverController.getRightX(),
+                () -> -driverController.getRightY())
             :
             // Field Drive
             DriveCommands.joystickDrive(
                 drive,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+                () -> driverController.getLeftY(),
+                () -> driverController.getLeftX(),
+                () -> driverController.getRightX()));
 
-    driverController.a().onTrue(new LiftFunnel(funnel));
-    driverController.b().onTrue(new LowerClimb(climb));
-    driverController.x().onTrue(new releaseCoral(claw));
-    driverController.y().onTrue(new IntakeCoral(claw));
+    // driverController.a().onTrue(new LiftFunnel(funnel));
+    // driverController.b().onTrue(new LowerClimb(climb));
+    // driverController.x().onTrue(new releaseCoral(claw));
+    // driverController.y().onTrue(new IntakeCoral(claw));
 
     // Switch to X pattern when X button is pressed
-    testController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    driverController.povUp().onTrue(new IntakeCoral(claw));
+    driverController.povDown().onTrue(new releaseCoral(claw));
 
     // Reset gyro / odometry
     final Runnable resetGyro =
