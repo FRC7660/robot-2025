@@ -25,10 +25,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorState;
 import java.util.function.DoubleSupplier;
+import frc.robot.subsystems.drive.Drive;
 
 // import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Elevator extends SubsystemBase {
+  private final Drive drive;
 
   public final SparkMax motorAlpha =
       new SparkMax(Constants.Elevator.motorAplphaID, MotorType.kBrushless);
@@ -75,6 +77,7 @@ public class Elevator extends SubsystemBase {
 
   public Double getHeight() {
     // Height gained from one rotation: 0.91978999in * 2
+    // = 1.833333 in.
     // Sprocket Diameter: 1.75667in
     // Circumfrence: 5.518737in
     Double height;
@@ -83,7 +86,7 @@ public class Elevator extends SubsystemBase {
     return height;
   }
 
-  public void setState(ElevatorState state) {
+  public void setState(ElevatorState state, boolean isLeftSide) {
     Double output;
     System.out.println("state is " + state);
     switch (state) {
@@ -120,6 +123,7 @@ public class Elevator extends SubsystemBase {
     // Gear ratio - 6:1
     // motorSim.setPosition(5);
 
+    drive = new Drive(null, null, null, null, null, null);
     motorAlphaEncoder.setPosition(50);
     System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
 

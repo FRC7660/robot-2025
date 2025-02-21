@@ -279,7 +279,23 @@ public class RobotContainer {
         left = false;
         break;
     }
-    buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
+    // buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height,left), elevator));
+    // CONCEPT FRAMEWORK FOR AUTOSCORE - THIS IS NOT THE FINAL CODE, JUST THE ORDER THINGS WILL HAPPEN
+    buttonXtrigger.onTrue(
+      Commands.parallel(
+        Commands.run(null, drive), // Drive - Alignment command
+        
+        Commands.sequence(
+          Commands.run(null, arm), // Arm - Safety position command
+          Commands.run(null, elevator), // Elevator - Move to Preset command
+          Commands.run(null, arm), // Arm - Score position command
+          Commands.run(null, claw), // Claw - Eject/Score command
+          Commands.run(null, arm), // Arm - Safety position command
+          Commands.run(null, elevator)) // Elevator - Move to Zero command          
+          ));
+
+    
+          
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
