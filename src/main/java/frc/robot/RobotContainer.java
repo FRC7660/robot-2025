@@ -151,8 +151,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Default command for Elevator
-    elevator.setDefaultCommand(
-        elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
+    // elevator.setDefaultCommand(
+    //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
 
     // Set up SysId routines
     autoChooser.addOption(

@@ -110,11 +110,6 @@ public class Elevator extends SubsystemBase {
     setMotors(output * 0.1, true);
   }
 
-  public Command runManualCommand(DoubleSupplier inputSpeed) {
-
-    return this.runOnce(() -> setMotors(inputSpeed.getAsDouble(), false));
-  }
-
   public Elevator() {
     // Clockwise - up, Counter - down, same for both motors
     // Gear ratio - 6:1

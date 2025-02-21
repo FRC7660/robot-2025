@@ -7,11 +7,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
@@ -19,7 +22,11 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
-  private DutyCycleEncoder encoder = new DutyCycleEncoder(2);
+  private Encoder encoder = new edu.wpi.first.wpilibj.Encoder(1,2);
+
+  private double desiredSpeed = 0;
+
+  private PIDController controller = new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
@@ -32,12 +39,17 @@ public class Arm extends SubsystemBase {
   }
 
   public void raise() {
-    motorArm.set(Constants.Arm.armSpeed);
+    desiredSpeed = Constants.Arm.armSpeed;
   }
 
   public void stop() {
-    motorArm.set(0);
+    desiredSpeed = 0;
   }
+
+  public void setPosition(double position) {
+    desiredSpeed = controller.calculate(encoder.get(), position);
+  }
+
 
   public Boolean armAtMax() {
     double position = motorArm.getPosition().getValueAsDouble();
@@ -63,6 +75,14 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Encoder", encoder.get());
+
+    if (desiredSpeed <0 && encoder.get() <= Constants.Arm.reverseLimit){
+      desiredSpeed = 0;
+    }
+    if (desiredSpeed >0 && encoder.get() >= Constants.Arm.forewardLimit){
+      desiredSpeed = 0;
+    }
+    motorArm.set(desiredSpeed);
   }
 
   public void simulationPeriodic() {
