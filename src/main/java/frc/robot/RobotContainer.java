@@ -17,7 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -151,8 +150,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Default command for Elevator
-    elevator.setDefaultCommand(
-        elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
+    // elevator.setDefaultCommand(
+    //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -182,6 +181,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     configurebuttonBox();
+    arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         Constants.absoluteDrive

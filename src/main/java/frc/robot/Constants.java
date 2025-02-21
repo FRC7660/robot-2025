@@ -42,6 +42,12 @@ public final class Constants {
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
+    public static final double safe_pos = 0.4;
+    public static final double kp = 0.1;
+    public static final double ki = 0;
+    public static final double kd = 0;
+    public static final double reverseLimit = -450;
+    public static final double forewardLimit = -10;
   }
 
   public static class Claw {
