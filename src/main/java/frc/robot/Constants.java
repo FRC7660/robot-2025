@@ -46,8 +46,8 @@ public final class Constants {
     public static final double kp = 0.1;
     public static final double ki = 0;
     public static final double kd = 0;
-    public static final double reverseLimit = 0.2;
-    public static final double forewardLimit = 0.6;
+    public static final double reverseLimit = -450;
+    public static final double forewardLimit = -10;
   }
 
   public static class Claw {
