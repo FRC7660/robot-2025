@@ -28,13 +28,16 @@ public class Climb extends SubsystemBase {
   private DigitalInput climbLimit;
 
   private SparkMaxSim motorClimbSim;
+  private double desiredSpeed;
 
   public Climb() {
+    desiredSpeed = 0;
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorClimbSim = new SparkMaxSim(motorClimb, DCMotor.getNEO(1));
     }
 
     encoderClimb = motorClimb.getEncoder();
+    encoderClimb.setPosition(0);
     configClimb = new SparkMaxConfig();
     configClimb.idleMode(IdleMode.kBrake);
     motorClimb.configure(
@@ -54,15 +57,27 @@ public class Climb extends SubsystemBase {
   }
 
   public void lower() {
-    motorClimb.set(Constants.Climb.climbSpeed);
+    desiredSpeed = -Constants.Climb.climbSpeed;
+  }
+
+  public void raise() {
+    desiredSpeed = Constants.Climb.climbSpeed;
   }
 
   public void stop() {
-    motorClimb.set(0);
+    desiredSpeed = 0;
   }
 
   public boolean getClimbLimit() {
     return !climbLimit.get();
+  }
+
+  public double getPosition() {
+    return encoderClimb.getPosition();
+  }
+
+  public boolean encoderLimitHit() {
+    return getPosition() >= Constants.Climb.upperLimit;
   }
 
   @Override
@@ -72,8 +87,20 @@ public class Climb extends SubsystemBase {
       motorClimb.set(0);
     }
 
+    if (getClimbLimit() && desiredSpeed < 0) {
+      desiredSpeed = 0;
+    } else if (getPosition() >= Constants.Climb.upperLimit && desiredSpeed > 0) {
+      desiredSpeed = 0;
+    }
+    motorClimb.set(desiredSpeed);
+
+    if (getClimbLimit()){
+      encoderClimb.setPosition(0);
+    }
+
     SmartDashboard.putNumber("Climb-Pos", encoderClimb.getPosition());
     SmartDashboard.putBoolean("Climb Limit Switch", getClimbLimit());
+    SmartDashboard.putNumber("ClimbEncoder", getPosition());
   }
 
   public void simulationPeriodic() {
