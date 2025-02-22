@@ -38,6 +38,7 @@ import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
+import frc.robot.commands.ManualElevator;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
@@ -157,8 +158,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Default command for Elevator
-    // elevator.setDefaultCommand(
-    //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
+    elevator.setDefaultCommand(
+        new ManualElevator(elevator, () -> MathUtil.applyDeadband(testController.getRightY(), 0.1), arm));
 
     // Set up SysId routines
     autoChooser.addOption(

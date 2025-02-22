@@ -59,16 +59,14 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setMotors(double speed, boolean overrideInversion) {
-    Double speedMulti = 0.2;
-    Double outputSpeed = speed;
-    if (overrideInversion == true) {
-      motorAlpha.set(outputSpeed * speedMulti);
-      motorBeta.set(outputSpeed * speedMulti);
+    Double upSpeedMulti = 1.0;
+    Double downSpeedMulti = 0.4;
+    if (speed > 0){
+      motorAlpha.set(speed * upSpeedMulti);
     } else {
-      motorAlpha.set(outputSpeed * speedMulti * alphaInversion);
-      motorBeta.set(outputSpeed * speedMulti * betaInversion);
+      motorAlpha.set(speed * downSpeedMulti);
     }
-    SmartDashboard.putNumber("Motor Alpha OutputSpeed", outputSpeed);
+    SmartDashboard.putNumber("Motor Alpha OutputSpeed", motorAlpha.get());
   }
 
   public Double getHeight() {
@@ -120,11 +118,15 @@ public class Elevator extends SubsystemBase {
     alphaConfig.softLimit.reverseSoftLimit(Constants.Elevator.lowerLimit);
     alphaConfig.softLimit.forwardSoftLimitEnabled(true);
     alphaConfig.softLimit.reverseSoftLimitEnabled(true);
-    alphaConfig.idleMode(IdleMode.kBrake);
+    alphaConfig.idleMode(IdleMode.kCoast);
+    alphaConfig.inverted(false);
     betaConfig = alphaConfig;
 
     motorAlpha.configure(
         alphaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    betaConfig.follow(motorAlpha);
+    betaConfig.inverted(false);
     motorBeta.configure(
         betaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
