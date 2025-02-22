@@ -5,14 +5,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.elevator.*;
 import java.util.function.DoubleSupplier;
 
 public class ManualElevator extends Command {
   private final Elevator m_elevator;
   private DoubleSupplier m_speed;
+  private final Arm m_arm;
 
-  public ManualElevator(Elevator subsystem, DoubleSupplier speed) {
+  public ManualElevator(Elevator subsystem, DoubleSupplier speed, Arm arm) {
+    m_arm = arm;
     m_elevator = subsystem;
     m_speed = speed;
     addRequirements(subsystem);
@@ -20,7 +24,9 @@ public class ManualElevator extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_arm.setPosition(Constants.Arm.safe_pos);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
