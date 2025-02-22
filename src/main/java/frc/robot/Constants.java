@@ -67,7 +67,7 @@ public final class Constants {
 
   public static class Funnel {
     public static int winchID = 41;
-    public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
+    public static double winchSpeed = 0.05; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
     public static int funnelSwitchID = 6;
   }

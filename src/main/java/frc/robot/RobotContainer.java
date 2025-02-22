@@ -17,6 +17,8 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,7 +35,9 @@ import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
+import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
@@ -206,8 +210,8 @@ public class RobotContainer {
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().onTrue(new LowerClimb(climb));
     driverController.b().onTrue(new RaiseClimb(climb));
-    // driverController.x().onTrue(new releaseCoral(claw));
-    // driverController.y().onTrue(new IntakeCoral(claw));
+    driverController.x().onTrue(new LowerFunnel(funnel, climb));
+    driverController.y().whileTrue(new LiftFunnel(funnel, climb));
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
