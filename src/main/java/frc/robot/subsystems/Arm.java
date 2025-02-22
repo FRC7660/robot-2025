@@ -75,12 +75,16 @@ public class Arm extends SubsystemBase {
     return false;
   }
 
+  public double getPosition() {
+    return encoder.get();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Encoder", encoder.getDistance());
+    SmartDashboard.putNumber("Arm-Encoder", encoder.get());
 
     if (desiredSpeed < 0 && encoder.get() <= Constants.Arm.reverseLimit) {
       desiredSpeed = 0;
