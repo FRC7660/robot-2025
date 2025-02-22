@@ -39,6 +39,7 @@ import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.*;
+import frc.robot.subsystems.VisionReader;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.*;
 import frc.robot.subsystems.vision.*;
@@ -65,6 +66,7 @@ public class RobotContainer {
   private final Climb climb = new Climb();
   private final Claw claw = new Claw();
 
+  private final VisionReader visionReader = new VisionReader();
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandGenericHID buttonBox = new CommandGenericHID(1);
