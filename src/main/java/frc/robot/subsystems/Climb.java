@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +25,7 @@ public class Climb extends SubsystemBase {
 
   private RelativeEncoder encoderClimb;
   private SparkMaxConfig configClimb;
+  private DigitalInput climbLimit;
 
   private SparkMaxSim motorClimbSim;
 
@@ -38,6 +40,8 @@ public class Climb extends SubsystemBase {
     motorClimb.configure(
         configClimb, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     encoderClimb.setPosition(0);
+
+    climbLimit = new DigitalInput(Constants.Climb.climbSwitchID);
   }
 
   public Boolean climbFinished() {
@@ -57,6 +61,10 @@ public class Climb extends SubsystemBase {
     motorClimb.set(0);
   }
 
+  public boolean getClimbLimit() {
+    return !climbLimit.get();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -65,6 +73,7 @@ public class Climb extends SubsystemBase {
     }
 
     SmartDashboard.putNumber("Climb-Pos", encoderClimb.getPosition());
+    SmartDashboard.putBoolean("Climb Limit Switch", getClimbLimit());
   }
 
   public void simulationPeriodic() {
