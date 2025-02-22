@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase {
     return height;
   }
 
-  public void setState(ElevatorState state, boolean isLeftSide) {
+  public void setState(ElevatorState state) {
     Double output;
     System.out.println("state is " + state);
     switch (state) {

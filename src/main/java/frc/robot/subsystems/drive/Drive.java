@@ -252,11 +252,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     stop();
   }
 
-  // Move the robot to the left or right of an April tag to align with the reef
-  public void alignToScore(boolean isLeftSide){
-    
-  }
-
   /** Returns a command to run a quasistatic test in the specified direction. */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     return run(() -> runCharacterization(0.0))

@@ -36,6 +36,7 @@ import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
+import frc.robot.commands.autoscore.*;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
@@ -202,6 +203,7 @@ public class RobotContainer {
     driverController.b().onTrue(new LowerClimb(climb));
     driverController.x().onTrue(new releaseCoral(claw));
     driverController.y().onTrue(new IntakeCoral(claw));
+    driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,0.1));
 
     // Switch to X pattern when X button is pressed
     testController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -225,6 +227,9 @@ public class RobotContainer {
     Trigger buttonXtrigger = buttonBox.button(inputButton);
     String buttonName;
     Constants.ElevatorState height;
+    Double scorePosition;
+    Double sPL4 = 1.0;
+    Double sPLMiddle = 0.5;
     boolean left;
     switch (inputButton) {
 
@@ -232,21 +237,25 @@ public class RobotContainer {
       case Constants.ButtonBox.bottomLeft:
         buttonName = "bottom left";
         height = ElevatorState.L1;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.lowerLeft:
         buttonName = "lower left";
         height = ElevatorState.L2;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.upperLeft:
         buttonName = "upper left";
         height = ElevatorState.L3;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.topLeft:
         buttonName = "top left";
         height = ElevatorState.L4;
+        scorePosition = sPL4;
         left = true;
         break;
 
@@ -254,21 +263,25 @@ public class RobotContainer {
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
         height = ElevatorState.L1;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.lowerRight:
         buttonName = "lower right";
         height = ElevatorState.L2;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.upperRight:
         buttonName = "upper right";
         height = ElevatorState.L3;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.topRight:
         buttonName = "top right";
         height = ElevatorState.L4;
+        scorePosition = sPL4;
         left = false;
         break;
 
@@ -276,25 +289,23 @@ public class RobotContainer {
       default:
         buttonName = "NONEXISTENT";
         height = ElevatorState.ZERO;
+        scorePosition = 0.0;
         left = false;
         break;
     }
     // buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height,left), elevator));
-    // CONCEPT FRAMEWORK FOR AUTOSCORE - THIS IS NOT THE FINAL CODE, JUST THE ORDER THINGS WILL HAPPEN
+    
     buttonXtrigger.onTrue(
       Commands.parallel(
-        Commands.run(null, drive), // Drive - Alignment command
-        
+        Commands.run(() -> new TestStrafe(left,0.1), drive), // Drive - Alignment command
         Commands.sequence(
-          Commands.run(null, arm), // Arm - Safety position command
-          Commands.run(null, elevator), // Elevator - Move to Preset command
-          Commands.run(null, arm), // Arm - Score position command
-          Commands.run(null, claw), // Claw - Eject/Score command
-          Commands.run(null, arm), // Arm - Safety position command
-          Commands.run(null, elevator)) // Elevator - Move to Zero command          
+          Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+          Commands.run(() -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
+          Commands.run(() -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
+          Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
+          Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+          Commands.run(() -> new MoveElevator(ElevatorState.ZERO), elevator)) // Elevator - Move to Zero command          
           ));
-
-    
           
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
