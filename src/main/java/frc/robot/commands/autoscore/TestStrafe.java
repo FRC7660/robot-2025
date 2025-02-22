@@ -5,19 +5,24 @@
 package frc.robot.commands.autoscore;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TestStrafe extends Command {
   private final Drive drive;
+  boolean isLeft;
+  Double magnitude;
 
   /** Creates a new TestStrafe. */
-  public TestStrafe(boolean isLeft, Double magnitude) {
+  public TestStrafe(Drive driveIntake, boolean left, Double mag) {
     // Use addRequirements() here to declare subsystem dependencies.
-    drive = new Drive(null, null, null, null, null, null);
+
+    drive = driveIntake;
+    isLeft = left;
+    magnitude = mag;
+
+    addRequirements(drive);
     
   }
 
@@ -30,7 +35,8 @@ public class TestStrafe extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //Commands.runOnce(() -> DriveCommands.strafe(drive, isLeft, magnitude), drive);
+    //System.out.println("TEST STRAFE REACHED");
+    DriveCommands.strafe(drive, isLeft,() -> magnitude);
   }
 
   // Called once the command ends or is interrupted.

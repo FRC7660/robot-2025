@@ -86,10 +86,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
+                new ModuleIOSpark(0),
+                new ModuleIOSpark(1),
+                new ModuleIOSpark(2),
+                new ModuleIOSpark(3),
                 (pose) -> {});
 
         this.vision =
@@ -203,7 +203,13 @@ public class RobotContainer {
     driverController.b().onTrue(new LowerClimb(climb));
     driverController.x().onTrue(new releaseCoral(claw));
     driverController.y().onTrue(new IntakeCoral(claw));
-    driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,0.1));
+    
+    driverController.leftTrigger(0.1).whileTrue
+      (DriveCommands.strafe(drive,true,() -> driverController.getLeftTriggerAxis()*0.5));
+    driverController.rightTrigger(0.1).whileTrue
+      (DriveCommands.strafe(drive,false,() -> driverController.getRightTriggerAxis()*0.5));
+    
+    //driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
     // Switch to X pattern when X button is pressed
     testController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -297,7 +303,7 @@ public class RobotContainer {
     
     buttonXtrigger.onTrue(
       Commands.parallel(
-        Commands.run(() -> new TestStrafe(left,0.1), drive), // Drive - Alignment command
+        Commands.run(() -> new TestStrafe(drive,left,0.1), drive), // Drive - Alignment command
         Commands.sequence(
           Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
           Commands.run(() -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
