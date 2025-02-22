@@ -68,7 +68,7 @@ public class Funnel extends SubsystemBase {
   }
 
   public void hold() {
-    desiredSpeed = 0.025;
+    desiredSpeed = Constants.Funnel.winchHoldSpeed;
   }
 
   public boolean limitHit(){

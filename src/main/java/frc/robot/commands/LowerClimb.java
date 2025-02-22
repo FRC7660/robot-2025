@@ -5,12 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Climb;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class LowerClimb extends Command {
   /** Creates a new LowerClimb. */
   private final Climb climb;
+  private boolean vert = true;
 
   public LowerClimb(Climb climb) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -22,7 +24,14 @@ public class LowerClimb extends Command {
   @Override
   public void initialize() {
     System.out.println("Climb is lowering");
-    climb.lower();
+
+    if (vert == true){
+        vert = false;
+        climb.lower(Constants.Climb.midPosition);
+      } else {
+        vert = true;
+        climb.lower(Constants.Climb.endPosition);
+      }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

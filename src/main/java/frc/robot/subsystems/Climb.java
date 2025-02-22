@@ -29,6 +29,7 @@ public class Climb extends SubsystemBase {
 
   private SparkMaxSim motorClimbSim;
   private double desiredSpeed;
+  private double targetAngle;
 
   public Climb() {
     desiredSpeed = 0;
@@ -60,8 +61,9 @@ public class Climb extends SubsystemBase {
     return getPosition() >= Constants.Climb.upperLimit;
   }
 
-  public void lower() {
+  public void lower(double angle) {
     desiredSpeed = -Constants.Climb.climbSpeed;
+    targetAngle = angle;
   }
 
   public void raise() {
@@ -94,6 +96,8 @@ public class Climb extends SubsystemBase {
     if (getClimbLimit() && desiredSpeed < 0) {
       desiredSpeed = 0;
     } else if (getPosition() >= Constants.Climb.upperLimit && desiredSpeed > 0) {
+      desiredSpeed = 0;
+    } else if (encoderClimb.getPosition() < targetAngle && desiredSpeed < 0){
       desiredSpeed = 0;
     }
     motorClimb.set(desiredSpeed);
