@@ -50,7 +50,7 @@ public class Climb extends SubsystemBase {
   public Boolean climbFinished() {
     double position = encoderClimb.getPosition();
     if (position > Constants.Climb.climbEncoderLimit) {
-      //System.out.println("Limit Reached");
+      // System.out.println("Limit Reached");
       return true;
     }
     return false;
@@ -98,7 +98,7 @@ public class Climb extends SubsystemBase {
     }
     motorClimb.set(desiredSpeed);
 
-    if (getClimbLimit()){
+    if (getClimbLimit()) {
       encoderClimb.setPosition(0);
     }
 
