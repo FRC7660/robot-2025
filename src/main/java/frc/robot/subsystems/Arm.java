@@ -29,12 +29,6 @@ public class Arm extends SubsystemBase {
 
   private PIDController controller =
       new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
-  private Encoder encoder = new Encoder(1, 2);
-
-  private double desiredSpeed = 0;
-
-  private PIDController controller =
-      new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
 
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
@@ -52,10 +46,6 @@ public class Arm extends SubsystemBase {
     motorArm.setInverted(true);
   }
 
-  public void setMotor(double speed) {
-    desiredSpeed = speed * 0.5;
-  }
-
   public void raise() {
     desiredSpeed = Constants.Arm.armSpeed;
     desiredSpeed = Constants.Arm.armSpeed;
@@ -68,10 +58,6 @@ public class Arm extends SubsystemBase {
   public void setPosition(double position) {
     desiredSpeed = controller.calculate(encoder.get(), position);
     desiredSpeed = 0;
-  }
-
-  public void setPosition(double position) {
-    desiredSpeed = controller.calculate(encoder.get(), position);
   }
 
   public Boolean armAtMax() {
@@ -118,10 +104,6 @@ public class Arm extends SubsystemBase {
         RobotController
             .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
     // function
-  }
-
-  public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble()));
   }
 
   public Command manualArm(DoubleSupplier speed) {
