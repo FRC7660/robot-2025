@@ -48,6 +48,7 @@ public final class Constants {
     public static final double kd = 0;
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
+    public static final double testPosition = -380;
   }
 
   public static class Claw {
@@ -61,12 +62,17 @@ public final class Constants {
     public static double climbSpeed = 0.50;
     public static double climbEncoderLimit = 1;
     public static int climbSwitchID = 5;
+    public static double upperLimit = 165;
+    public static double midPosition = 100;
+    public static double endPosition = -10;
   }
 
   public static class Funnel {
     public static int winchID = 41;
-    public static double winchSpeed = 0.50; // Clockwise = positive, holds funnel down in position
+    public static double winchSpeed = 0.05; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
+    public static int funnelSwitchID = 6;
+    public static double winchHoldSpeed = 0.025;
   }
 
   public static class ButtonBox {
@@ -102,10 +108,12 @@ public final class Constants {
 
   public static class Elevator {
     public static final Double lowerLimit = 0.0;
-    public static final Double upperLimit = 100.0;
+    public static final Double upperLimit = 1000.0;
     public static final int lowerlimitID = 3;
     public static final int motorAplphaID = 51;
     public static final int motorBetaID = 52;
+    public static final double raiseSpeedMulti = 0.4;
+    public static final double lowerSpeedMulti = 0.15;
   }
 
   public static final boolean absoluteDrive = false;

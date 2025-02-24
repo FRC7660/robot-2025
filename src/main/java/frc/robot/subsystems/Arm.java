@@ -43,9 +43,11 @@ public class Arm extends SubsystemBase {
 
   public void setMotor(double speed) {
     desiredSpeed = speed * 0.5;
+    motorArm.setInverted(true);
   }
 
   public void raise() {
+    desiredSpeed = Constants.Arm.armSpeed;
     desiredSpeed = Constants.Arm.armSpeed;
   }
 
@@ -55,6 +57,7 @@ public class Arm extends SubsystemBase {
 
   public void setPosition(double position) {
     desiredSpeed = controller.calculate(encoder.get(), position);
+    desiredSpeed = 0;
   }
 
   public Boolean armAtMax() {
@@ -75,12 +78,16 @@ public class Arm extends SubsystemBase {
     return false;
   }
 
+  public double getPosition() {
+    return encoder.get();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Encoder", encoder.getDistance());
+    SmartDashboard.putNumber("Arm-Encoder", encoder.get());
 
     if (desiredSpeed < 0 && encoder.get() <= Constants.Arm.reverseLimit) {
       desiredSpeed = 0;

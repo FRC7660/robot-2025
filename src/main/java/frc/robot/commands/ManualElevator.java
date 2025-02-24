@@ -32,11 +32,12 @@ public class ManualElevator extends Command {
   @Override
   public void execute() {
     double dSpeed = m_speed.getAsDouble();
-    if (dSpeed >= 0.1 || dSpeed <= -0.1) {
+    if (true) {
       m_elevator.setMotors(dSpeed, false);
-    } else {
-      m_elevator.setMotors(0, false);
     }
+    // } else {
+    //   m_elevator.setMotors(0, false);
+    // }
   }
 
   // Called once the command ends or is interrupted.

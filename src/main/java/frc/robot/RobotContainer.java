@@ -17,6 +17,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,8 +31,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
+import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.LiftFunnel;
+import frc.robot.commands.LowerClimb;
+import frc.robot.commands.LowerFunnel;
+import frc.robot.commands.ManualElevator;
+import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
@@ -150,8 +157,9 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Default command for Elevator
-    // elevator.setDefaultCommand(
-    //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
+    elevator.setDefaultCommand(
+        new ManualElevator(
+            elevator, () -> MathUtil.applyDeadband(testController.getRightY(), 0.1), arm));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -182,6 +190,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     configurebuttonBox();
     arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
+    arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         Constants.absoluteDrive
@@ -201,12 +210,14 @@ public class RobotContainer {
                 () -> driverController.getRightX()));
 
     // driverController.a().onTrue(new LiftFunnel(funnel));
-    // driverController.b().onTrue(new LowerClimb(climb));
-    // driverController.x().onTrue(new releaseCoral(claw));
-    // driverController.y().onTrue(new IntakeCoral(claw));
+    driverController.a().onTrue(new LowerClimb(climb));
+    driverController.b().onTrue(new RaiseClimb(climb));
+    driverController.x().onTrue(new LowerFunnel(funnel, climb));
+    driverController.y().whileTrue(new LiftFunnel(funnel, climb));
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    testController.a().whileTrue(new ArmPIDTest(arm));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
