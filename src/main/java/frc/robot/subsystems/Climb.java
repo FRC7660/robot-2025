@@ -94,7 +94,7 @@ public class Climb extends SubsystemBase {
     }
     motorClimb.set(desiredSpeed);
 
-    if (getClimbLimit()){
+    if (getClimbLimit()) {
       encoderClimb.setPosition(0);
     }
 
