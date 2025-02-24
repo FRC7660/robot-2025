@@ -10,11 +10,16 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.util.function.DoubleSupplier;
 import java.util.function.DoubleSupplier;
 
 public class Arm extends SubsystemBase {
@@ -23,6 +28,12 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
+  private Encoder encoder = new Encoder(1, 2);
+
+  private double desiredSpeed = 0;
+
+  private PIDController controller =
+      new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
   private Encoder encoder = new Encoder(1, 2);
 
   private double desiredSpeed = 0;
@@ -43,13 +54,24 @@ public class Arm extends SubsystemBase {
 
   public void setMotor(double speed) {
     desiredSpeed = speed * 0.5;
+    motorArm.setInverted(true);
+  }
+
+  public void setMotor(double speed) {
+    desiredSpeed = speed * 0.5;
   }
 
   public void raise() {
     desiredSpeed = Constants.Arm.armSpeed;
+    desiredSpeed = Constants.Arm.armSpeed;
   }
 
   public void stop() {
+    desiredSpeed = 0;
+  }
+
+  public void setPosition(double position) {
+    desiredSpeed = controller.calculate(encoder.get(), position);
     desiredSpeed = 0;
   }
 
@@ -101,6 +123,10 @@ public class Arm extends SubsystemBase {
         RobotController
             .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
     // function
+  }
+
+  public Command manualArm(DoubleSupplier speed) {
+    return this.run(() -> setMotor(speed.getAsDouble()));
   }
 
   public Command manualArm(DoubleSupplier speed) {

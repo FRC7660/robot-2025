@@ -190,6 +190,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     configurebuttonBox();
     arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
+    arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         Constants.absoluteDrive
