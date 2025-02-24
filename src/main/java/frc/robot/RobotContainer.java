@@ -17,7 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -159,7 +158,8 @@ public class RobotContainer {
 
     // Default command for Elevator
     elevator.setDefaultCommand(
-        new ManualElevator(elevator, () -> MathUtil.applyDeadband(testController.getRightY(), 0.1), arm));
+        new ManualElevator(
+            elevator, () -> MathUtil.applyDeadband(testController.getRightY(), 0.1), arm));
 
     // Set up SysId routines
     autoChooser.addOption(

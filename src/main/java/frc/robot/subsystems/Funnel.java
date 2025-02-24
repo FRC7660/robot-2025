@@ -5,20 +5,14 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -30,12 +24,12 @@ public class Funnel extends SubsystemBase {
   private RelativeEncoder encoderWinch;
   private SparkFlexConfig configWinch;
 
-  //private SparkMaxSim motorWinchSim;
+  // private SparkMaxSim motorWinchSim;
 
   private DigitalInput funnelLimit;
 
   private double desiredSpeed = 0;
-  private PIDController pid = new PIDController(0,0,0);
+  private PIDController pid = new PIDController(0, 0, 0);
 
   public Funnel() {
     // if (Constants.currentMode == Constants.Mode.SIM) {
@@ -71,7 +65,7 @@ public class Funnel extends SubsystemBase {
     desiredSpeed = Constants.Funnel.winchHoldSpeed;
   }
 
-  public boolean limitHit(){
+  public boolean limitHit() {
     return !funnelLimit.get();
   }
 

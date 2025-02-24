@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 
@@ -13,6 +12,7 @@ import frc.robot.subsystems.Funnel;
 public class LowerFunnel extends Command {
   /** Creates a new LiftIndex. */
   private final Funnel funnel;
+
   private final Climb climb;
 
   public LowerFunnel(Funnel funnel, Climb climb) {

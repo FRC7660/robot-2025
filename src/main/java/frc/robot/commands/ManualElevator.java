@@ -33,7 +33,8 @@ public class ManualElevator extends Command {
   public void execute() {
     double dSpeed = m_speed.getAsDouble();
     if (true) {
-      m_elevator.setMotors(dSpeed, false);}
+      m_elevator.setMotors(dSpeed, false);
+    }
     // } else {
     //   m_elevator.setMotors(0, false);
     // }
