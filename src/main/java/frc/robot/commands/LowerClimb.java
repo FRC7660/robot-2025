@@ -12,6 +12,7 @@ import frc.robot.subsystems.Climb;
 public class LowerClimb extends Command {
   /** Creates a new LowerClimb. */
   private final Climb climb;
+
   private boolean vert = true;
 
   public LowerClimb(Climb climb) {
@@ -25,13 +26,13 @@ public class LowerClimb extends Command {
   public void initialize() {
     System.out.println("Climb is lowering");
 
-    if (vert == true){
-        vert = false;
-        climb.lower(Constants.Climb.midPosition);
-      } else {
-        vert = true;
-        climb.lower(Constants.Climb.endPosition);
-      }
+    if (vert == true) {
+      vert = false;
+      climb.lower(Constants.Climb.midPosition);
+    } else {
+      vert = true;
+      climb.lower(Constants.Climb.endPosition);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
