@@ -73,6 +73,7 @@ public class Elevator extends SubsystemBase {
 
   public Double getHeight() {
     // Height gained from one rotation: 0.91978999in * 2
+    // = 1.833333 in.
     // Sprocket Diameter: 1.75667in
     // Circumfrence: 5.518737in
     Double height;

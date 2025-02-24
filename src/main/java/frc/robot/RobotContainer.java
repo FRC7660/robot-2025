@@ -38,6 +38,7 @@ import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.commands.autoscore.*;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
@@ -91,10 +92,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
+                new ModuleIOSpark(0),
+                new ModuleIOSpark(1),
+                new ModuleIOSpark(2),
+                new ModuleIOSpark(3),
                 (pose) -> {});
 
         this.vision =
@@ -205,6 +206,17 @@ public class RobotContainer {
                 () -> driverController.getLeftX(),
                 () -> driverController.getRightX()));
 
+    driverController
+        .leftTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+    driverController
+        .rightTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
+
+    // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
+
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().onTrue(new LowerClimb(climb));
     driverController.b().onTrue(new RaiseClimb(climb));
@@ -248,6 +260,9 @@ public class RobotContainer {
     Trigger buttonXtrigger = buttonBox.button(inputButton);
     String buttonName;
     Constants.ElevatorState height;
+    Double scorePosition;
+    Double sPL4 = 1.0;
+    Double sPLMiddle = 0.5;
     boolean left;
     switch (inputButton) {
 
@@ -255,21 +270,25 @@ public class RobotContainer {
       case Constants.ButtonBox.bottomLeft:
         buttonName = "bottom left";
         height = ElevatorState.L1;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.lowerLeft:
         buttonName = "lower left";
         height = ElevatorState.L2;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.upperLeft:
         buttonName = "upper left";
         height = ElevatorState.L3;
+        scorePosition = sPLMiddle;
         left = true;
         break;
       case Constants.ButtonBox.topLeft:
         buttonName = "top left";
         height = ElevatorState.L4;
+        scorePosition = sPL4;
         left = true;
         break;
 
@@ -277,21 +296,25 @@ public class RobotContainer {
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
         height = ElevatorState.L1;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.lowerRight:
         buttonName = "lower right";
         height = ElevatorState.L2;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.upperRight:
         buttonName = "upper right";
         height = ElevatorState.L3;
+        scorePosition = sPLMiddle;
         left = false;
         break;
       case Constants.ButtonBox.topRight:
         buttonName = "top right";
         height = ElevatorState.L4;
+        scorePosition = sPL4;
         left = false;
         break;
 
@@ -299,10 +322,29 @@ public class RobotContainer {
       default:
         buttonName = "NONEXISTENT";
         height = ElevatorState.ZERO;
+        scorePosition = 0.0;
         left = false;
         break;
     }
-    buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
+    // buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height,left), elevator));
+
+    buttonXtrigger.onTrue(
+        Commands.parallel(
+            Commands.run(
+                () -> new TestStrafe(drive, left, 0.1), drive), // Drive - Alignment command
+            Commands.sequence(
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
+                Commands.run(
+                    () -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
+                Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(ElevatorState.ZERO),
+                    elevator)) // Elevator - Move to Zero command
+            ));
+
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
