@@ -43,9 +43,9 @@ public class ArmPIDTest extends Command {
     pid.setP(SmartDashboard.getNumber("Arm P", 0));
     pid.setI(SmartDashboard.getNumber("Arm I", 0));
     pid.setD(SmartDashboard.getNumber("Arm D", 0));
-    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
-    feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
-    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+    // feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
+    // feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
+    // feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
     double output = pid.calculate(arm.getPosition(), Constants.Arm.testPosition);
     arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
   }
