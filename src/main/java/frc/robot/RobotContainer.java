@@ -30,8 +30,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
+import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.LiftFunnel;
+import frc.robot.commands.LowerClimb;
+import frc.robot.commands.LowerFunnel;
+import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.commands.autoscore.*;
@@ -201,11 +206,7 @@ public class RobotContainer {
                 () -> driverController.getLeftX(),
                 () -> driverController.getRightX()));
 
-    driverController.a().onTrue(new LiftFunnel(funnel));
-    driverController.b().onTrue(new LowerClimb(climb));
-    driverController.x().onTrue(new releaseCoral(claw));
-    driverController.y().onTrue(new IntakeCoral(claw));
-    
+
     driverController.leftTrigger(0.1).whileTrue
       (DriveCommands.strafe(drive,true,() -> driverController.getLeftTriggerAxis()*0.5));
     driverController.rightTrigger(0.1).whileTrue
@@ -213,8 +214,16 @@ public class RobotContainer {
     
     //driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
+    // driverController.a().onTrue(new LiftFunnel(funnel));
+    driverController.a().onTrue(new LowerClimb(climb));
+    driverController.b().onTrue(new RaiseClimb(climb));
+    driverController.x().onTrue(new LowerFunnel(funnel, climb));
+    driverController.y().whileTrue(new LiftFunnel(funnel, climb));
+
+
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    testController.a().whileTrue(new ArmPIDTest(arm));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));

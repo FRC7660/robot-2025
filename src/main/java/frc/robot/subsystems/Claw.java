@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
@@ -12,7 +11,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -20,8 +18,6 @@ import frc.robot.Constants;
 public class Claw extends SubsystemBase {
   /** Creates a new Claw. */
   private SparkFlex motorClaw = new SparkFlex(54, MotorType.kBrushless);
-
-  private TalonFXSimState motorClawSim;
 
   private DigitalInput clawBreakBeam;
 
@@ -35,10 +31,6 @@ public class Claw extends SubsystemBase {
     clawBreakBeam =
         new DigitalInput(
             Constants.Claw.clawBeam); // false = beam broken(coral present), true = beam not broken
-
-    // if (Constants.currentMode == Constants.Mode.SIM) {
-    //   motorClawSim = new TalonFXSimState(motorClaw);
-    // }
   }
 
   public void start() {
@@ -58,12 +50,5 @@ public class Claw extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Claw Break-Beam", getClawSensorHit());
     SmartDashboard.putNumber("Claw Velo", motorClaw.get());
-  }
-
-  public void simulationPeriodic() {
-    motorClawSim.setSupplyVoltage(
-        RobotController
-            .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
-    // function
   }
 }

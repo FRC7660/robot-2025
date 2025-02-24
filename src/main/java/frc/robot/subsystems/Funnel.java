@@ -5,77 +5,93 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Funnel extends SubsystemBase {
   /** Creates a new Index. */
-  private SparkMax motorWinch = new SparkMax(Constants.Funnel.winchID, MotorType.kBrushless);
+  private SparkFlex motorWinch = new SparkFlex(Constants.Funnel.winchID, MotorType.kBrushless);
 
   private RelativeEncoder encoderWinch;
-  private SparkMaxConfig configWinch;
+  private SparkFlexConfig configWinch;
 
-  private SparkMaxSim motorWinchSim;
+  // private SparkMaxSim motorWinchSim;
+
+  private DigitalInput funnelLimit;
+
+  private double desiredSpeed = 0;
+  private PIDController pid = new PIDController(0, 0, 0);
 
   public Funnel() {
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      motorWinchSim = new SparkMaxSim(motorWinch, DCMotor.getNEO(1));
-    }
+    // if (Constants.currentMode == Constants.Mode.SIM) {
+    //   motorWinchSim = new SparkMaxSim(motorWinch, DCMotor.getNEO(1));
+    // }
     encoderWinch = motorWinch.getEncoder();
-    configWinch = new SparkMaxConfig();
+    configWinch = new SparkFlexConfig();
     configWinch.idleMode(IdleMode.kBrake);
     motorWinch.configure(
-        configWinch, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        configWinch, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     encoderWinch.setPosition(0); // improve later if time, possibly set when enabled
+
+    funnelLimit = new DigitalInput(Constants.Funnel.funnelSwitchID);
+
+    SmartDashboard.putNumber("Funnel P", 0);
+    SmartDashboard.putNumber("Funnel I", 0);
+    SmartDashboard.putNumber("Funnel D", 0);
   }
 
   public void wind() {
-    motorWinch.set(Constants.Funnel.winchSpeed);
+    desiredSpeed = Constants.Funnel.winchSpeed;
   }
 
   public void unwind() {
-    motorWinch.set(-Constants.Funnel.winchSpeed);
+    desiredSpeed = -Constants.Funnel.winchSpeed;
   }
 
   public void stop() {
-    motorWinch.set(0);
+    desiredSpeed = 0;
   }
 
-  public Boolean limitReached() {
-    double position = encoderWinch.getPosition();
-    if (position > Constants.Funnel.limit) {
-      System.out.println("Limit Reached");
-      return true;
-    } else if (position < -Constants.Funnel.limit) {
-      System.out.println("Limit Reached");
-      return true;
-    }
-    return false;
+  public void hold() {
+    desiredSpeed = 0.025;
+  }
+
+  public boolean limitHit() {
+    return !funnelLimit.get();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (limitReached()) {
-      motorWinch.set(0);
+    if (limitHit() && desiredSpeed < 0) {
+      desiredSpeed = 0;
     }
+    motorWinch.set(desiredSpeed);
 
     SmartDashboard.putNumber("Funnel-Pos", encoderWinch.getPosition());
+    SmartDashboard.putBoolean("funnelLimit", limitHit());
+
+    double p = SmartDashboard.getNumber("Funnel P", 0);
+    double i = SmartDashboard.getNumber("Funnel I", 0);
+    double d = SmartDashboard.getNumber("Funnel D", 0);
+
+    pid.setP(p);
+    pid.setI(i);
+    pid.setD(d);
   }
 
-  public void simulationPeriodic() {
-    double velo = motorWinch.get() * 1.0;
-    double voltage = RoboRioSim.getVInVoltage();
-    motorWinchSim.iterate(velo, voltage, Constants.simCycleTime);
-  }
+  // public void simulationPeriodic() {
+  //   double velo = motorWinch.get() * 1.0;
+  //   double voltage = RoboRioSim.getVInVoltage();
+  //   motorWinchSim.iterate(velo, voltage, Constants.simCycleTime);
+  // }
 }
