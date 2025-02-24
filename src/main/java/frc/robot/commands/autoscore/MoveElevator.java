@@ -12,7 +12,7 @@ public class MoveElevator extends Command {
   /** Creates a new MoveElevator. */
   public MoveElevator(ElevatorState state) {
     // Use addRequirements() here to declare subsystem dependencies.
-    
+
   }
 
   // Called when the command is initially scheduled.

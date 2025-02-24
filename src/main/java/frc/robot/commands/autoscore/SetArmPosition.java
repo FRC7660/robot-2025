@@ -11,7 +11,7 @@ public class SetArmPosition extends Command {
   /** Creates a new SetArmPosition. */
   public SetArmPosition(double positionValue) {
     // Use addRequirements() here to declare subsystem dependencies.
-    
+
   }
 
   // Called when the command is initially scheduled.

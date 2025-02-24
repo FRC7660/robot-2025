@@ -38,8 +38,8 @@ import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
-import frc.robot.commands.releaseCoral;
 import frc.robot.commands.autoscore.*;
+import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
@@ -206,20 +206,22 @@ public class RobotContainer {
                 () -> driverController.getLeftX(),
                 () -> driverController.getRightX()));
 
+    driverController
+        .leftTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+    driverController
+        .rightTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
 
-    driverController.leftTrigger(0.1).whileTrue
-      (DriveCommands.strafe(drive,true,() -> driverController.getLeftTriggerAxis()*0.5));
-    driverController.rightTrigger(0.1).whileTrue
-      (DriveCommands.strafe(drive,false,() -> driverController.getRightTriggerAxis()*0.5));
-    
-    //driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
+    // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().onTrue(new LowerClimb(climb));
     driverController.b().onTrue(new RaiseClimb(climb));
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
-
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -314,19 +316,24 @@ public class RobotContainer {
         break;
     }
     // buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height,left), elevator));
-    
+
     buttonXtrigger.onTrue(
-      Commands.parallel(
-        Commands.run(() -> new TestStrafe(drive,left,0.1), drive), // Drive - Alignment command
-        Commands.sequence(
-          Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
-          Commands.run(() -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
-          Commands.run(() -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
-          Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
-          Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
-          Commands.run(() -> new MoveElevator(ElevatorState.ZERO), elevator)) // Elevator - Move to Zero command          
-          ));
-          
+        Commands.parallel(
+            Commands.run(
+                () -> new TestStrafe(drive, left, 0.1), drive), // Drive - Alignment command
+            Commands.sequence(
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
+                Commands.run(
+                    () -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
+                Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(ElevatorState.ZERO),
+                    elevator)) // Elevator - Move to Zero command
+            ));
+
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
