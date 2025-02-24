@@ -211,6 +211,17 @@ public class RobotContainer {
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
 
+    driverController
+        .leftTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+    driverController
+        .rightTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
+
+    // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
+
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
     testController.a().whileTrue(new ArmPIDTest(arm));

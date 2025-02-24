@@ -65,6 +65,16 @@ public class DriveCommands {
         .getTranslation();
   }
 
+  private static Translation2d getStrafeVelocity(
+      Rotation2d currentRotation, double inputMagnitude) {
+    Rotation2d linearDirection = currentRotation;
+
+    // Return new linear velocity
+    return new Pose2d(new Translation2d(), linearDirection)
+        .transformBy(new Transform2d(inputMagnitude, 0.0, new Rotation2d()))
+        .getTranslation();
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -358,6 +368,56 @@ public class DriveCommands {
                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
                           : drive.getRotation());
               drive.runVelocity(speeds);
+            },
+            drive)
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  public static Command strafe(Drive drive, boolean isLeft, DoubleSupplier strafeSpeed) {
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Construct command
+    return Commands.run(
+            () -> {
+              Rotation2d currentRotation = drive.getRotation();
+
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getStrafeVelocity(currentRotation, strafeSpeed.getAsDouble());
+
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), currentRotation.getRadians());
+
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              speeds =
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive
+                              .getRotation()
+                              .plus(new Rotation2d(isLeft ? -Math.PI / 2 : Math.PI / 2))
+                          : drive.getRotation());
+              drive.runVelocity(speeds);
+              // System.out.println("STRAFE END");
             },
             drive)
         // Reset PID controller when command starts
