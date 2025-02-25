@@ -107,7 +107,7 @@ public final class Constants {
     public static final Double lowerLimit = 0.0;
     public static final Double upperLimit = 100.0;
     public static final int lowerlimitID = 3;
-    public static final int motorAplphaID = 51;
+    public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
   }
 
