@@ -224,13 +224,13 @@ public class RobotContainer {
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
 
     driverController
-        .leftTrigger(0.1)
+        .leftTrigger(0.07)
         .whileTrue(
-            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.3));
     driverController
-        .rightTrigger(0.1)
+        .rightTrigger(0.07)
         .whileTrue(
-            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
+            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.3));
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
