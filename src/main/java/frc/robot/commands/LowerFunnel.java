@@ -12,6 +12,7 @@ import frc.robot.subsystems.Funnel;
 public class LowerFunnel extends Command {
   /** Creates a new LiftIndex. */
   private final Funnel funnel;
+
   private final Climb climb;
 
   public LowerFunnel(Funnel funnel, Climb climb) {

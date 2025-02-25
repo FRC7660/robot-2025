@@ -17,8 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -212,6 +210,17 @@ public class RobotContainer {
     driverController.b().onTrue(new RaiseClimb(climb));
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
+
+    driverController
+        .leftTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+    driverController
+        .rightTrigger(0.1)
+        .whileTrue(
+            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
+
+    // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));

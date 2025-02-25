@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.lang.constant.Constable;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,10 +17,6 @@ public class ArmPIDTest extends Command {
   private PIDController pid;
   private ArmFeedforward feedforward;
   private final Arm arm;
-  
-  /** Creates a new ArmPIDTest. */
-  public ArmPIDTest(Arm arm) {
-    // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     pid = new PIDController(0,0,0);
     feedforward = new ArmFeedforward(0, 0, 0);
