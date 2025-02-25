@@ -59,9 +59,9 @@ public class Elevator extends SubsystemBase {
   public void setMotors(double speed, boolean overrideInversion) {
     Double speedMulti;
     if (speed < 0) {
-      speedMulti = 0.4;
+      speedMulti = 0.25;
     } else {
-      speedMulti = 0.9;
+      speedMulti = 0.95;
     }
     Double outputSpeed = speed * speedMulti;
     motorAlpha.set(outputSpeed);
