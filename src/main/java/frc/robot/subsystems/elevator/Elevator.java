@@ -29,7 +29,7 @@ import frc.robot.Constants.ElevatorState;
 public class Elevator extends SubsystemBase {
 
   public final SparkMax motorAlpha =
-      new SparkMax(Constants.Elevator.motorAplphaID, MotorType.kBrushless);
+      new SparkMax(Constants.Elevator.motorAlphaID, MotorType.kBrushless);
   public final SparkMax motorBeta =
       new SparkMax(Constants.Elevator.motorBetaID, MotorType.kBrushless);
   public int alphaInversion = -1; // The factor by which a motor's rotation should be applied
@@ -50,25 +50,25 @@ public class Elevator extends SubsystemBase {
 
   public void raise() {
     motorAlpha.set(.5 * alphaInversion);
-    motorBeta.set(.5 * betaInversion);
   }
 
   public void lower() {
     motorAlpha.set(-.5 * alphaInversion);
-    motorBeta.set(-.5 * betaInversion);
   }
 
   public void setMotors(double speed, boolean overrideInversion) {
-    Double speedMulti = 0.2;
-    Double outputSpeed = speed;
-    if (overrideInversion == true) {
-      motorAlpha.set(outputSpeed * speedMulti);
-      motorBeta.set(outputSpeed * speedMulti);
+    Double speedMulti;
+    if (speed < 0) {
+      speedMulti = 0.4;
     } else {
-      motorAlpha.set(outputSpeed * speedMulti * alphaInversion);
-      motorBeta.set(outputSpeed * speedMulti * betaInversion);
+      speedMulti = 0.9;
     }
-    SmartDashboard.putNumber("Motor Alpha OutputSpeed", outputSpeed);
+    Double outputSpeed = speed * speedMulti;
+    motorAlpha.set(outputSpeed);
+    motorBeta.set(outputSpeed);
+    SmartDashboard.putNumber("Elevator Output", outputSpeed);
+    SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
+    SmartDashboard.putNumber("Motor Beta Speed", motorBeta.get());
   }
 
   public Double getHeight() {
@@ -113,7 +113,7 @@ public class Elevator extends SubsystemBase {
     // Gear ratio - 6:1
     // motorSim.setPosition(5);
 
-    motorAlphaEncoder.setPosition(50);
+    motorAlphaEncoder.setPosition(0);
     System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
 
     alphaConfig.softLimit.forwardSoftLimit(Constants.Elevator.upperLimit);
@@ -121,12 +121,13 @@ public class Elevator extends SubsystemBase {
     alphaConfig.softLimit.forwardSoftLimitEnabled(true);
     alphaConfig.softLimit.reverseSoftLimitEnabled(true);
     alphaConfig.idleMode(IdleMode.kBrake);
-    betaConfig = alphaConfig;
+    alphaConfig.inverted(false);
+    betaConfig.apply(alphaConfig);
 
     motorAlpha.configure(
-        alphaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        alphaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     motorBeta.configure(
-        betaConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        betaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorSim = new SparkMaxSim(motorAlpha, DCMotor.getNeo550(1));
