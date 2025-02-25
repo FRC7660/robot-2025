@@ -17,6 +17,8 @@ public class ArmPIDTest extends Command {
   private PIDController pid;
   private ArmFeedforward feedforward;
   private final Arm arm;
+
+  public ArmPIDTest(Arm arm){
     this.arm = arm;
     pid = new PIDController(0,0,0);
     feedforward = new ArmFeedforward(0, 0, 0);

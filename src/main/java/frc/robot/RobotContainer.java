@@ -206,8 +206,8 @@ public class RobotContainer {
                 () -> driverController.getRightX()));
 
     // driverController.a().onTrue(new LiftFunnel(funnel));
-    driverController.a().onTrue(new LowerClimb(climb));
-    driverController.b().onTrue(new RaiseClimb(climb));
+    driverController.a().whileTrue(new LowerClimb(climb));
+    driverController.b().whileTrue(new RaiseClimb(climb));
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
 
