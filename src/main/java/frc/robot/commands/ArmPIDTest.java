@@ -28,10 +28,10 @@ public class ArmPIDTest extends Command {
     SmartDashboard.putNumber("Arm P", 0);
     SmartDashboard.putNumber("Arm I", 0);
     SmartDashboard.putNumber("Arm D", 0);
-    SmartDashboard.putNumber("Arm kS", 0);
-    SmartDashboard.putNumber("Arm kG", 0);
-    SmartDashboard.putNumber("Arm kV", 0);
-    SmartDashboard.putNumber("Arm Test Pos", 0);
+    //SmartDashboard.putNumber("Arm kS", 0);
+    //SmartDashboard.putNumber("Arm kG", 0);
+    //SmartDashboard.putNumber("Arm kV", 0);
+    SmartDashboard.putNumber("Arm-Test-Pos", 0);
     SmartDashboard.putNumber("Arm FF", 0);
   }
 
@@ -45,10 +45,10 @@ public class ArmPIDTest extends Command {
     pid.setP(SmartDashboard.getNumber("Arm P", 0));
     pid.setI(SmartDashboard.getNumber("Arm I", 0));
     pid.setD(SmartDashboard.getNumber("Arm D", 0));
-    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
-    feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
-    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
-    SmartDashboard.getNumber("Arm Test Pos", 0);
+    //feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
+    //feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
+   // feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+    SmartDashboard.getNumber("Arm-Test-Pos", 0);
     SmartDashboard.putNumber("Arm FF", Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
     double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm Test Pos", 0)) + Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian);
     arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
