@@ -50,7 +50,7 @@ public class ArmPIDTest extends Command {
    // feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
     SmartDashboard.getNumber("Arm-Test-Pos", 0);
     SmartDashboard.putNumber("Arm FF", Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
-    double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm Test Pos", 0)) + Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian);
+    double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm Test Pos", 0)) + (Constants.Arm.gravityFeedForward * Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
     arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
   }
 
