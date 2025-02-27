@@ -23,7 +23,7 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
-  private Encoder encoder = new Encoder(1, 2);
+  public Encoder encoderArm = new Encoder(1, 2);
 
   private double desiredSpeed = 0;
 
@@ -54,7 +54,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPosition(double position) {
-    desiredSpeed = controller.calculate(encoder.get(), position);
+    desiredSpeed = controller.calculate(encoderArm.get(), position) + Math.sin((encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian);
   }
 
   public Boolean armAtMax() {
@@ -76,7 +76,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosition() {
-    return encoder.get();
+    return encoderArm.get();
   }
 
   @Override
@@ -84,12 +84,13 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Encoder", encoder.get());
+    SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
+    SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
 
-    if (desiredSpeed < 0 && encoder.get() <= Constants.Arm.reverseLimit) {
+    if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
       desiredSpeed = 0;
     }
-    if (desiredSpeed > 0 && encoder.get() >= Constants.Arm.forewardLimit) {
+    if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
       desiredSpeed = 0;
     }
     desiredSpeed = MathUtil.applyDeadband(desiredSpeed, 0.05);

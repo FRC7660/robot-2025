@@ -31,6 +31,8 @@ public class ArmPIDTest extends Command {
     SmartDashboard.putNumber("Arm kS", 0);
     SmartDashboard.putNumber("Arm kG", 0);
     SmartDashboard.putNumber("Arm kV", 0);
+    SmartDashboard.putNumber("Arm Test Pos", 0);
+    SmartDashboard.putNumber("Arm FF", 0);
   }
 
   // Called when the command is initially scheduled.
@@ -46,7 +48,9 @@ public class ArmPIDTest extends Command {
     feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
     feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
     feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
-    double output = pid.calculate(arm.getPosition(), Constants.Arm.testPosition);
+    SmartDashboard.getNumber("Arm Test Pos", 0);
+    SmartDashboard.putNumber("Arm FF", Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
+    double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm Test Pos", 0)) + Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian);
     arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
   }
 
