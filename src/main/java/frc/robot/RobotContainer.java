@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.DriveCommands;
@@ -61,7 +58,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Vision vision;
   private final LEDlive ledLive;
   private final Elevator elevator;
   private SwerveDriveSimulation driveSimulation = null;
@@ -85,65 +81,7 @@ public class RobotContainer {
 
     ledLive = new LEDlive();
     elevator = new Elevator();
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIONavX(),
-                new ModuleIOMixed(0),
-                new ModuleIOMixed(1),
-                new ModuleIOMixed(2),
-                new ModuleIOMixed(3),
-                (pose) -> {});
-
-        this.vision =
-            new Vision(
-                drive,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-
-        break;
-      case SIM:
-        // create a maple-sim swerve drive simulation instance
-        this.driveSimulation =
-            new SwerveDriveSimulation(
-                DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
-        // add the simulated drivetrain to the simulation field
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOSim(driveSimulation.getModules()[0]),
-                new ModuleIOSim(driveSimulation.getModules()[1]),
-                new ModuleIOSim(driveSimulation.getModules()[2]),
-                new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
-
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                new VisionIOPhotonVisionSim(
-                    camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
-
-        break;
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-        vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
-
-        break;
-    }
+    drive = new Drive();
 
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
@@ -157,22 +95,6 @@ public class RobotContainer {
     // Default command for Elevator
     // elevator.setDefaultCommand(
     //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -188,22 +110,6 @@ public class RobotContainer {
     configurebuttonBox();
     arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        Constants.absoluteDrive
-            ? DriveCommands.joystickDriveAtAngle(
-                // Absolute Drive
-                drive,
-                () -> driverController.getLeftX(),
-                () -> -driverController.getLeftY(),
-                () -> driverController.getRightX(),
-                () -> -driverController.getRightY())
-            :
-            // Field Drive
-            DriveCommands.joystickDrive(
-                drive,
-                () -> driverController.getLeftY(),
-                () -> driverController.getLeftX(),
-                () -> driverController.getRightX()));
 
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().onTrue(new LowerClimb(climb));
@@ -222,8 +128,6 @@ public class RobotContainer {
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
-    // Switch to X pattern when X button is pressed
-    driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
     testController.a().whileTrue(new ArmPIDTest(arm));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
