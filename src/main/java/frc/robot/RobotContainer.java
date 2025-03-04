@@ -42,6 +42,7 @@ import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.driveCommands.AbsoluteDrive;
+import frc.robot.commands.driveCommands.AbsoluteFieldDrive;
 import frc.robot.commands.driveCommands.Strafe;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
@@ -77,7 +78,7 @@ public class RobotContainer {
   private final CommandXboxController testController = new CommandXboxController(2);
 
   private final SwerveSubsystem drivebase =
-      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "yagsl"));
+      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "7660"));
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
@@ -86,8 +87,8 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity =
       SwerveInputStream.of(
               drivebase.getSwerveDrive(),
-              () -> driverController.getLeftY() * -1,
-              () -> driverController.getLeftX() * -1)
+              () -> driverController.getLeftY() * 1,
+              () -> driverController.getLeftX() * 1)
           .withControllerRotationAxis(driverController::getRightX)
           .deadband(Constants.DEADBAND)
           .scaleTranslation(0.8)
@@ -176,13 +177,7 @@ public class RobotContainer {
         drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(
-          new AbsoluteDrive(
-              drivebase,
-              driverController::getLeftX,
-              driverController::getLeftY,
-              driverController::getRightX,
-              driverController::getRightY));
+      drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
     } else {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
