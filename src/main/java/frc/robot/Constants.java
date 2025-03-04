@@ -13,7 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import swervelib.math.Matter;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -110,6 +113,13 @@ public final class Constants {
     public static final int motorAplphaID = 51;
     public static final int motorBetaID = 52;
   }
+
+  public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  public static final double ROBOT_MASS = 125 * 0.453592;
+  public static final Matter CHASSIS =
+      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
+  public static final double DEADBAND = 0.1;
 
   public static final boolean absoluteDrive = false;
 }

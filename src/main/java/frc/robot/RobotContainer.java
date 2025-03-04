@@ -15,10 +15,16 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,26 +34,26 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
-import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
+import frc.robot.commands.driveCommands.AbsoluteDrive;
+import frc.robot.commands.driveCommands.Strafe;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Funnel;
-import frc.robot.subsystems.LEDsubsystem.*;
-import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.*;
-import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.LEDlive;
+import frc.robot.subsystems.SwerveSubsystem;
+import java.io.File;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import swervelib.SwerveInputStream;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,10 +63,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
   private final LEDlive ledLive;
   private final Elevator elevator;
-  private SwerveDriveSimulation driveSimulation = null;
   private final Funnel funnel = new Funnel();
   private final Arm arm = new Arm();
   private final Climb climb = new Climb();
@@ -71,6 +75,54 @@ public class RobotContainer {
   private final CommandGenericHID buttonBox = new CommandGenericHID(1);
   private final CommandXboxController testController = new CommandXboxController(2);
 
+  private final SwerveSubsystem drivebase =
+      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "yagsl"));
+
+  /**
+   * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular
+   * velocity.
+   */
+  SwerveInputStream driveAngularVelocity =
+      SwerveInputStream.of(
+              drivebase.getSwerveDrive(),
+              () -> driverController.getLeftY() * -1,
+              () -> driverController.getLeftX() * -1)
+          .withControllerRotationAxis(driverController::getRightX)
+          .deadband(Constants.DEADBAND)
+          .scaleTranslation(0.8)
+          .allianceRelativeControl(true);
+
+  /** Clone's the angular velocity input stream and converts it to a fieldRelative input stream. */
+  SwerveInputStream driveDirectAngle =
+      driveAngularVelocity
+          .copy()
+          .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+          .headingWhile(true);
+
+  /** Clone's the angular velocity input stream and converts it to a robotRelative input stream. */
+  SwerveInputStream driveRobotOriented =
+      driveAngularVelocity.copy().robotRelative(true).allianceRelativeControl(false);
+
+  SwerveInputStream driveAngularVelocityKeyboard =
+      SwerveInputStream.of(
+              drivebase.getSwerveDrive(),
+              () -> -driverController.getLeftY(),
+              () -> -driverController.getLeftX())
+          .withControllerRotationAxis(() -> driverController.getRawAxis(2))
+          .deadband(Constants.DEADBAND)
+          .scaleTranslation(0.8)
+          .allianceRelativeControl(true);
+  // Derive the heading axis with math!
+  SwerveInputStream driveDirectAngleKeyboard =
+      driveAngularVelocityKeyboard
+          .copy()
+          .withControllerHeadingAxis(
+              () -> Math.sin(driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2),
+              () -> Math.cos(driverController.getRawAxis(2) * Math.PI) * (Math.PI * 2))
+          .headingWhile(true)
+          .translationHeadingOffset(true)
+          .translationHeadingOffset(Rotation2d.fromDegrees(0));
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -78,10 +130,10 @@ public class RobotContainer {
   public RobotContainer() {
 
     DriverStation.silenceJoystickConnectionWarning(Constants.currentMode == Constants.Mode.SIM);
+    NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
 
     ledLive = new LEDlive();
     elevator = new Elevator();
-    drive = new Drive();
 
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
@@ -111,6 +163,74 @@ public class RobotContainer {
     arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
     // Default command, normal field-relative drive
 
+    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
+    Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
+    Command driveFieldOrientedDirectAngleKeyboard =
+        drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+    Command driveFieldOrientedAnglularVelocityKeyboard =
+        drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+    Command driveSetpointGenKeyboard =
+        drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
+
+    if (RobotBase.isSimulation()) {
+      drivebase.setDefaultCommand(
+          new AbsoluteDrive(
+              drivebase,
+              driverController::getLeftX,
+              driverController::getLeftY,
+              driverController::getRightX,
+              driverController::getRightY));
+    } else {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    }
+
+    if (Robot.isSimulation()) {
+      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
+      // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+      driveDirectAngleKeyboard.driveToPose(
+          () -> target,
+          new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)),
+          new ProfiledPIDController(
+              5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
+      driverController
+          .start()
+          .onTrue(
+              Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverController
+          .button(2)
+          .whileTrue(
+              Commands.runEnd(
+                  () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+                  () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+
+      //      driverXbox.b().whileTrue(
+      //          drivebase.driveToPose(
+      //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+      //                              );
+
+    }
+
+    if (DriverStation.isTest()) {
+      drivebase.setDefaultCommand(
+          driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+
+      driverController
+          .leftBumper()
+          .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverController.back().whileTrue(drivebase.centerModulesCommand());
+    } else {
+      driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverController.povDown().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverController
+          .leftBumper()
+          .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    }
+
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().onTrue(new LowerClimb(climb));
     driverController.b().onTrue(new RaiseClimb(climb));
@@ -119,12 +239,11 @@ public class RobotContainer {
 
     driverController
         .leftTrigger(0.1)
-        .whileTrue(
-            DriveCommands.strafe(drive, true, () -> driverController.getLeftTriggerAxis() * 0.5));
+        .whileTrue(new Strafe(drivebase, () -> driverController.getLeftTriggerAxis() * 0.5, false));
     driverController
         .rightTrigger(0.1)
         .whileTrue(
-            DriveCommands.strafe(drive, false, () -> driverController.getRightTriggerAxis() * 0.5));
+            new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
@@ -134,18 +253,20 @@ public class RobotContainer {
     driverController.povDown().onTrue(new releaseCoral(claw));
 
     // Reset gyro / odometry
-    final Runnable resetGyro =
-        Constants.currentMode == Constants.Mode.SIM // this is an IF statement
-            // simulation
-            ? () ->
-                drive.resetOdometry(
-                    driveSimulation
-                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-            // real
-            : () ->
-                drive.resetOdometry(
-                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    //   final Runnable resetGyro =
+    //       Constants.currentMode == Constants.Mode.SIM // this is an IF statement
+    //           // simulation
+    //           ? () ->
+    //               drive.resetOdometry(
+    //                   driveSimulation
+    //                       .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+    // during
+    //           // real
+    //           : () ->
+    //               drive.resetOdometry(
+    //                   new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero
+    // gyro
+    //   driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
   private void setUpBoxButton(int inputButton) {
@@ -251,22 +372,15 @@ public class RobotContainer {
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
+    drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
-  public void displaySimFieldToAdvantageScope() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+  public SwerveSubsystem getDrive() {
+    return drivebase;
   }
 
-  public Drive getDrive() {
-    return drive;
+  public void setMotorBrakeMode(boolean brake) {
+    drivebase.setMotorBrake(brake);
   }
 }
