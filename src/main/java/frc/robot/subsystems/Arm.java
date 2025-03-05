@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -26,6 +27,7 @@ public class Arm extends SubsystemBase {
   public Encoder encoderArm = new Encoder(1, 2);
 
   private double desiredSpeed = 0;
+  private ArmFeedforward feedforward;
 
   private PIDController controller =
       new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
@@ -33,12 +35,21 @@ public class Arm extends SubsystemBase {
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorArmSim = new TalonFXSimState(motorArm);
+      
     }
 
     motorArm.setPosition(0);
 
     motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
+
+    feedforward = new ArmFeedforward(0, 0, 0);
+    SmartDashboard.putNumber("Arm FF", 0);
+    SmartDashboard.putNumber("Arm kS", 0);
+    SmartDashboard.putNumber("Arm kG", 0);
+    SmartDashboard.putNumber("Arm kV", 0);
+
+    SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
   }
 
   public void setMotor(double speed) {
@@ -87,7 +98,19 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
-    SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
+
+
+    double posff = (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())*Constants.Arm.radiansPerMotorRotation;
+    SmartDashboard.putNumber("Arm PosFF", posff);
+
+    desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
+
+    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
+    feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
+    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+    double outff = feedforward.calculate(posff, desiredSpeed);
+    
+    SmartDashboard.putNumber("Arm FF", outff);
 
     // if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
     //   desiredSpeed = 0;

@@ -52,6 +52,9 @@ public final class Constants {
     public static final double horizontalCounts = -12.86;
     public static final double countsPerRadian = 5.83;
     public static final double gravityFeedForward = 0.07;
+    public static final double motorOffset = -12.3;
+    public static final double motorRotationsPerCircle = 37.2;
+    public static final double radiansPerMotorRotation = (2*Math.PI)/37.2;
   }
 
   public static class Claw {
