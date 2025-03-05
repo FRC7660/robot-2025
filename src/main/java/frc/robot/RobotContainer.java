@@ -328,22 +328,22 @@ public class RobotContainer {
     }
     buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
 
-    // buttonXtrigger.onTrue(
-    //     Commands.parallel(
-    //         Commands.run(
-    //             () -> new TestStrafe(drive, left, 0.1), drive), // Drive - Alignment command
-    //         Commands.sequence(
-    //             Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
-    //             Commands.run(
-    //                 () -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
-    //             Commands.run(
-    //                 () -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
-    //             Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
-    //             Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
-    //             Commands.run(
-    //                 () -> new MoveElevator(ElevatorState.ZERO),
-    //                 elevator)) // Elevator - Move to Zero command
-    //         ));
+    buttonXtrigger.onTrue(
+        Commands.parallel(
+            Commands.run(
+                () -> new TestStrafe(drive, left, 0.1), drive), // Drive - Alignment command
+            Commands.sequence(
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(height), elevator), // Elevator - Move to Preset command
+                Commands.run(
+                    () -> new SetArmPosition(scorePosition), arm), // Arm - Score position command
+                Commands.run(() -> new releaseCoral(claw), claw), // Claw - Eject/Score command
+                Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
+                Commands.run(
+                    () -> new MoveElevator(ElevatorState.ZERO),
+                    elevator)) // Elevator - Move to Zero command
+            ));
 
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
