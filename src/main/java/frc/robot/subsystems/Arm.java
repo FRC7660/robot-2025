@@ -19,7 +19,7 @@ import java.util.function.DoubleSupplier;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
+  public TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
 
   private TalonFXSimState motorArmSim;
 
@@ -37,12 +37,12 @@ public class Arm extends SubsystemBase {
 
     motorArm.setPosition(0);
 
-    motorArm.setNeutralMode(NeutralModeValue.Brake);
+    motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
   }
 
   public void setMotor(double speed) {
-    desiredSpeed = speed * 0.5;
+    desiredSpeed = speed;
   }
 
   public void raise() {
@@ -54,7 +54,9 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPosition(double position) {
-    desiredSpeed = controller.calculate(encoderArm.get(), position) + Math.sin((encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian);
+    desiredSpeed =
+        controller.calculate(motorArm.getPosition().getValueAsDouble(), position)
+            + Math.cos((encoderArm.get() - Constants.Arm.horizontalCounts) / Constants.Arm.countsPerRadian);
   }
 
   public Boolean armAtMax() {
@@ -76,7 +78,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosition() {
-    return encoderArm.get();
+    return motorArm.getPosition().getValueAsDouble();
   }
 
   @Override
@@ -87,12 +89,12 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
     SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
 
-    if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
-      desiredSpeed = 0;
-    }
-    if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
-      desiredSpeed = 0;
-    }
+    // if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
+    //   desiredSpeed = 0;
+    // }
+    // if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
+    //   desiredSpeed = 0;
+    // }
     desiredSpeed = MathUtil.applyDeadband(desiredSpeed, 0.05);
     motorArm.set(desiredSpeed);
   }
@@ -105,6 +107,6 @@ public class Arm extends SubsystemBase {
   }
 
   public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble()));
+    return this.run(() -> setMotor(speed.getAsDouble()*0.3));
   }
 }

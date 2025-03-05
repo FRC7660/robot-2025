@@ -28,11 +28,12 @@ public class ArmPIDTest extends Command {
     SmartDashboard.putNumber("Arm P", 0);
     SmartDashboard.putNumber("Arm I", 0);
     SmartDashboard.putNumber("Arm D", 0);
-    //SmartDashboard.putNumber("Arm kS", 0);
-    //SmartDashboard.putNumber("Arm kG", 0);
-    //SmartDashboard.putNumber("Arm kV", 0);
+    SmartDashboard.putNumber("Arm kS", 0);
+    SmartDashboard.putNumber("Arm kG", 0);
+    SmartDashboard.putNumber("Arm kV", 0);
     SmartDashboard.putNumber("Arm-Test-Pos", 0);
     SmartDashboard.putNumber("Arm FF", 0);
+    SmartDashboard.putNumber("Arm Test Velo", 0);
   }
 
   // Called when the command is initially scheduled.
@@ -45,13 +46,22 @@ public class ArmPIDTest extends Command {
     pid.setP(SmartDashboard.getNumber("Arm P", 0));
     pid.setI(SmartDashboard.getNumber("Arm I", 0));
     pid.setD(SmartDashboard.getNumber("Arm D", 0));
-    //feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
-    //feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
-   // feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
+    feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
+    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+
+    SmartDashboard.putNumber("Arm FF", feedforward.calculate(
+        SmartDashboard.getNumber("Arm-Test-Pos", 0), 
+        SmartDashboard.getNumber("Arm Test Velo", 0)));
+    
     SmartDashboard.getNumber("Arm-Test-Pos", 0);
-    SmartDashboard.putNumber("Arm FF", Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
-    double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm Test Pos", 0)) + (Constants.Arm.gravityFeedForward * Math.sin((arm.encoderArm.get() - Constants.Arm.verticleCounts)/Constants.Arm.countsPerRadian));
+    double output = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm-Test-Pos", 0)) 
+    + feedforward.calculate(SmartDashboard.getNumber("Arm-Test-Pos", 0), SmartDashboard.getNumber("Arm Test Velo", 0) );
     arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
+
+    double measured_angle_rad = (arm.getPosition() - Constants.Arm.horizontalCounts) / Constants.Arm.countsPerRadian;
+
+    SmartDashboard.putNumber("Arm Meas Angle Radians", measured_angle_rad);
   }
 
   // Called once the command ends or is interrupted.

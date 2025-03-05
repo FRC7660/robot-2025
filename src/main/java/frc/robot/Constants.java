@@ -49,9 +49,8 @@ public final class Constants {
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
-    public static final int verticleCounts = 192;
-    public static final int horizontalCounts = 664;
-    public static final int countsPerRadian = 300;
+    public static final double horizontalCounts = -12.86;
+    public static final double countsPerRadian = 5.83;
     public static final double gravityFeedForward = 0.07;
   }
 
