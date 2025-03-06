@@ -35,7 +35,6 @@ public class Arm extends SubsystemBase {
   public Arm() {
     if (Constants.currentMode == Constants.Mode.SIM) {
       motorArmSim = new TalonFXSimState(motorArm);
-      
     }
 
     motorArm.setPosition(0);
@@ -46,7 +45,7 @@ public class Arm extends SubsystemBase {
     feedforward = new ArmFeedforward(0, 0, 0);
     SmartDashboard.putNumber("Arm FF", 0);
     SmartDashboard.putNumber("Arm kS", 0);
-    SmartDashboard.putNumber("Arm kG", 0);
+    SmartDashboard.putNumber("Arm kG", Constants.Arm.kG);
     SmartDashboard.putNumber("Arm kV", 0);
 
     SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
@@ -67,7 +66,9 @@ public class Arm extends SubsystemBase {
   public void setPosition(double position) {
     desiredSpeed =
         controller.calculate(motorArm.getPosition().getValueAsDouble(), position)
-            + Math.cos((encoderArm.get() - Constants.Arm.horizontalCounts) / Constants.Arm.countsPerRadian);
+            + Math.cos(
+                (encoderArm.get() - Constants.Arm.horizontalCounts)
+                    / Constants.Arm.countsPerRadian);
   }
 
   public Boolean armAtMax() {
@@ -99,17 +100,17 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
-
-    double posff = (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())*Constants.Arm.radiansPerMotorRotation;
+    double posff =
+        (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
+            * Constants.Arm.radiansPerMotorRotation;
     SmartDashboard.putNumber("Arm PosFF", posff);
 
-    desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
+    //desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
 
-    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
-    feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
-    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
-    double outff = feedforward.calculate(posff, desiredSpeed);
-    
+    feedforward.setKg(Constants.Arm.kG);
+
+    double outff = feedforward.calculate(posff, 0);
+
     SmartDashboard.putNumber("Arm FF", outff);
 
     // if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
@@ -118,8 +119,9 @@ public class Arm extends SubsystemBase {
     // if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
     //   desiredSpeed = 0;
     // }
-    desiredSpeed = MathUtil.applyDeadband(desiredSpeed, 0.05);
-    motorArm.set(desiredSpeed);
+    double speed = MathUtil.applyDeadband(desiredSpeed, 0.01);
+    motorArm.set(speed);
+    SmartDashboard.putNumber("Arm desiredSpeed", speed);
   }
 
   public void simulationPeriodic() {
@@ -130,6 +132,6 @@ public class Arm extends SubsystemBase {
   }
 
   public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble()*0.3));
+    return this.run(() -> setMotor(speed.getAsDouble() * 0.3));
   }
 }
