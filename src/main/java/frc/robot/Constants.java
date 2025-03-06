@@ -63,6 +63,7 @@ public final class Constants {
     public static double climbEncoderLimit = 1;
     public static int climbSwitchID = 5;
     public static double upperLimit = 165;
+    public static double halfwayPosition = 100;
   }
 
   public static class Funnel {
