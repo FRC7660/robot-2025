@@ -43,10 +43,15 @@ public final class Constants {
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
     public static final double safe_pos = 0.4;
+    public static final double kS = 0.0;
     public static final double kG = 0.03;
-    public static final double kp = 0.1;
-    public static final double ki = 0.05;
+    public static final double kV = 0.0;
+    public static final double kp = 0.01;
+    public static final double ki = 0.005;
     public static final double kd = 0;
+    public static final double scorePos = -3.5;
+    public static final double zeroPos = 0.0;
+    public static final double safePos = -10.0;
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
@@ -56,6 +61,7 @@ public final class Constants {
     public static final double motorOffset = -12.3;
     public static final double motorRotationsPerCircle = 37.2;
     public static final double radiansPerMotorRotation = (2 * Math.PI) / 37.2;
+    public static final double endDeadband = 0.4;
   }
 
   public static class Claw {

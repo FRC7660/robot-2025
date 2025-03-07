@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
-import frc.robot.commands.ArmPIDTest;
+import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
@@ -227,7 +227,9 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.povDown().onTrue(new ArmGoToPos(arm, Constants.Arm.scorePos));
+    testController.povUp().onTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
+    testController.povRight().onTrue(new ArmGoToPos(arm, Constants.Arm.safePos));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));

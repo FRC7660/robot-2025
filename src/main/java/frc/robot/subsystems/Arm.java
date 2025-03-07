@@ -24,12 +24,16 @@ public class Arm extends SubsystemBase {
 
   private TalonFXSimState motorArmSim;
 
+  private boolean manualMode = false;
+
   public Encoder encoderArm = new Encoder(1, 2);
 
-  private double desiredSpeed = 0;
+  private double desiredOutput = 0;
   private ArmFeedforward feedforward;
 
-  private PIDController controller =
+  private double targetPos;
+
+  private PIDController pid =
       new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
 
   public Arm() {
@@ -37,38 +41,36 @@ public class Arm extends SubsystemBase {
       motorArmSim = new TalonFXSimState(motorArm);
     }
 
-    motorArm.setPosition(0);
-
     motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
 
-    feedforward = new ArmFeedforward(0, 0, 0);
+    feedforward = new ArmFeedforward(Constants.Arm.kS, Constants.Arm.kG, Constants.Arm.kV);
     SmartDashboard.putNumber("Arm FF", 0);
-    SmartDashboard.putNumber("Arm kS", 0);
-    SmartDashboard.putNumber("Arm kG", Constants.Arm.kG);
-    SmartDashboard.putNumber("Arm kV", 0);
+    SmartDashboard.putNumber("Arm kS", feedforward.getKs());
+    SmartDashboard.putNumber("Arm kG", feedforward.getKg());
+    SmartDashboard.putNumber("Arm kV", feedforward.getKv());
+    
+    SmartDashboard.putNumber("Arm P", pid.getP());
+    SmartDashboard.putNumber("Arm I", pid.getI());
+    SmartDashboard.putNumber("Arm D", pid.getD());
 
-    SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
+    SmartDashboard.putBoolean("Arm-manualMode", manualMode);
   }
 
-  public void setMotor(double speed) {
-    desiredSpeed = speed;
+  public void setMotor(double output) {
+    desiredOutput = output;
   }
 
-  public void raise() {
-    desiredSpeed = Constants.Arm.armSpeed;
+  public void setManual(boolean manual){
+    manualMode = manual;
   }
 
-  public void stop() {
-    desiredSpeed = 0;
+  public void setTarget(double Pos) {
+    targetPos = Pos;
   }
 
-  public void setPosition(double position) {
-    desiredSpeed =
-        controller.calculate(motorArm.getPosition().getValueAsDouble(), position)
-            + Math.cos(
-                (encoderArm.get() - Constants.Arm.horizontalCounts)
-                    / Constants.Arm.countsPerRadian);
+  public double getTarget() {
+    return targetPos;
   }
 
   public Boolean armAtMax() {
@@ -89,12 +91,20 @@ public class Arm extends SubsystemBase {
     return false;
   }
 
+  public boolean atTargetPos() {
+    return MathUtil.isNear(targetPos, getPosition(), Constants.Arm.endDeadband);
+  }
+
   public double getPosition() {
     return motorArm.getPosition().getValueAsDouble();
   }
 
   @Override
   public void periodic() {
+    if(manualMode){
+      motorArm.set(desiredOutput);
+      return;
+    }
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
@@ -103,25 +113,15 @@ public class Arm extends SubsystemBase {
     double posff =
         (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
             * Constants.Arm.radiansPerMotorRotation;
-    SmartDashboard.putNumber("Arm PosFF", posff);
-
-    //desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
-
-    feedforward.setKg(Constants.Arm.kG);
+    SmartDashboard.putNumber("Arm-PosFF", posff);
 
     double outff = feedforward.calculate(posff, 0);
 
     SmartDashboard.putNumber("Arm FF", outff);
 
-    // if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
-    //   desiredSpeed = 0;
-    // }
-    // if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
-    //   desiredSpeed = 0;
-    // }
-    double speed = MathUtil.applyDeadband(desiredSpeed, 0.01);
-    motorArm.set(speed);
-    SmartDashboard.putNumber("Arm desiredSpeed", speed);
+    double outPID = pid.calculate(getPosition(), targetPos);
+
+    motorArm.set(MathUtil.clamp(outff + outPID, -0.4, 0.4));
   }
 
   public void simulationPeriodic() {
