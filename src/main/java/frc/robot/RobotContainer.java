@@ -228,6 +228,7 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
     testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));

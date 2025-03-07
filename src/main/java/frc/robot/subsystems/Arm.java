@@ -105,7 +105,7 @@ public class Arm extends SubsystemBase {
             * Constants.Arm.radiansPerMotorRotation;
     SmartDashboard.putNumber("Arm PosFF", posff);
 
-    //desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
+    // desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
 
     feedforward.setKg(Constants.Arm.kG);
 

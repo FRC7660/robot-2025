@@ -100,10 +100,10 @@ public final class Constants {
     ZERO
   }
 
-  public static final Double l1height = 25.0;
-  public static final Double l2height = 50.0;
-  public static final Double l3height = 75.0;
-  public static final Double l4height = 100.0;
+  public static final Double l1height = 60 * 0.25;
+  public static final Double l2height = 60 * 0.50;
+  public static final Double l3height = 60 * 0.75;
+  public static final Double l4height = 60 * 0.99;
   public static final Double zeroHeight = 0.0;
 
   public static final Double elevatorP = 0.1;
@@ -111,8 +111,9 @@ public final class Constants {
   public static final Double elevatorD = 0.0;
 
   public static class Elevator {
-    public static final Double lowerLimit = 0.0;
-    public static final Double upperLimit = 100.0;
+    public static final Double lowerLimit = 1.5;
+    public static final Double upperLimit = 60.0;
+    public static final Double feedForward = 0.0399;
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;

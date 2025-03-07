@@ -47,11 +47,10 @@ public class ArmPIDTest extends Command {
     pid.setD(SmartDashboard.getNumber("Arm D", 0));
 
     SmartDashboard.getNumber("Arm-Test-Pos", 0);
-    double outPID = pid.calculate(arm.getPosition(),
-     SmartDashboard.getNumber("Arm-Test-Pos", 0));
+    double outPID = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm-Test-Pos", 0));
     double posff = SmartDashboard.getNumber("Arm PosFF", 0);
     double desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
-  
+
     SmartDashboard.putNumber("Arm outPID", outPID);
 
     feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
