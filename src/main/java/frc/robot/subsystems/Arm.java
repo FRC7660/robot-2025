@@ -128,6 +128,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
+    SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
+
     m_controller.setP(SmartDashboard.getNumber("Arm P", Constants.Arm.kp));
     m_controller.setI(SmartDashboard.getNumber("Arm I", Constants.Arm.ki));
     m_controller.setD(SmartDashboard.getNumber("Arm D", Constants.Arm.kd));
