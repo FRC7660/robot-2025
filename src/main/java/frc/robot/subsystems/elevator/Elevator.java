@@ -7,7 +7,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -18,7 +18,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 // import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import com.revrobotics.sim.SparkFlexSim;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -215,12 +214,9 @@ public class Elevator extends SubsystemBase {
     m_feedforward.setKv(SmartDashboard.getNumber("eKv", 0));
 
     m_controller.setConstraints(
-      new TrapezoidProfile.Constraints(
-        SmartDashboard.getNumber("eKcVel", 0),
-        SmartDashboard.getNumber("eKcAccel", 0)
-      )
-    );
-    
+        new TrapezoidProfile.Constraints(
+            SmartDashboard.getNumber("eKcVel", 0), SmartDashboard.getNumber("eKcAccel", 0)));
+
     SmartDashboard.putNumber("Visual Setpoint", m_controller.getSetpoint().position);
   }
 

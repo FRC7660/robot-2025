@@ -16,7 +16,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,11 +36,6 @@ import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.SwitchVideo;
-import frc.robot.commands.LiftFunnel;
-import frc.robot.commands.LowerClimb;
-import frc.robot.commands.LowerFunnel;
-import frc.robot.commands.ManualElevator;
-import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.driveCommands.Strafe;
 import frc.robot.commands.releaseCoral;
@@ -229,8 +223,10 @@ public class RobotContainer {
 
     testController.a().whileTrue(new ArmPIDTest(arm));
     testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
-    testController.b().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
-      }
+    testController
+        .b()
+        .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
+  }
 
   private void configureSimBindings() {
     Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
