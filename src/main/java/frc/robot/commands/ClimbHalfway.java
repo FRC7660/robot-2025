@@ -5,44 +5,39 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.elevator.Elevator;
-import java.util.function.DoubleSupplier;
+import frc.robot.Constants;
+import frc.robot.subsystems.Climb;
 
-public class ManualElevator extends Command {
-  private final Elevator m_elevator;
-  private DoubleSupplier m_speed;
-  private final Arm m_arm;
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class ClimbHalfway extends Command {
+  private final Climb climb;
 
-  public ManualElevator(Elevator subsystem, DoubleSupplier speed, Arm arm) {
-    m_arm = arm;
-    m_elevator = subsystem;
-    m_speed = speed;
-    addRequirements(subsystem);
+  /** Creates a new ClimbHalfway. */
+  public ClimbHalfway(Climb climb) {
+    this.climb = climb;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(climb);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // m_arm.setPosition(Constants.Arm.safe_pos);
+    climb.lower();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    double dSpeed = m_speed.getAsDouble();
-    m_elevator.setMotors(dSpeed);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setMotors(0);
+    climb.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return climb.getPosition() <= Constants.Climb.halfwayPosition;
   }
 }

@@ -3,9 +3,15 @@
 ## driver controller
  * joysticks: drive
  * triggers: strafe
- * a/b: coral intake and output
- * d-pad: either manual elevator and arm or manual funnel and climb
+ * d-pad up: manual elevator up
+ * d-pad down: manual elevator down
+ * d-pad left: manual arm in
+ * d-pad right: manual arm out
+ * a: coral intake
+ * b: coral outake
  * x: elevator and arm to home position
+ * y: vision switch
+ * back button (two squares/view button): climb prep routine
 
 ## button board
  * 4 buttons: elevator presets with automatic arm movement
