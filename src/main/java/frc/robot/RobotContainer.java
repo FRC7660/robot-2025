@@ -24,7 +24,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -36,9 +35,6 @@ import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.IntakeCoral;
-import frc.robot.commands.LowerClimb;
-import frc.robot.commands.LowerFunnel;
-import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.driveCommands.Strafe;
@@ -188,16 +184,16 @@ public class RobotContainer {
       driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverController.back().whileTrue(drivebase.centerModulesCommand());
-    } 
+    }
 
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     driverController.start().onTrue(new PrintCommand("You pressed the start command!"));
     driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
-    driverController.back().onTrue( new PrintCommand("You pressed the back button!"));
+    driverController.back().onTrue(new PrintCommand("You pressed the back button!"));
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
-    //TODO: bind x to 'return elevator and arm to home position'
+    // TODO: bind x to 'return elevator and arm to home position'
     driverController.x().onTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
     driverController.y().onTrue(new SwitchVideo());
 
@@ -212,7 +208,7 @@ public class RobotContainer {
     testController.a().whileTrue(new ArmPIDTest(arm));
   }
 
-  private void configureSimBindings(){
+  private void configureSimBindings() {
     Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
     // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
     driveDirectAngleKeyboard.driveToPose(
