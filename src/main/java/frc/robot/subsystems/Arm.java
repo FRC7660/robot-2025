@@ -99,6 +99,10 @@ public class Arm extends SubsystemBase {
     return motorArm.getPosition().getValueAsDouble();
   }
 
+  public void holdCurrentPosition() {
+    targetPos = getPosition();
+  }
+
   @Override
   public void periodic() {
     if(manualMode){
@@ -132,6 +136,6 @@ public class Arm extends SubsystemBase {
   }
 
   public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble() * 0.3));
+    return this.runEnd(() -> setMotor(speed.getAsDouble() * 0.3), () -> holdCurrentPosition());
   }
 }
