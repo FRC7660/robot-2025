@@ -110,7 +110,10 @@ public class SwerveSubsystem extends SubsystemBase {
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
 
-    SmartDashboard.putData(swerveDrive.field);
+    // put the field2d widget up in sim.
+    if (SwerveDriveTelemetry.isSimulation) {
+      SmartDashboard.putData(swerveDrive.field);
+    }
   }
 
   /**
