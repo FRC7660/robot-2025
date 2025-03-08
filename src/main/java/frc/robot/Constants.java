@@ -43,9 +43,13 @@ public final class Constants {
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
     public static final double safe_pos = 0.4;
+    public static final double kDt = 0.02;
+    public static final double kMaxVelocity = 1.75;
+    public static final double kMaxAcceleration = 0.75;
     public static final double kS = 0.0;
-    public static final double kG = 0.03;
+    public static final double kGVoltage = 0.36; // multiplied by 12 for voltage
     public static final double kV = 0.0;
+    public static final double kA = 0.0;
     public static final double kp = 0.01;
     public static final double ki = 0.005;
     public static final double kd = 0;
