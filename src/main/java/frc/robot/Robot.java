@@ -139,9 +139,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
-    // Reset the gyro to zero
-    robotContainer.getDrive().resetGyro();
   }
 
   /** This function is called periodically during operator control. */
@@ -167,6 +164,5 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
-    robotContainer.displaySimFieldToAdvantageScope();
   }
 }

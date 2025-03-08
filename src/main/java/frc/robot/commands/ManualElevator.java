@@ -7,7 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.elevator.*;
+import frc.robot.subsystems.elevator.Elevator;
 import java.util.function.DoubleSupplier;
 
 public class ManualElevator extends Command {
