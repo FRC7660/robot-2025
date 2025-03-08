@@ -225,6 +225,9 @@ public class RobotContainer {
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
+    // switch camera video displayed on Elastic
+    // driverController.b().onTrue(new SwitchVideo());
+
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
     testController.a().whileTrue(new ArmPIDTest(arm));
