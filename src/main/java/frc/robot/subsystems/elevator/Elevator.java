@@ -104,6 +104,7 @@ public class Elevator extends SubsystemBase {
       motorSimEncoder = motorSim.getRelativeEncoderSim();
     }
   }
+
   // public void raise() {
   //   motorAlpha.set(.5 * alphaInversion);
   // }
