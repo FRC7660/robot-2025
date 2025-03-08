@@ -144,6 +144,8 @@ public class Arm extends SubsystemBase {
             SmartDashboard.getNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity),
             SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
 
+    m_controller.setGoal(targetPos);
+
     double posff =
         (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
             * Constants.Arm.radiansPerMotorRotation;
