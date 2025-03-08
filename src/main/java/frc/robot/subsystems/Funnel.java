@@ -62,7 +62,7 @@ public class Funnel extends SubsystemBase {
   }
 
   public void hold() {
-    desiredSpeed = 0.025;
+    desiredSpeed = 0.04;
   }
 
   public boolean limitHit() {
