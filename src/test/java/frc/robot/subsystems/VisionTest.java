@@ -1,19 +1,15 @@
 package frc.robot.commands;
 
-import java.util.HashMap;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 
 public class VisionTest {
-    private static String jblob = """
+  private static String jblob =
+      """
                                             [
    {
       "tag_id":7,
@@ -49,26 +45,23 @@ public class VisionTest {
         ]
             """;
 
-    
-        
   @Test
   public void test1() {
-    //JSONObject obj = new JSONObject(jblob);
+    // JSONObject obj = new JSONObject(jblob);
     JSONArray top = new JSONArray(jblob);
     // String pageName = obj.getJSONObject("pageInfo").getString("pageName");
     JSONObject obj = top.getJSONObject(0);
 
+    int tag_id = obj.getInt("tag_id");
+    JSONArray pose_R = obj.getJSONArray("pose_R"); // Extract pose_R
+    JSONArray pose_t = obj.getJSONArray("pose_t"); // Extract pose_t
 
-   int tag_id = obj.getInt("tag_id");
-   JSONArray pose_R = obj.getJSONArray("pose_R");  // Extract pose_R
-   JSONArray pose_t = obj.getJSONArray("pose_t");  // Extract pose_t
+    // Print values
+    // System.out.println("Tag ID: " + tag_id);
+    // System.out.println("Rotation Matrix: " + pose_R);
+    // System.out.println("Translation Vector: " + pose_t);
 
-   // Print values
-   // System.out.println("Tag ID: " + tag_id);
-   // System.out.println("Rotation Matrix: " + pose_R);
-   // System.out.println("Translation Vector: " + pose_t);
-
-   // Extracting rotation matrix values
+    // Extracting rotation matrix values
     // roll
     double r00 = pose_R.getJSONArray(0).getDouble(0);
     double r01 = pose_R.getJSONArray(0).getDouble(1);
@@ -81,21 +74,21 @@ public class VisionTest {
     double r20 = pose_R.getJSONArray(2).getDouble(0);
     double r21 = pose_R.getJSONArray(2).getDouble(1);
     double r22 = pose_R.getJSONArray(2).getDouble(2);
- 
+
     // Extracting translation vector values
     double tx = pose_t.getJSONArray(0).getDouble(0);
     double ty = pose_t.getJSONArray(1).getDouble(0);
     double tz = pose_t.getJSONArray(2).getDouble(0);
 
     // Convert rotation matrix to roll, pitch, yaw
-    double roll = Math.atan2(r21, r22);  // Rotation around X-axis
-    double pitch = Math.asin(-r20);      // Rotation around Y-axis
-    double yaw = Math.atan2(r10, r00);   // Rotation around Z-axis
+    double roll = Math.atan2(r21, r22); // Rotation around X-axis
+    double pitch = Math.asin(-r20); // Rotation around Y-axis
+    double yaw = Math.atan2(r10, r00); // Rotation around Z-axis
 
     // Create Rotation3d object
     Rotation3d rotation = new Rotation3d(roll, pitch, yaw);
     // Create Translation3d object
-    Translation3d translation = new Translation3d(tx,ty,tz);
+    Translation3d translation = new Translation3d(tx, ty, tz);
 
     // Construct Pose3d
     Pose3d pose = new Pose3d(translation, rotation);
@@ -109,7 +102,7 @@ public class VisionTest {
     // JSONArray pose_R = jsonThing.getJSONArray("pose_R");
     // double[] row1 = (double[])pose_R.get(0);
     // double x1 = row1[0];
-    
+
     // JSONArray pose_t = jsonThing.getJSONArray("pose_t");
     // int tag_id = jsonThing.getInt("tag_id");
     // //Int tag_Id = new Int(jsonThing.getInt("tag_id"));

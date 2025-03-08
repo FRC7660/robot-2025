@@ -15,8 +15,6 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import javax.crypto.spec.DESKeySpec;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,9 +37,9 @@ import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
+import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
-import frc.robot.commands.SwitchVideo;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
@@ -54,6 +52,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.VisionReader;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -72,6 +71,7 @@ public class RobotContainer {
   private final Arm arm = new Arm();
   private final Climb climb = new Climb();
   private final Claw claw = new Claw();
+  private VisionReader visionReader = null;
 
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -85,7 +85,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     DriverStation.silenceJoystickConnectionWarning(Constants.currentMode == Constants.Mode.SIM);
-
+    visionReader = new VisionReader();
     ledLive = new LEDlive();
     elevator = new Elevator();
     switch (Constants.currentMode) {
@@ -225,7 +225,7 @@ public class RobotContainer {
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
-    //switch video displayed on Elastic
+    // switch video displayed on Elastic
     driverController.b().onTrue(new SwitchVideo());
 
     // Switch to X pattern when X button is pressed
@@ -248,8 +248,6 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-
-    
   }
 
   private void setUpBoxButton(int inputButton) {
