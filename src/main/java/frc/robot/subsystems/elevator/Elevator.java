@@ -6,8 +6,6 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.Random;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
@@ -18,7 +16,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-//import edu.wpi.first.math.controller.PIDController;
+// import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -57,15 +55,16 @@ public class Elevator extends SubsystemBase {
 
   Double eKp = 0.001;
   Double eKi = 0.001;
+  Double eKd = 0.0;
+  Double eKs = 0.0;
   Double eKg = Constants.Elevator.feedForward;
   Double eKv = 0.06;
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(0.4, 0.2);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(eKp, eKi, 0, m_constraints, 0.02);
-  private final ElevatorFeedforward m_feedforward =
-      new ElevatorFeedforward(0, eKg, eKv);
+      new ProfiledPIDController(eKp, eKi, eKd, m_constraints, 0.02);
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(eKs, eKg, eKv);
 
   // public void raise() {
   //   motorAlpha.set(.5 * alphaInversion);
@@ -166,6 +165,8 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putNumber("eKp", eKp);
     SmartDashboard.putNumber("eKi", eKi);
+    SmartDashboard.putNumber("eKd", eKd);
+    SmartDashboard.putNumber("eKs", eKs);
     SmartDashboard.putNumber("eKg", eKg);
     SmartDashboard.putNumber("eKv", eKv);
 
@@ -199,10 +200,13 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Alpha Applied", motorAlpha.getAppliedOutput());
 
     m_controller.setPID(
-      SmartDashboard.getNumber("eKp", 0), 
-      SmartDashboard.getNumber("eKi", 0),
-      0);
-    
+        SmartDashboard.getNumber("eKp", 0),
+        SmartDashboard.getNumber("eKi", 0),
+        SmartDashboard.getNumber("eKd", 0));
+
+    m_feedforward.setKs(SmartDashboard.getNumber("eKs", 0));
+    m_feedforward.setKg(SmartDashboard.getNumber("eKg", 0));
+    m_feedforward.setKv(SmartDashboard.getNumber("eKv", 0));
   }
 
   public void simulationPeriodic() {
