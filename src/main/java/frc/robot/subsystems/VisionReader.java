@@ -16,13 +16,11 @@ import org.json.JSONObject;
 
 public class VisionReader extends SubsystemBase {
   /** Creates a new VisionReader. */
-  public VisionReader() {
-    System.out.println("CONSTRUCTER");
-  }
+  public VisionReader() {}
 
   @Override
   public void periodic() {
-    System.out.println("PRINTING AT ZERO");
+    
     String fromTable = SmartDashboard.getString("detecTable", "[]");
 
     // System.out.println(fromTable);
@@ -36,7 +34,7 @@ public class VisionReader extends SubsystemBase {
     JSONArray pose_R = obj.getJSONArray("pose_R"); // Extract pose_R
     JSONArray pose_t = obj.getJSONArray("pose_t"); // Extract pose_t
 
-    System.out.println("PRINTING AT ONE");
+    
     System.out.println(x);
     if (x > 0) {
       JSONObject dict = (JSONObject) top.get(0);
