@@ -46,12 +46,19 @@ public final class Constants {
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
     public static final double safe_pos = 0.4;
+    public static final double kG = 0.03;
     public static final double kp = 0.1;
-    public static final double ki = 0;
+    public static final double ki = 0.05;
     public static final double kd = 0;
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
+    public static final double horizontalCounts = -12.86;
+    public static final double countsPerRadian = 5.83;
+    public static final double gravityFeedForward = 0.07;
+    public static final double motorOffset = -12.3;
+    public static final double motorRotationsPerCircle = 37.2;
+    public static final double radiansPerMotorRotation = (2 * Math.PI) / 37.2;
   }
 
   public static class Claw {
@@ -97,10 +104,10 @@ public final class Constants {
     ZERO
   }
 
-  public static final Double l1height = 25.0;
-  public static final Double l2height = 50.0;
-  public static final Double l3height = 75.0;
-  public static final Double l4height = 100.0;
+  public static final Double l1height = 2.0; // 60 * 0.25;
+  public static final Double l2height = 10.5; // 60 * 0.50;
+  public static final Double l3height = 28.5; // 60 * 0.75;
+  public static final Double l4height = 58.5; // 60 * 0.99;
   public static final Double zeroHeight = 0.0;
 
   public static final Double elevatorP = 0.1;
@@ -108,10 +115,11 @@ public final class Constants {
   public static final Double elevatorD = 0.0;
 
   public static class Elevator {
-    public static final Double lowerLimit = 0.0;
-    public static final Double upperLimit = 100.0;
+    public static final Double lowerLimit = 1.5;
+    public static final Double upperLimit = 60.0;
+    public static final Double feedForward = 0.4;
     public static final int lowerlimitID = 3;
-    public static final int motorAplphaID = 51;
+    public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
   }
 

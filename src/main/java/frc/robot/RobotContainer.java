@@ -206,6 +206,10 @@ public class RobotContainer {
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
     testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
+    testController
+        .b()
+        .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
   }
 
   private void configureSimBindings() {

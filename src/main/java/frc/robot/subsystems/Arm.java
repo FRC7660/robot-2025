@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -19,13 +20,14 @@ import java.util.function.DoubleSupplier;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
+  public TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
 
   private TalonFXSimState motorArmSim;
 
-  private Encoder encoder = new Encoder(1, 2);
+  public Encoder encoderArm = new Encoder(1, 2);
 
   private double desiredSpeed = 0;
+  private ArmFeedforward feedforward;
 
   private PIDController controller =
       new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
@@ -37,12 +39,20 @@ public class Arm extends SubsystemBase {
 
     motorArm.setPosition(0);
 
-    motorArm.setNeutralMode(NeutralModeValue.Brake);
+    motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
+
+    feedforward = new ArmFeedforward(0, 0, 0);
+    SmartDashboard.putNumber("Arm FF", 0);
+    SmartDashboard.putNumber("Arm kS", 0);
+    SmartDashboard.putNumber("Arm kG", Constants.Arm.kG);
+    SmartDashboard.putNumber("Arm kV", 0);
+
+    SmartDashboard.putNumber("Arm-Desired-Speed", desiredSpeed);
   }
 
   public void setMotor(double speed) {
-    desiredSpeed = speed * 0.5;
+    desiredSpeed = speed;
   }
 
   public void raise() {
@@ -54,7 +64,11 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPosition(double position) {
-    desiredSpeed = controller.calculate(encoder.get(), position);
+    desiredSpeed =
+        controller.calculate(motorArm.getPosition().getValueAsDouble(), position)
+            + Math.cos(
+                (encoderArm.get() - Constants.Arm.horizontalCounts)
+                    / Constants.Arm.countsPerRadian);
   }
 
   public Boolean armAtMax() {
@@ -76,7 +90,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosition() {
-    return encoder.get();
+    return motorArm.getPosition().getValueAsDouble();
   }
 
   @Override
@@ -84,16 +98,30 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Encoder", encoder.get());
+    SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
-    if (desiredSpeed < 0 && encoder.get() <= Constants.Arm.reverseLimit) {
-      desiredSpeed = 0;
-    }
-    if (desiredSpeed > 0 && encoder.get() >= Constants.Arm.forewardLimit) {
-      desiredSpeed = 0;
-    }
-    desiredSpeed = MathUtil.applyDeadband(desiredSpeed, 0.05);
-    motorArm.set(desiredSpeed);
+    double posff =
+        (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
+            * Constants.Arm.radiansPerMotorRotation;
+    SmartDashboard.putNumber("Arm PosFF", posff);
+
+    // desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
+
+    feedforward.setKg(Constants.Arm.kG);
+
+    double outff = feedforward.calculate(posff, 0);
+
+    SmartDashboard.putNumber("Arm FF", outff);
+
+    // if (desiredSpeed < 0 && encoderArm.get() <= Constants.Arm.reverseLimit) {
+    //   desiredSpeed = 0;
+    // }
+    // if (desiredSpeed > 0 && encoderArm.get() >= Constants.Arm.forewardLimit) {
+    //   desiredSpeed = 0;
+    // }
+    double speed = MathUtil.applyDeadband(desiredSpeed, 0.01);
+    motorArm.set(speed);
+    SmartDashboard.putNumber("Arm desiredSpeed", speed);
   }
 
   public void simulationPeriodic() {
@@ -104,6 +132,6 @@ public class Arm extends SubsystemBase {
   }
 
   public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble()));
+    return this.run(() -> setMotor(speed.getAsDouble() * 0.3));
   }
 }
