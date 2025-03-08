@@ -25,4 +25,6 @@
  * player 1: elevator and arm to home position
 
 ## To Do:
-* update left 4 buttons for elevator presets to include automatic arm movement!!
+* update left 4 buttons for elevator presets to include automatic arm movement (move out of way and then into position)!!
+* manual elevator
+* return elevator and arm to home position

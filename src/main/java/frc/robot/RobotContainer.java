@@ -202,8 +202,8 @@ public class RobotContainer {
 
     driverController.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
     driverController.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    driverController.povRight().whileTrue(new PrintCommand("TODO: Arm Out")); // TODO
-    driverController.povLeft().whileTrue(new PrintCommand("TODO: Arm In")); // TODO
+    driverController.povRight().whileTrue(arm.manualArmOut()); 
+    driverController.povLeft().whileTrue(arm.manualArmIn()); 
 
     driverController
         .leftTrigger(0.1)
@@ -322,8 +322,8 @@ public class RobotContainer {
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
     buttonBox.axisGreaterThan(0, 0.5).whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
     buttonBox.axisLessThan(0, -0.5).whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    buttonBox.axisGreaterThan(1, 0.5).whileTrue(new PrintCommand("TODO: Arm Out")); // TODO
-    buttonBox.axisLessThan(1, -0.5).whileTrue(new PrintCommand("TODO: Arm In")); // TODO
+    buttonBox.axisGreaterThan(1, 0.5).whileTrue(arm.manualArmOut()); 
+    buttonBox.axisLessThan(1, -0.5).whileTrue(arm.manualArmIn()); 
 
     // TODO: bind x to 'return elevator and arm to home position'
     buttonBox
