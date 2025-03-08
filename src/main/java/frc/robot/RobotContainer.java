@@ -232,7 +232,8 @@ public class RobotContainer {
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
     testController.a().whileTrue(new ArmPIDTest(arm));
     testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
-
+    testController.b().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
+    
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
 

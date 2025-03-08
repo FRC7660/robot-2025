@@ -18,6 +18,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 // import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import com.revrobotics.sim.SparkFlexSim;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -47,23 +49,25 @@ public class Elevator extends SubsystemBase {
   private RelativeEncoder motorAlphaEncoder = motorAlpha.getEncoder();
   private RelativeEncoder motorBetaEncoder = motorBeta.getEncoder();
 
-  private SparkMaxSim motorSim;
+  private SparkFlexSim motorSim;
   private SparkRelativeEncoderSim motorSimEncoder;
 
   // private PIDController elevatorPid =
   //     new PIDController(Constants.elevatorP, Constants.elevatorI, Constants.elevatorD);
 
-  Double eKp = 0.0;
-  Double eKi = 0.0;
+  Double eKp = 0.4;
+  Double eKi = 0.2;
   Double eKd = 0.0;
   Double eKs = 0.0;
   Double eKg = Constants.Elevator.feedForward;
-  Double eKv = 0.0;
+  Double eKv = 0.1;
+  Double eKconstraintVel = 100.0;
+  Double eKconstraintAccel = 100.0;
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(0.4, 0.2);
+  private final TrapezoidProfile.Constraints m_startingConstraints =
+      new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(eKp, eKi, eKd, m_constraints, 0.02);
+      new ProfiledPIDController(eKp, eKi, eKd, m_startingConstraints, 0.02);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(eKs, eKg, eKv);
 
   // public void raise() {
@@ -106,8 +110,8 @@ public class Elevator extends SubsystemBase {
   }
 
   private void setCalculatedMotors(Double output, Double feedForward) {
-    motorAlpha.set(output + feedForward);
-    motorBeta.set(output + feedForward);
+    motorAlpha.setVoltage(output + feedForward);
+    motorBeta.setVoltage(output + feedForward);
   }
 
   public Double getHeight() {
@@ -169,6 +173,8 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("eKs", eKs);
     SmartDashboard.putNumber("eKg", eKg);
     SmartDashboard.putNumber("eKv", eKv);
+    SmartDashboard.putNumber("eKcVel", eKconstraintVel);
+    SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
 
     motorAlphaEncoder.setPosition(0);
     System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
@@ -187,7 +193,7 @@ public class Elevator extends SubsystemBase {
         betaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
     if (Constants.currentMode == Constants.Mode.SIM) {
-      // motorSim = new SparkFlexSim(motorAlpha, DCMotor.getNeo550(1));
+      motorSim = new SparkFlexSim(motorAlpha, DCMotor.getNeo550(1));
       motorSimEncoder = motorSim.getRelativeEncoderSim();
     }
   }
@@ -207,6 +213,15 @@ public class Elevator extends SubsystemBase {
     m_feedforward.setKs(SmartDashboard.getNumber("eKs", 0));
     m_feedforward.setKg(SmartDashboard.getNumber("eKg", 0));
     m_feedforward.setKv(SmartDashboard.getNumber("eKv", 0));
+
+    m_controller.setConstraints(
+      new TrapezoidProfile.Constraints(
+        SmartDashboard.getNumber("eKcVel", 0),
+        SmartDashboard.getNumber("eKcAccel", 0)
+      )
+    );
+    
+    SmartDashboard.putNumber("Visual Setpoint", m_controller.getSetpoint().position);
   }
 
   public void simulationPeriodic() {
