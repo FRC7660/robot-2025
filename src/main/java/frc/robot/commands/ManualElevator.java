@@ -31,13 +31,13 @@ public class ManualElevator extends Command {
   @Override
   public void execute() {
     double dSpeed = m_speed.getAsDouble();
-    m_elevator.setMotors(dSpeed, false);
+    m_elevator.setMotors(dSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setMotors(0, false);
+    m_elevator.setMotors(0);
   }
 
   // Returns true when the command should end.

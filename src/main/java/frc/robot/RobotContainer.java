@@ -225,12 +225,15 @@ public class RobotContainer {
 
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
+    // switch camera video displayed on Elastic
+    // driverController.b().onTrue(new SwitchVideo());
+
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    testController.povDown().onTrue(new ArmGoToPos(arm, Constants.Arm.scorePos));
-    testController.povUp().onTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
-    testController.povRight().onTrue(new ArmGoToPos(arm, Constants.Arm.safePos));
-
+    testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
+    testController.b().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
+    
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
 
