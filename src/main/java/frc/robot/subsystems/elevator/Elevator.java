@@ -53,12 +53,12 @@ public class Elevator extends SubsystemBase {
   // private PIDController elevatorPid =
   //     new PIDController(Constants.elevatorP, Constants.elevatorI, Constants.elevatorD);
 
-  Double eKp = 0.001;
-  Double eKi = 0.001;
+  Double eKp = 0.0;
+  Double eKi = 0.0;
   Double eKd = 0.0;
   Double eKs = 0.0;
   Double eKg = Constants.Elevator.feedForward;
-  Double eKv = 0.06;
+  Double eKv = 0.0;
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(0.4, 0.2);
