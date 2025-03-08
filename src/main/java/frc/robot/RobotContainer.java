@@ -38,10 +38,10 @@ import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
-import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
+import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
@@ -225,8 +225,8 @@ public class RobotContainer {
     driverController.a().whileTrue(new LowerClimb(climb));
     driverController.b().whileTrue(new RaiseClimb(climb));
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
-    driverController.y().whileTrue(new LiftFunnel(funnel, climb));
-    driverController.povUp().whileTrue(new ClimbPrepRoutine(climb, funnel));
+    // driverController.y().whileTrue(new LiftFunnel(funnel, climb));
+    driverController.povRight().whileTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController
         .leftTrigger(0.1)
@@ -240,7 +240,7 @@ public class RobotContainer {
     // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
 
     // switch camera video displayed on Elastic
-    // driverController.b().onTrue(new SwitchVideo());
+    driverController.y().onTrue(new SwitchVideo());
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
