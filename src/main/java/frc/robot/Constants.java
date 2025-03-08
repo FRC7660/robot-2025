@@ -101,7 +101,7 @@ public final class Constants {
   }
 
   public static final Double l1height = 2.0; //60 * 0.25;
-  public static final Double l2height = 9.0; //60 * 0.50;
+  public static final Double l2height = 10.5; //60 * 0.50;
   public static final Double l3height = 28.5; //60 * 0.75;
   public static final Double l4height = 58.5; //60 * 0.99;
   public static final Double zeroHeight = 0.0;
