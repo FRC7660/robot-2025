@@ -17,6 +17,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,12 +31,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
-import frc.robot.commands.ArmPIDTest;
+import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
+import frc.robot.commands.ManualElevator;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
@@ -155,8 +157,9 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Default command for Elevator
-    // elevator.setDefaultCommand(
-    //     elevator.runManualCommand(() -> MathUtil.applyDeadband(testController.getLeftY(), 0.1)));
+    elevator.setDefaultCommand(
+        new ManualElevator(
+            elevator, () -> MathUtil.applyDeadband(-testController.getRightY(), 0.1), arm));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -227,7 +230,9 @@ public class RobotContainer {
 
     // Switch to X pattern when X button is pressed
     driverController.leftBumper().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.povDown().onTrue(new ArmGoToPos(arm, Constants.Arm.scorePos));
+    testController.povUp().onTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
+    testController.povRight().onTrue(new ArmGoToPos(arm, Constants.Arm.safePos));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
