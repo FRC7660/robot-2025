@@ -13,10 +13,14 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
+import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
@@ -43,14 +48,25 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
-import frc.robot.subsystems.LEDsubsystem.*;
-import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.*;
-import frc.robot.subsystems.vision.*;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.LEDsubsystem.LEDlive;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.GyroIOSim;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOMixed;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -206,10 +222,11 @@ public class RobotContainer {
                 () -> driverController.getRightX()));
 
     // driverController.a().onTrue(new LiftFunnel(funnel));
-    driverController.a().onTrue(new LowerClimb(climb));
-    driverController.b().onTrue(new RaiseClimb(climb));
+    driverController.a().whileTrue(new LowerClimb(climb));
+    driverController.b().whileTrue(new RaiseClimb(climb));
     driverController.x().onTrue(new LowerFunnel(funnel, climb));
     driverController.y().whileTrue(new LiftFunnel(funnel, climb));
+    driverController.povUp().whileTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController
         .leftTrigger(0.1)
@@ -240,7 +257,7 @@ public class RobotContainer {
             // real
             : () ->
                 drive.resetOdometry(
-                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d(Math.PI))); // zero gyro
     driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
