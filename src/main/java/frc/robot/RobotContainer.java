@@ -160,8 +160,6 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     configurebuttonBox();
-    arm.setDefaultCommand(arm.manualArm(testController::getLeftY));
-    // Default command, normal field-relative drive
 
     Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
@@ -174,37 +172,10 @@ public class RobotContainer {
     Command driveSetpointGenKeyboard =
         drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-    if (RobotBase.isSimulation()) {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
-    } else {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
-    }
+    drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
 
     if (Robot.isSimulation()) {
-      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
-      // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-      driveDirectAngleKeyboard.driveToPose(
-          () -> target,
-          new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)),
-          new ProfiledPIDController(
-              5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
-      driverController
-          .start()
-          .onTrue(
-              Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverController
-          .button(2)
-          .whileTrue(
-              Commands.runEnd(
-                  () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-                  () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
-
-      //      driverXbox.b().whileTrue(
-      //          drivebase.driveToPose(
-      //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-      //                              );
-
+      configureSimBindings();
     }
 
     if (DriverStation.isTest()) {
@@ -217,14 +188,10 @@ public class RobotContainer {
       driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverController.back().whileTrue(drivebase.centerModulesCommand());
-    } else {
-      driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverController.povDown().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverController
-          .leftBumper()
-          .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-    }
+    } 
 
+    driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    
     // driverController.a().onTrue(new LiftFunnel(funnel));
     driverController.a().whileTrue(new LowerClimb(climb));
     driverController.b().whileTrue(new RaiseClimb(climb));
@@ -249,6 +216,32 @@ public class RobotContainer {
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
+  }
+
+  private void configureSimBindings(){
+    Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
+    // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+    driveDirectAngleKeyboard.driveToPose(
+        () -> target,
+        new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)),
+        new ProfiledPIDController(
+            5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
+    driverController
+        .start()
+        .onTrue(
+            Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+    driverController
+        .button(2)
+        .whileTrue(
+            Commands.runEnd(
+                () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+                () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+
+    //      driverXbox.b().whileTrue(
+    //          drivebase.driveToPose(
+    //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+    //                              );
   }
 
   private void setUpBoxButton(int inputButton) {
