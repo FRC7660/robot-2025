@@ -35,6 +35,9 @@ import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.LowerClimb;
+import frc.robot.commands.LowerFunnel;
+import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.driveCommands.Strafe;
@@ -186,16 +189,21 @@ public class RobotContainer {
       driverController.back().whileTrue(drivebase.centerModulesCommand());
     }
 
+    // start: hamburger/menu/right tiny button
+    // back: two squares/view/left tiny button
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverController.start().onTrue(new PrintCommand("You pressed the start command!"));
     driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
-    driverController.back().onTrue(new PrintCommand("You pressed the back button!"));
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
     // TODO: bind x to 'return elevator and arm to home position'
-    driverController.x().onTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
+    driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
     driverController.y().onTrue(new SwitchVideo());
+
+    driverController.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
+    driverController.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
+    driverController.povRight().whileTrue(new PrintCommand("TODO: Arm Out")); // TODO
+    driverController.povLeft().whileTrue(new PrintCommand("TODO: Arm In")); // TODO
 
     driverController
         .leftTrigger(0.1)
@@ -267,7 +275,7 @@ public class RobotContainer {
         left = true;
         break;
 
-      // RIGHT SIDE PRESETS
+      // RIGHT SIDE PRESETS - Not Used Right Now
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
         height = ElevatorState.L1;
@@ -306,10 +314,20 @@ public class RobotContainer {
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
     setUpBoxButton(Constants.ButtonBox.topLeft);
-    setUpBoxButton(Constants.ButtonBox.bottomRight);
-    setUpBoxButton(Constants.ButtonBox.lowerRight);
-    setUpBoxButton(Constants.ButtonBox.upperRight);
-    setUpBoxButton(Constants.ButtonBox.topRight);
+
+    buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
+    buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
+    buttonBox.button(Constants.ButtonBox.upperRight).whileTrue(new LowerFunnel(funnel, climb));
+
+    buttonBox.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
+    buttonBox.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
+    buttonBox.povRight().whileTrue(new PrintCommand("TODO: Arm In")); // TODO
+    buttonBox.povLeft().whileTrue(new PrintCommand("TODO: Arm Out")); // TODO
+
+    // TODO: bind x to 'return elevator and arm to home position'
+    buttonBox
+        .button(Constants.ButtonBox.p1)
+        .whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
 
     Trigger tp1 = buttonBox.button(Constants.ButtonBox.p1);
     tp1.onTrue(new PrintCommand("p1 Pressed"));
