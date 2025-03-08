@@ -191,31 +191,25 @@ public class RobotContainer {
     } 
 
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    
-    // driverController.a().onTrue(new LiftFunnel(funnel));
-    driverController.a().whileTrue(new LowerClimb(climb));
-    driverController.b().whileTrue(new RaiseClimb(climb));
-    driverController.x().onTrue(new LowerFunnel(funnel, climb));
-    // driverController.y().whileTrue(new LiftFunnel(funnel, climb));
-    driverController.povRight().whileTrue(new ClimbPrepRoutine(climb, funnel));
+    driverController.start().onTrue(new PrintCommand("You pressed the start command!"));
+    driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
+    driverController.back().onTrue( new PrintCommand("You pressed the back button!"));
+
+    driverController.a().onTrue(new IntakeCoral(claw));
+    driverController.b().onTrue(new releaseCoral(claw));
+    //TODO: bind x to 'return elevator and arm to home position'
+    driverController.x().onTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
+    driverController.y().onTrue(new SwitchVideo());
 
     driverController
         .leftTrigger(0.1)
-        .whileTrue(new Strafe(drivebase, () -> driverController.getLeftTriggerAxis() * 0.5, false));
+        .whileTrue(new Strafe(drivebase, () -> driverController.getLeftTriggerAxis() * 0.5, true));
     driverController
         .rightTrigger(0.1)
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    // driverController.rightBumper().whileTrue(DriveCommands.strafe(drive,false,() -> 0.1));
-
-    // switch camera video displayed on Elastic
-    driverController.y().onTrue(new SwitchVideo());
-
     testController.a().whileTrue(new ArmPIDTest(arm));
-
-    driverController.povUp().onTrue(new IntakeCoral(claw));
-    driverController.povDown().onTrue(new releaseCoral(claw));
   }
 
   private void configureSimBindings(){
