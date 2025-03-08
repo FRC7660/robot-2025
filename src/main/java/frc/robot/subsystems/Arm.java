@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import java.util.function.DoubleSupplier;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
@@ -131,7 +130,13 @@ public class Arm extends SubsystemBase {
     // function
   }
 
-  public Command manualArm(DoubleSupplier speed) {
-    return this.run(() -> setMotor(speed.getAsDouble() * 0.3));
+  public Command manualArmOut() {
+    return this.startRun(
+        () -> System.out.println("Manual arm out"), () -> setMotor(Constants.Arm.armSpeed));
+  }
+
+  public Command manualArmIn() {
+    return this.startRun(
+        () -> System.out.println("Manual arm in"), () -> setMotor(-Constants.Arm.armSpeed));
   }
 }

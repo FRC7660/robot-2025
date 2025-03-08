@@ -14,11 +14,11 @@ public class ManualElevator extends Command {
   private DoubleSupplier m_speed;
   private final Arm m_arm;
 
-  public ManualElevator(Elevator subsystem, DoubleSupplier speed, Arm arm) {
+  public ManualElevator(Elevator elevator, DoubleSupplier speed, Arm arm) {
     m_arm = arm;
-    m_elevator = subsystem;
+    m_elevator = elevator;
     m_speed = speed;
-    addRequirements(subsystem);
+    addRequirements(elevator, arm);
   }
 
   // Called when the command is initially scheduled.

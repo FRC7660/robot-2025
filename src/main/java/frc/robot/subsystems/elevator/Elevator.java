@@ -69,6 +69,42 @@ public class Elevator extends SubsystemBase {
       new ProfiledPIDController(eKp, eKi, eKd, m_startingConstraints, 0.02);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(eKs, eKg, eKv);
 
+  public Elevator() {
+    // Clockwise - up, Counter - down, same for both motors
+    // Gear ratio - 6:1
+    // motorSim.setPosition(5);
+
+    SmartDashboard.putNumber("eKp", eKp);
+    SmartDashboard.putNumber("eKi", eKi);
+    SmartDashboard.putNumber("eKd", eKd);
+    SmartDashboard.putNumber("eKs", eKs);
+    SmartDashboard.putNumber("eKg", eKg);
+    SmartDashboard.putNumber("eKv", eKv);
+    SmartDashboard.putNumber("eKcVel", eKconstraintVel);
+    SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
+
+    motorAlphaEncoder.setPosition(0);
+    System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
+
+    alphaConfig.softLimit.forwardSoftLimit(Constants.Elevator.upperLimit);
+    alphaConfig.softLimit.reverseSoftLimit(Constants.Elevator.lowerLimit);
+    alphaConfig.softLimit.forwardSoftLimitEnabled(true);
+    alphaConfig.softLimit.reverseSoftLimitEnabled(true);
+    alphaConfig.idleMode(IdleMode.kBrake);
+    alphaConfig.inverted(true);
+    betaConfig.apply(alphaConfig);
+
+    motorAlpha.configure(
+        alphaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    motorBeta.configure(
+        betaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      motorSim = new SparkFlexSim(motorAlpha, DCMotor.getNeo550(1));
+      motorSimEncoder = motorSim.getRelativeEncoderSim();
+    }
+  }
+
   // public void raise() {
   //   motorAlpha.set(.5 * alphaInversion);
   // }
@@ -159,42 +195,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("PID Goal", m_controller.getGoal().position);
     SmartDashboard.putNumber("Elevator Counter", counter);
     setCalculatedMotors(output, feedForward);
-  }
-
-  public Elevator() {
-    // Clockwise - up, Counter - down, same for both motors
-    // Gear ratio - 6:1
-    // motorSim.setPosition(5);
-
-    SmartDashboard.putNumber("eKp", eKp);
-    SmartDashboard.putNumber("eKi", eKi);
-    SmartDashboard.putNumber("eKd", eKd);
-    SmartDashboard.putNumber("eKs", eKs);
-    SmartDashboard.putNumber("eKg", eKg);
-    SmartDashboard.putNumber("eKv", eKv);
-    SmartDashboard.putNumber("eKcVel", eKconstraintVel);
-    SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
-
-    motorAlphaEncoder.setPosition(0);
-    System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
-
-    alphaConfig.softLimit.forwardSoftLimit(Constants.Elevator.upperLimit);
-    alphaConfig.softLimit.reverseSoftLimit(Constants.Elevator.lowerLimit);
-    alphaConfig.softLimit.forwardSoftLimitEnabled(true);
-    alphaConfig.softLimit.reverseSoftLimitEnabled(true);
-    alphaConfig.idleMode(IdleMode.kBrake);
-    alphaConfig.inverted(true);
-    betaConfig.apply(alphaConfig);
-
-    motorAlpha.configure(
-        alphaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-    motorBeta.configure(
-        betaConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      motorSim = new SparkFlexSim(motorAlpha, DCMotor.getNeo550(1));
-      motorSimEncoder = motorSim.getRelativeEncoderSim();
-    }
   }
 
   @Override
