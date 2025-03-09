@@ -238,6 +238,34 @@ public class RobotContainer {
     driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
+
+  private void configureSimBindings() {
+    Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
+    // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+    driveDirectAngleKeyboard.driveToPose(
+        () -> target,
+        new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)),
+        new ProfiledPIDController(
+            5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
+    driverController
+        .start()
+        .onTrue(
+            Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+    driverController
+        .button(2)
+        .whileTrue(
+            Commands.runEnd(
+                () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+                () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+
+    //      driverXbox.b().whileTrue(
+    //          drivebase.driveToPose(
+    //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+    //                              );
+  }
+
+
   private void setUpBoxButton(int inputButton) {
     Trigger buttonXtrigger = buttonBox.button(inputButton);
     String buttonName;
