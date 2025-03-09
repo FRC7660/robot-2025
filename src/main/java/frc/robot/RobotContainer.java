@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
-import frc.robot.commands.ArmPIDTest;
+import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
@@ -213,37 +213,29 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmPIDTest(arm));
+    testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePos));
+    testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
     testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
     testController
         .b()
         .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
-  }
 
-  private void configureSimBindings() {
-    Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
-    // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-    driveDirectAngleKeyboard.driveToPose(
-        () -> target,
-        new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)),
-        new ProfiledPIDController(
-            5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))));
-    driverController
-        .start()
-        .onTrue(
-            Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-    driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-    driverController
-        .button(2)
-        .whileTrue(
-            Commands.runEnd(
-                () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-                () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+    driverController.povUp().onTrue(new IntakeCoral(claw));
+    driverController.povDown().onTrue(new releaseCoral(claw));
 
-    //      driverXbox.b().whileTrue(
-    //          drivebase.driveToPose(
-    //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-    //                              );
+    // Reset gyro / odometry
+    final Runnable resetGyro =
+        Constants.currentMode == Constants.Mode.SIM // this is an IF statement
+            // simulation
+            ? () ->
+                drive.resetOdometry(
+                    driveSimulation
+                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
+            // real
+            : () ->
+                drive.resetOdometry(
+                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
   private void setUpBoxButton(int inputButton) {
