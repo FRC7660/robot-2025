@@ -223,21 +223,21 @@ public class RobotContainer {
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
 
-    // Reset gyro / odometry
-    final Runnable resetGyro =
-        Constants.currentMode == Constants.Mode.SIM // this is an IF statement
-            // simulation
-            ? () ->
-                drive.resetOdometry(
-                    driveSimulation
-                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-            // real
-            : () ->
-                drive.resetOdometry(
-                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    // // Reset gyro / odometry
+    // final Runnable resetGyro =
+    //     Constants.currentMode == Constants.Mode.SIM // this is an IF statement
+    //         // simulation
+    //         ? () ->
+    //             drive.resetOdometry(
+    //                 driveSimulation
+    //                     .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+    // during
+    //         // real
+    //         : () ->
+    //             drive.resetOdometry(
+    //                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+    // driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
-
 
   private void configureSimBindings() {
     Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
@@ -264,7 +264,6 @@ public class RobotContainer {
     //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
     //                              );
   }
-
 
   private void setUpBoxButton(int inputButton) {
     Trigger buttonXtrigger = buttonBox.button(inputButton);
