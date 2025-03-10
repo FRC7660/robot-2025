@@ -124,7 +124,7 @@ public class Arm extends SubsystemBase {
 
   public void manualOut() {
     manualMode = true;
-    desiredOutput = Constants.Arm.armSpeed;
+    desiredOutput = -Constants.Arm.armSpeed;
   }
 
   @Override
