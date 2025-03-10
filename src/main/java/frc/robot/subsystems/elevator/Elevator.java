@@ -129,36 +129,19 @@ public class Elevator extends SubsystemBase {
     return (motorAlphaEncoder.getPosition() > Constants.Elevator.upperLimit);
   }
 
-  public void setMotors(double speed) {
-    Double speedMulti;
-    if (speed < 0) {
-      speedMulti = 0.2;
-    } else {
-      speedMulti = 0.5;
-    }
-    Double outputSpeed = speed * speedMulti;
-    if (outputSpeed < 0 && isAtBottom()) {
-      motorAlpha.set(0);
-      motorBeta.set(0);
-    } else if (outputSpeed > 0 && isAtTop()) {
-      motorAlpha.set(Constants.Elevator.feedForward);
-      motorBeta.set(Constants.Elevator.feedForward);
-    } else {
-      motorAlpha.set(outputSpeed);
-      motorBeta.set(outputSpeed);
-    }
-    SmartDashboard.putNumber("Elevator Output", outputSpeed);
-    SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
-    SmartDashboard.putNumber("Motor Beta Speed", motorBeta.get());
-  }
-
   private void setCalculatedMotors(Double output, Double feedForward) {
     setVoltage(output + feedForward);
   }
 
   private void setVoltage(double output) {
-    motorAlpha.setVoltage(output);
-    motorBeta.setVoltage(output);
+    double adjusted = output;
+    if (output < 0 && isAtBottom()) {
+      adjusted = 0;
+    } else if (output > 0 && isAtTop()) {
+      adjusted = Constants.Elevator.feedForward;
+    }
+    motorAlpha.setVoltage(adjusted);
+    motorBeta.setVoltage(adjusted);
   }
 
   public Double getHeight() {
@@ -169,6 +152,10 @@ public class Elevator extends SubsystemBase {
     Double baseRotations = motorAlphaEncoder.getPosition();
     height = baseRotations * 0.91979 * 2;
     return height;
+  }
+
+  public double getPosition() {
+    return motorAlphaEncoder.getPosition();
   }
 
   public void setState(ElevatorState state) {

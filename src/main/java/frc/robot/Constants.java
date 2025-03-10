@@ -45,7 +45,6 @@ public final class Constants {
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
-    public static final double safe_pos = 0.4;
     public static final double kDt = 0.02;
     public static final double kMaxVelocity = 50;
     public static final double kMaxAcceleration = 50;
@@ -58,7 +57,8 @@ public final class Constants {
     public static final double kd = 0;
     public static final double scorePos = -3.5;
     public static final double zeroPos = -0.5;
-    public static final double safePos = -2.45;
+    public static final double safePosIn = -2.45;
+    public static final double safePosOut = -3.75; // FIND PRECISE NUMBER
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
@@ -137,6 +137,11 @@ public final class Constants {
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
     public static final double manualOutput = .2 * 12; // output in volts
+
+    public enum Direction {
+      UP,
+      DOWN,
+    }
   }
 
   public static final double MAX_SPEED = Units.feetToMeters(14.5);

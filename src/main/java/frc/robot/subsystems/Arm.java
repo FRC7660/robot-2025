@@ -73,12 +73,9 @@ public class Arm extends SubsystemBase {
     desiredOutput = output;
   }
 
-  public void setManual(boolean manual) {
-    manualMode = manual;
-  }
-
   public void setTarget(double Pos) {
     targetPos = Pos;
+    manualMode = false;
   }
 
   public double getTarget() {
@@ -111,8 +108,13 @@ public class Arm extends SubsystemBase {
     return motorArm.getPosition().getValueAsDouble();
   }
 
+  public boolean isInSafeZone() {
+    return (getPosition() <= Constants.Arm.safePosIn && getPosition() >= Constants.Arm.safePosOut);
+  }
+
   public void holdCurrentPosition() {
     targetPos = getPosition();
+    manualMode = false;
   }
 
   public void manualIn() {
