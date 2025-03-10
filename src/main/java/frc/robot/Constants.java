@@ -131,6 +131,7 @@ public final class Constants {
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
+    public static final double manualOutput = .2 * 12; // output in volts
   }
 
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
