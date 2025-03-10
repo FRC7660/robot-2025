@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.elevator.Elevator;
 import java.util.function.DoubleSupplier;
@@ -15,34 +14,30 @@ public class ManualElevator extends Command {
   private DoubleSupplier m_speed;
   private final Arm m_arm;
 
-  public ManualElevator(Elevator subsystem, DoubleSupplier speed, Arm arm) {
+  public ManualElevator(Elevator elevator, DoubleSupplier speed, Arm arm) {
     m_arm = arm;
-    m_elevator = subsystem;
+    m_elevator = elevator;
     m_speed = speed;
-    addRequirements(subsystem);
+    addRequirements(elevator, arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_arm.setPosition(Constants.Arm.safe_pos);
+    // m_arm.setPosition(Constants.Arm.safe_pos);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     double dSpeed = m_speed.getAsDouble();
-    if (dSpeed >= 0.1 || dSpeed <= -0.1) {
-      m_elevator.setMotors(dSpeed, false);
-    } else {
-      m_elevator.setMotors(0, false);
-    }
+    m_elevator.setMotors(dSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setMotors(0, false);
+    m_elevator.setMotors(0);
   }
 
   // Returns true when the command should end.
