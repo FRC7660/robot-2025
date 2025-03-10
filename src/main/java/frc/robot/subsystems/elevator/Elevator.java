@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
@@ -17,7 +15,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-// import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -44,7 +41,6 @@ public class Elevator extends SubsystemBase {
   // public DigitalInput topLimit = new DigitalInput(10);
   public SparkFlexConfig alphaConfig = new SparkFlexConfig();
   public SparkFlexConfig betaConfig = new SparkFlexConfig();
-  public Double targetPosition = 0.0;
 
   private RelativeEncoder motorAlphaEncoder = motorAlpha.getEncoder();
   private RelativeEncoder motorBetaEncoder = motorBeta.getEncoder();
@@ -64,7 +60,6 @@ public class Elevator extends SubsystemBase {
   Double eKconstraintVel = 100.0;
   Double eKconstraintAccel = 100.0;
 
-  Double target = 0.0;
   double manualOutput = 0.0;
 
   private boolean debug = false;
@@ -187,16 +182,15 @@ public class Elevator extends SubsystemBase {
     }
 
     m_controller.setGoal(goal);
-    target = goal;
     manual = false;
   }
 
-  public boolean isAtTarget() {
-    return MathUtil.isNear(target, motorAlphaEncoder.getPosition(), 1.0);
+  public boolean isAtGoal() {
+    return MathUtil.isNear(m_controller.getGoal().position, motorAlphaEncoder.getPosition(), 1.0);
   }
 
   public void hold() {
-    target = motorAlphaEncoder.getPosition();
+    m_controller.setGoal(motorAlphaEncoder.getPosition());
     manual = false;
   }
 
