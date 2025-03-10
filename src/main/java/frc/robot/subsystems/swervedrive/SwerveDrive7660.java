@@ -2,8 +2,8 @@ package frc.robot.subsystems.swervedrive;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.DriverStation;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import swervelib.SwerveDrive;
@@ -41,10 +41,16 @@ public class SwerveDrive7660 extends SwerveDrive {
     return Rotation2d.fromRadians(imuReadingCache.getValue().getZ());
   }
 
-  public void resetOdometry(Pose2d pose){
+  public void resetOdometry(Pose2d pose) {
     System.out.println("Resetting Odometry");
     odometryLock.lock();
-    swerveDrivePoseEstimator.resetPosition(getRawYaw(), getModulePositions(), pose.rotateBy(new Rotation2d(Math.PI)));
+    swerveDrivePoseEstimator.resetPosition(
+        getRawYaw(),
+        getModulePositions(),
+        pose.rotateBy(
+            DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                ? new Rotation2d(Math.PI)
+                : new Rotation2d(0)));
     odometryLock.unlock();
   }
 }

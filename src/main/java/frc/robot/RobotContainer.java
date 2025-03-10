@@ -96,7 +96,14 @@ public class RobotContainer {
   SwerveInputStream driveDirectAngle =
       driveAngularVelocity
           .copy()
-          .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+          .withControllerHeadingAxis(() -> 
+              DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                  ? driverController.getRightX()
+                  : -driverController.getRightX(),
+              () ->
+              DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                  ? driverController.getRightY()
+                  : -driverController.getRightY())
           .headingWhile(true);
 
   /** Clone's the angular velocity input stream and converts it to a robotRelative input stream. */
@@ -191,8 +198,7 @@ public class RobotContainer {
       driverController
           .start()
           .onTrue(
-              Commands.runOnce(
-                  () -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+              Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
       driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverController
           .button(2)
