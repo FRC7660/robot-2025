@@ -24,13 +24,15 @@ public class ArmPIDTest extends Command {
     this.arm = arm;
     pid = new PIDController(0, 0, 0);
     feedforward = new ArmFeedforward(0, 0, 0);
+    double posff =
+        (Constants.Arm.motorOffset - arm.getPosition()) * Constants.Arm.radiansPerMotorRotation;
 
     SmartDashboard.putNumber("Arm P", 0);
     SmartDashboard.putNumber("Arm I", 0);
     SmartDashboard.putNumber("Arm D", 0);
-    SmartDashboard.putNumber("Arm kS", 0);
-    SmartDashboard.putNumber("Arm kG", 0);
-    SmartDashboard.putNumber("Arm kV", 0);
+    SmartDashboard.putNumber("Arm-Test-Pos", 0);
+    SmartDashboard.putNumber("Arm Test Velo", 0);
+    SmartDashboard.putNumber("Arm PosFF", posff);
   }
 
   // Called when the command is initially scheduled.
@@ -40,14 +42,27 @@ public class ArmPIDTest extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    pid.setP(SmartDashboard.getNumber("Arm P", 0));
-    pid.setI(SmartDashboard.getNumber("Arm I", 0));
+    pid.setP(SmartDashboard.getNumber("Arm P", 0.01));
+    pid.setI(SmartDashboard.getNumber("Arm I", 0.005));
     pid.setD(SmartDashboard.getNumber("Arm D", 0));
-    // feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
-    // feedforward.setKg(SmartDashboard.getNumber("Arm kG", 0));
-    // feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
-    double output = pid.calculate(arm.getPosition(), Constants.Arm.testPosition);
-    arm.setMotor(MathUtil.clamp(output, -0.4, 0.4));
+
+    SmartDashboard.getNumber("Arm-Test-Pos", 0);
+    double outPID = pid.calculate(arm.getPosition(), SmartDashboard.getNumber("Arm-Test-Pos", 0));
+    double posff = SmartDashboard.getNumber("Arm PosFF", 0);
+    double desiredSpeed = SmartDashboard.getNumber("Arm-Desired-Speed", 0);
+
+    SmartDashboard.putNumber("Arm outPID", outPID);
+
+    feedforward.setKa(SmartDashboard.getNumber("Arm kS", 0));
+    feedforward.setKg(SmartDashboard.getNumber("Arm kG", Constants.Arm.kG));
+    feedforward.setKv(SmartDashboard.getNumber("Arm kV", 0));
+    double outff = feedforward.calculate(posff, desiredSpeed);
+    arm.setMotor(MathUtil.clamp(outff + outPID, -0.4, 0.4));
+
+    double measured_angle_rad =
+        (arm.getPosition() - Constants.Arm.horizontalCounts) / Constants.Arm.countsPerRadian;
+
+    SmartDashboard.putNumber("Arm Meas Angle Radians", measured_angle_rad);
   }
 
   // Called once the command ends or is interrupted.

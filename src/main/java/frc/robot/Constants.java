@@ -13,7 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import swervelib.math.Matter;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -38,17 +41,24 @@ public final class Constants {
   }
 
   public static class Arm {
-    public static double armSpeed = 0.50;
+    public static double armSpeed = 0.25;
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
     public static final double safe_pos = 0.4;
+    public static final double kG = 0.03;
     public static final double kp = 0.1;
-    public static final double ki = 0;
+    public static final double ki = 0.05;
     public static final double kd = 0;
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
+    public static final double horizontalCounts = -12.86;
+    public static final double countsPerRadian = 5.83;
+    public static final double gravityFeedForward = 0.07;
+    public static final double motorOffset = -12.3;
+    public static final double motorRotationsPerCircle = 37.2;
+    public static final double radiansPerMotorRotation = (2 * Math.PI) / 37.2;
   }
 
   public static class Claw {
@@ -63,11 +73,12 @@ public final class Constants {
     public static double climbEncoderLimit = 1;
     public static int climbSwitchID = 5;
     public static double upperLimit = 165;
+    public static double halfwayPosition = 80;
   }
 
   public static class Funnel {
     public static int winchID = 41;
-    public static double winchSpeed = 0.05; // Clockwise = positive, holds funnel down in position
+    public static double winchSpeed = 0.1; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
     public static int funnelSwitchID = 6;
   }
@@ -93,10 +104,10 @@ public final class Constants {
     ZERO
   }
 
-  public static final Double l1height = 25.0;
-  public static final Double l2height = 50.0;
-  public static final Double l3height = 75.0;
-  public static final Double l4height = 100.0;
+  public static final Double l1height = 2.0; // 60 * 0.25;
+  public static final Double l2height = 10.5; // 60 * 0.50;
+  public static final Double l3height = 28.5; // 60 * 0.75;
+  public static final Double l4height = 58.5; // 60 * 0.99;
   public static final Double zeroHeight = 0.0;
 
   public static final Double elevatorP = 0.1;
@@ -104,12 +115,20 @@ public final class Constants {
   public static final Double elevatorD = 0.0;
 
   public static class Elevator {
-    public static final Double lowerLimit = 0.0;
-    public static final Double upperLimit = 100.0;
+    public static final Double lowerLimit = 1.5;
+    public static final Double upperLimit = 60.0;
+    public static final Double feedForward = 0.4;
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
   }
+
+  public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  public static final double ROBOT_MASS = 125 * 0.453592;
+  public static final Matter CHASSIS =
+      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
+  public static final double DEADBAND = 0.1;
 
   public static final boolean absoluteDrive = false;
 }

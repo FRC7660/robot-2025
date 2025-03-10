@@ -40,6 +40,7 @@ public class Climb extends SubsystemBase {
     encoderClimb.setPosition(0);
     configClimb = new SparkMaxConfig();
     configClimb.idleMode(IdleMode.kBrake);
+    configClimb.inverted(true);
     motorClimb.configure(
         configClimb, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     encoderClimb.setPosition(0);
