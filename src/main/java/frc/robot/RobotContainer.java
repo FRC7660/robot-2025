@@ -32,9 +32,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
-import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
+import frc.robot.commands.ElevatorGoToPos;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
@@ -216,12 +216,11 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePosIn));
-    testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
-    testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
-    testController
-        .b()
-        .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
+    // testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePosIn)); // unsafe without
+    // elevator req.
+    // testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
+    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
+    testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
 
     driverController.povUp().onTrue(new IntakeCoral(claw));
     driverController.povDown().onTrue(new releaseCoral(claw));
@@ -326,7 +325,7 @@ public class RobotContainer {
         left = false;
         break;
     }
-    buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
+    buttonXtrigger.whileTrue(new ElevatorGoToPos(elevator, arm, height));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
