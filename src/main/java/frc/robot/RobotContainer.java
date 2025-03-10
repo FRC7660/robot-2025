@@ -191,7 +191,8 @@ public class RobotContainer {
       driverController
           .start()
           .onTrue(
-              Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+              Commands.runOnce(
+                  () -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
       driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverController
           .button(2)
