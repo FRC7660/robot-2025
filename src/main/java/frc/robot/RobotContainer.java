@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmGoToPos;
+import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
@@ -202,8 +203,10 @@ public class RobotContainer {
 
     driverController.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
     driverController.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    driverController.povRight().whileTrue(arm.manualArmOut());
-    driverController.povLeft().whileTrue(arm.manualArmIn());
+    driverController
+        .povRight()
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
+    driverController.povRight().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     driverController
         .leftTrigger(0.1)
@@ -341,8 +344,12 @@ public class RobotContainer {
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
     buttonBox.axisGreaterThan(0, 0.5).whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
     buttonBox.axisLessThan(0, -0.5).whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    buttonBox.axisGreaterThan(1, 0.5).whileTrue(arm.manualArmOut());
-    buttonBox.axisLessThan(1, -0.5).whileTrue(arm.manualArmIn());
+    buttonBox
+        .axisGreaterThan(1, 0.5)
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
+    buttonBox
+        .axisLessThan(1, -0.5)
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     // TODO: bind x to 'return elevator and arm to home position'
     buttonBox

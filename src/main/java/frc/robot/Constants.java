@@ -69,6 +69,11 @@ public final class Constants {
     public static final double motorRotationsPerCircle = 37.2;
     public static final double radiansPerMotorRotation = (2 * Math.PI) / 37.2;
     public static final double endDeadband = 0.4;
+
+    public enum Direction {
+      OUT,
+      IN,
+    }
   }
 
   public static class Claw {

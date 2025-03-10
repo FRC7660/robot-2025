@@ -15,7 +15,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -116,6 +115,16 @@ public class Arm extends SubsystemBase {
     targetPos = getPosition();
   }
 
+  public void manualIn() {
+    manualMode = true;
+    desiredOutput = Constants.Arm.armSpeed;
+  }
+
+  public void manualOut() {
+    manualMode = true;
+    desiredOutput = Constants.Arm.armSpeed;
+  }
+
   @Override
   public void periodic() {
     if (manualMode) {
@@ -165,15 +174,5 @@ public class Arm extends SubsystemBase {
         RobotController
             .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
     // function
-  }
-
-  public Command manualArmOut() {
-    return this.startRun(
-        () -> System.out.println("Manual arm out"), () -> setMotor(Constants.Arm.armSpeed));
-  }
-
-  public Command manualArmIn() {
-    return this.startRun(
-        () -> System.out.println("Manual arm in"), () -> setMotor(-Constants.Arm.armSpeed));
   }
 }
