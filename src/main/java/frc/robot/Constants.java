@@ -41,7 +41,7 @@ public final class Constants {
   }
 
   public static class Arm {
-    public static double armSpeed = 0.25;
+    public static double armSpeed = 0.1;
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;

@@ -35,6 +35,7 @@ import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.ElevatorGoToPos;
+import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
@@ -201,12 +202,16 @@ public class RobotContainer {
     driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
     driverController.y().onTrue(new SwitchVideo());
 
-    driverController.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
-    driverController.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
+    driverController
+        .povUp()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
+    driverController
+        .povDown()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
     driverController
         .povRight()
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
-    driverController.povRight().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
+    driverController.povLeft().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     driverController
         .leftTrigger(0.1)
