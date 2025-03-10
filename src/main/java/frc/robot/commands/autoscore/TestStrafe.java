@@ -5,17 +5,18 @@
 package frc.robot.commands.autoscore;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.drive.*;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.driveCommands.*;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TestStrafe extends Command {
-  private final Drive drive;
+  private final SwerveSubsystem drive;
   boolean isLeft;
-  Double magnitude;
+  Double magnitude;  
 
   /** Creates a new TestStrafe. */
-  public TestStrafe(Drive driveIntake, boolean left, Double mag) {
+  public TestStrafe(SwerveSubsystem driveIntake, boolean left, Double mag) {
     // Use addRequirements() here to declare subsystem dependencies.
 
     drive = driveIntake;
@@ -33,7 +34,7 @@ public class TestStrafe extends Command {
   @Override
   public void execute() {
     // System.out.println("TEST STRAFE REACHED");
-    DriveCommands.strafe(drive, isLeft, () -> magnitude);
+    Commands.run(null, drive);
   }
 
   // Called once the command ends or is interrupted.

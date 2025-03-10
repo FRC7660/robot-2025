@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -49,6 +50,7 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.swervedrive.SwerveDrive7660;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.SimulatedArena;
@@ -322,7 +324,8 @@ public class RobotContainer {
     buttonXtrigger.onTrue(
         Commands.parallel(
             Commands.run(
-                () -> new TestStrafe(drive, left, 0.1), drive), // Drive - Alignment command
+                () -> new TestStrafe(drivebase, left, 0.1), drivebase), // Drive - Alignment command
+                // test strafe does nothing, should be replaced
             Commands.sequence(
                 Commands.run(() -> new SetArmPosition(0), arm), // Arm - Safety position command
                 Commands.run(
