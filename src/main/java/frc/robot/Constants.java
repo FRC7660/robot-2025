@@ -54,8 +54,8 @@ public final class Constants {
     public static final double ki = 0.025;
     public static final double kd = 0;
     public static final double scorePos = -3.5;
-    public static final double zeroPos = -0.5;
-    public static final double safePos = -2.45;
+    public static final double zeroPos = -0.25;
+    public static final double safePos = -2.35;
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;

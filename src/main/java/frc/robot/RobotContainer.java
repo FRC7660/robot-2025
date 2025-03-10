@@ -237,8 +237,8 @@ public class RobotContainer {
         .b()
         .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
 
-    driverController.povUp().onTrue(new IntakeCoral(claw));
-    driverController.povDown().onTrue(new releaseCoral(claw));
+    testController.povUp().onTrue(new IntakeCoral(claw));
+    testController.povDown().onTrue(new releaseCoral(claw));
 
     // Reset gyro / odometry
     final Runnable resetGyro =
