@@ -151,6 +151,7 @@ public class Elevator extends SubsystemBase {
 
   public Double getHeight() {
     // Height gained from one rotation: 0.91978999in * 2
+    // = 1.833333 in.
     // Sprocket Diameter: 1.75667in
     // Circumfrence: 5.518737in
     Double height;
@@ -201,6 +202,8 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
     SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
+    SmartDashboard.putNumber("Motor Beta Speed", motorBeta.get());
+    SmartDashboard.putNumber("Motor Beta Position", motorBetaEncoder.getPosition());
     SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
     SmartDashboard.putNumber("Alpha Applied", motorAlpha.getAppliedOutput());
 
