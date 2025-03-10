@@ -27,14 +27,15 @@ public class ArmManual extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_elevator.hold();
+
     limitOut = Constants.Arm.forewardLimit;
-    if (m_elevator.isAtBottom()) {
-      limitIn = Constants.Arm.safePos;
+    if (!m_elevator.isAtBottom()) {
+      limitIn = Constants.Arm.safePosIn;
     } else {
       limitIn = Constants.Arm.zeroPos;
     }
 
-    m_elevator.hold();
     String dirStr = "out";
     if (direction == Constants.Arm.Direction.OUT) {
       m_arm.manualOut();
@@ -53,7 +54,6 @@ public class ArmManual extends Command {
   @Override
   public void end(boolean interrupted) {
     m_arm.holdCurrentPosition();
-    m_arm.setManual(false);
   }
 
   // Returns true when the command should end.

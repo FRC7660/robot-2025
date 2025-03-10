@@ -216,7 +216,7 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePos));
+    testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePosIn));
     testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
     testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
     testController
