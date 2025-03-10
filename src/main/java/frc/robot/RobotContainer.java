@@ -221,9 +221,6 @@ public class RobotContainer {
     testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
     testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
 
-    driverController.povUp().onTrue(new IntakeCoral(claw));
-    driverController.povDown().onTrue(new releaseCoral(claw));
-
     // // Reset gyro / odometry
     // final Runnable resetGyro =
     //     Constants.currentMode == Constants.Mode.SIM // this is an IF statement
