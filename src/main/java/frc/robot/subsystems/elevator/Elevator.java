@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
@@ -15,8 +13,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-// import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -43,7 +41,6 @@ public class Elevator extends SubsystemBase {
   // public DigitalInput topLimit = new DigitalInput(10);
   public SparkFlexConfig alphaConfig = new SparkFlexConfig();
   public SparkFlexConfig betaConfig = new SparkFlexConfig();
-  public Double targetPosition = 0.0;
 
   private RelativeEncoder motorAlphaEncoder = motorAlpha.getEncoder();
   private RelativeEncoder motorBetaEncoder = motorBeta.getEncoder();
@@ -62,6 +59,12 @@ public class Elevator extends SubsystemBase {
   Double eKv = 0.1;
   Double eKconstraintVel = 100.0;
   Double eKconstraintAccel = 100.0;
+
+  double manualOutput = 0.0;
+
+  private boolean debug = false;
+  private boolean tuning = false;
+  private boolean manual = false;
 
   private final TrapezoidProfile.Constraints m_startingConstraints =
       new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel);
@@ -121,32 +124,19 @@ public class Elevator extends SubsystemBase {
     return (motorAlphaEncoder.getPosition() > Constants.Elevator.upperLimit);
   }
 
-  public void setMotors(double speed) {
-    Double speedMulti;
-    if (speed < 0) {
-      speedMulti = 0.2;
-    } else {
-      speedMulti = 0.5;
-    }
-    Double outputSpeed = speed * speedMulti;
-    if (outputSpeed < 0 && isAtBottom()) {
-      motorAlpha.set(0);
-      motorBeta.set(0);
-    } else if (outputSpeed > 0 && isAtTop()) {
-      motorAlpha.set(Constants.Elevator.feedForward);
-      motorBeta.set(Constants.Elevator.feedForward);
-    } else {
-      motorAlpha.set(outputSpeed);
-      motorBeta.set(outputSpeed);
-    }
-    SmartDashboard.putNumber("Elevator Output", outputSpeed);
-    SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
-    SmartDashboard.putNumber("Motor Beta Speed", motorBeta.get());
+  private void setCalculatedMotors(Double output, Double feedForward) {
+    setVoltage(output + feedForward);
   }
 
-  private void setCalculatedMotors(Double output, Double feedForward) {
-    motorAlpha.setVoltage(output + feedForward);
-    motorBeta.setVoltage(output + feedForward);
+  private void setVoltage(double output) {
+    double adjusted = output;
+    if (output < 0 && isAtBottom()) {
+      adjusted = 0;
+    } else if (output > 0 && isAtTop()) {
+      adjusted = Constants.Elevator.feedForward;
+    }
+    motorAlpha.setVoltage(adjusted);
+    motorBeta.setVoltage(adjusted);
   }
 
   public Double getHeight() {
@@ -157,6 +147,10 @@ public class Elevator extends SubsystemBase {
     Double baseRotations = motorAlphaEncoder.getPosition();
     height = baseRotations * 0.91979 * 2;
     return height;
+  }
+
+  public double getPosition() {
+    return motorAlphaEncoder.getPosition();
   }
 
   public void setState(ElevatorState state) {
@@ -188,36 +182,68 @@ public class Elevator extends SubsystemBase {
     }
 
     m_controller.setGoal(goal);
-    output = m_controller.calculate(motorAlphaEncoder.getPosition());
-    feedForward = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+    manual = false;
+  }
+
+  public boolean isAtGoal() {
+    return MathUtil.isNear(m_controller.getGoal().position, motorAlphaEncoder.getPosition(), 1.0);
+  }
+
+  public void hold() {
+    m_controller.setGoal(motorAlphaEncoder.getPosition());
+    manual = false;
+  }
+
+  public void manualUp() {
+    manual = true;
+    manualOutput = Constants.Elevator.manualOutput;
+  }
+
+  public void manualDown() {
+    manual = true;
+    manualOutput = -Constants.Elevator.manualOutput;
+  }
+
+  @Override
+  public void periodic() {
+
+    SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
+    SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
+
+    if (manual) {
+      setVoltage(manualOutput);
+      return;
+    }
+
+    if (debug) {
+      SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
+      SmartDashboard.putNumber("Alpha Applied", motorAlpha.getAppliedOutput());
+    }
+
+    if (tuning) {
+      m_controller.setPID(
+          SmartDashboard.getNumber("eKp", 0),
+          SmartDashboard.getNumber("eKi", 0),
+          SmartDashboard.getNumber("eKd", 0));
+
+      m_feedforward.setKs(SmartDashboard.getNumber("eKs", 0));
+      m_feedforward.setKg(SmartDashboard.getNumber("eKg", 0));
+      m_feedforward.setKv(SmartDashboard.getNumber("eKv", 0));
+
+      m_controller.setConstraints(
+          new TrapezoidProfile.Constraints(
+              SmartDashboard.getNumber("eKcVel", 0), SmartDashboard.getNumber("eKcAccel", 0)));
+
+      SmartDashboard.putNumber("Visual Setpoint", m_controller.getSetpoint().position);
+    }
+
+    double output = m_controller.calculate(motorAlphaEncoder.getPosition());
+    double feedForward = m_feedforward.calculate(m_controller.getSetpoint().velocity);
     SmartDashboard.putNumber("PID Output", output);
     SmartDashboard.putNumber("PID feedForward calculation", feedForward);
     SmartDashboard.putNumber("PID Goal", m_controller.getGoal().position);
     SmartDashboard.putNumber("Elevator Counter", counter);
     setCalculatedMotors(output, feedForward);
-  }
-
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
-    SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
-    SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
-    SmartDashboard.putNumber("Alpha Applied", motorAlpha.getAppliedOutput());
-
-    m_controller.setPID(
-        SmartDashboard.getNumber("eKp", 0),
-        SmartDashboard.getNumber("eKi", 0),
-        SmartDashboard.getNumber("eKd", 0));
-
-    m_feedforward.setKs(SmartDashboard.getNumber("eKs", 0));
-    m_feedforward.setKg(SmartDashboard.getNumber("eKg", 0));
-    m_feedforward.setKv(SmartDashboard.getNumber("eKv", 0));
-
-    m_controller.setConstraints(
-        new TrapezoidProfile.Constraints(
-            SmartDashboard.getNumber("eKcVel", 0), SmartDashboard.getNumber("eKcAccel", 0)));
-
-    SmartDashboard.putNumber("Visual Setpoint", m_controller.getSetpoint().position);
   }
 
   public void simulationPeriodic() {
