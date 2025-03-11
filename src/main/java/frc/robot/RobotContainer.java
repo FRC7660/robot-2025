@@ -36,6 +36,7 @@ import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
+import frc.robot.commands.DriveForTime;
 import frc.robot.commands.ElevatorGoToPos;
 import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
@@ -155,6 +156,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("BytingCommand", testCommand);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -1, 0, 1));
 
     // Default command for Elevator
     // elevator.setDefaultCommand(
