@@ -32,8 +32,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
-import frc.robot.commands.ArmPIDTest;
+import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
+import frc.robot.commands.ElevatorGoToPos;
+import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
@@ -209,10 +211,16 @@ public class RobotContainer {
     driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
     driverController.y().onTrue(new SwitchVideo());
 
-    driverController.povUp().whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
-    driverController.povDown().whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    driverController.povRight().whileTrue(arm.manualArmOut());
-    driverController.povLeft().whileTrue(arm.manualArmIn());
+    driverController
+        .povUp()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
+    driverController
+        .povDown()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
+    driverController
+        .povRight()
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
+    driverController.povLeft().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     driverController
         .leftTrigger(0.1)
@@ -222,11 +230,26 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmPIDTest(arm));
-    testController.y().whileTrue(Commands.run(() -> elevator.setState(ElevatorState.L1), elevator));
-    testController
-        .b()
-        .whileTrue(Commands.run(() -> elevator.setState(ElevatorState.ZERO), elevator));
+    // testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePosIn)); // unsafe without
+    // elevator req.
+    // testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
+    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
+    testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
+
+    // // Reset gyro / odometry
+    // final Runnable resetGyro =
+    //     Constants.currentMode == Constants.Mode.SIM // this is an IF statement
+    //         // simulation
+    //         ? () ->
+    //             drive.resetOdometry(
+    //                 driveSimulation
+    //                     .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+    // during
+    //         // real
+    //         : () ->
+    //             drive.resetOdometry(
+    //                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+    // driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
   private void configureSimBindings() {
@@ -313,7 +336,7 @@ public class RobotContainer {
         left = false;
         break;
     }
-    buttonXtrigger.whileTrue(Commands.run(() -> elevator.setState(height), elevator));
+    buttonXtrigger.whileTrue(new ElevatorGoToPos(elevator, arm, height));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
@@ -331,8 +354,12 @@ public class RobotContainer {
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
     buttonBox.axisGreaterThan(0, 0.5).whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
     buttonBox.axisLessThan(0, -0.5).whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
-    buttonBox.axisGreaterThan(1, 0.5).whileTrue(arm.manualArmOut());
-    buttonBox.axisLessThan(1, -0.5).whileTrue(arm.manualArmIn());
+    buttonBox
+        .axisGreaterThan(1, 0.5)
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
+    buttonBox
+        .axisLessThan(1, -0.5)
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     // TODO: bind x to 'return elevator and arm to home position'
     buttonBox
