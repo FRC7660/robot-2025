@@ -15,7 +15,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmPIDTest;
 import frc.robot.commands.ClimbPrepRoutine;
+import frc.robot.commands.DriveForTime;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
@@ -50,13 +50,9 @@ import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-
 import java.io.File;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import frc.robot.commands.DriveForTime;
 import swervelib.SwerveInputStream;
 
 /**

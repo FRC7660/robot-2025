@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import swervelib.SwerveInputStream;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveForTime extends Command {
@@ -17,6 +16,7 @@ public class DriveForTime extends Command {
   private final double speedx;
   private final double speedy;
   private final double time;
+
   /** Creates a new DriveForTime. */
   public DriveForTime(SwerveSubsystem drive, double speedx, double speedy, double time) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -42,7 +42,7 @@ public class DriveForTime extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.drive(new ChassisSpeeds(0,0,0));
+    drive.drive(new ChassisSpeeds(0, 0, 0));
   }
 
   // Returns true when the command should end.
