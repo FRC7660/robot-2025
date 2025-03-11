@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
+import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ArmManual;
 import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.DriveForTime;
@@ -232,9 +233,8 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    // testController.a().whileTrue(new ArmGoToPos(arm, Constants.Arm.safePosIn)); // unsafe without
-    // elevator req.
-    // testController.x().whileTrue(new ArmGoToPos(arm, Constants.Arm.zeroPos));
+    testController.a().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.safePosIn));
+    testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
     testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
     testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
 
