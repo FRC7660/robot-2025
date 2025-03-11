@@ -190,6 +190,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public void hold() {
+    manualOutput =
+        0.0; // BUGFIX1 - Set the manual output to zero whenever hold is called (manual input
+    // released)
+    // Just in case it's this simple...
     m_controller.setGoal(motorAlphaEncoder.getPosition());
     manual = false;
   }

@@ -202,9 +202,15 @@ public class RobotContainer {
     driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
     driverController.y().onTrue(new SwitchVideo());
 
-    driverController.povUp().whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
-    driverController.povDown().whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
-    driverController.povRight().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
+    driverController
+        .povUp()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
+    driverController
+        .povDown()
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
+    driverController
+        .povRight()
+        .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
     driverController.povLeft().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     driverController

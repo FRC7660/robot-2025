@@ -113,18 +113,28 @@ public class Arm extends SubsystemBase {
   }
 
   public void holdCurrentPosition() {
-    targetPos = getPosition();
-    manualMode = false;
+    // targetPos = getPosition();
+    // manualMode = false;
+    setTarget(
+        getPosition()); // BUGFIX2 - Avoid redundant assignment to manualMode + use helper function
   }
 
   public void manualIn() {
     manualMode = true;
     desiredOutput = Constants.Arm.armSpeed;
+    targetPos = getPosition(); // BUGFIX2 - Make the target position "follow" the real position
+    /*
+     * This should make it impossible for the target to be desynchronized with the real position
+     * during manual control at any time until it is overridden when manualMode becomes false
+     * Note: this line does NOT turn off manual mode, and "silently" changes target position
+     * This means that PID calculations are never run despite the variable change
+     */
   }
 
   public void manualOut() {
     manualMode = true;
     desiredOutput = -Constants.Arm.armSpeed;
+    targetPos = getPosition(); // BUGFIX2 - ditto above
   }
 
   @Override
