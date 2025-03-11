@@ -92,10 +92,19 @@ public class RobotContainer {
           .allianceRelativeControl(true);
 
   /** Clone's the angular velocity input stream and converts it to a fieldRelative input stream. */
+  /*The driver input inversion seems unnecessary if everything else is right, so maybe fix later */
   SwerveInputStream driveDirectAngle =
       driveAngularVelocity
           .copy()
-          .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+          .withControllerHeadingAxis(
+              () ->
+                  DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                      ? driverController.getRightX()
+                      : -driverController.getRightX(),
+              () ->
+                  DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+                      ? driverController.getRightY()
+                      : -driverController.getRightY())
           .headingWhile(true);
 
   /** Clone's the angular velocity input stream and converts it to a robotRelative input stream. */
