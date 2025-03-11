@@ -696,7 +696,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Translation2d getStrafeVelocity(Rotation2d currentRotation, double inputMagnitude) {
     return new Pose2d(new Translation2d(), currentRotation)
-        .transformBy(new Transform2d(inputMagnitude, 0.0, new Rotation2d()))
+        .transformBy(new Transform2d(-inputMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
 
