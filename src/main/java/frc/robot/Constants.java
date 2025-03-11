@@ -41,15 +41,24 @@ public final class Constants {
   }
 
   public static class Arm {
-    public static double armSpeed = 0.25;
+    public static double armSpeed = 0.1;
     public static double armEncoderUpperLimit = 1;
     public static double armEncoderLowerLimit = 4;
     public static final int motorID = 53;
-    public static final double safe_pos = 0.4;
-    public static final double kG = 0.03;
-    public static final double kp = 0.1;
-    public static final double ki = 0.05;
+    public static final double kDt = 0.02;
+    public static final double kMaxVelocity = 50;
+    public static final double kMaxAcceleration = 50;
+    public static final double kS = 0.0;
+    public static final double kGVoltage = 0.28; // multiplied by 12 for voltage
+    public static final double kV = 0.125;
+    public static final double kA = 0.0;
+    public static final double kp = 1.5;
+    public static final double ki = 0.025;
     public static final double kd = 0;
+    public static final double scorePos = -3.5;
+    public static final double zeroPos = -0.5;
+    public static final double safePosIn = -2.45;
+    public static final double safePosOut = -3.75; // FIND PRECISE NUMBER
     public static final double reverseLimit = -450;
     public static final double forewardLimit = -10;
     public static final double testPosition = -380;
@@ -59,6 +68,12 @@ public final class Constants {
     public static final double motorOffset = -12.3;
     public static final double motorRotationsPerCircle = 37.2;
     public static final double radiansPerMotorRotation = (2 * Math.PI) / 37.2;
+    public static final double endDeadband = 0.4;
+
+    public enum Direction {
+      OUT,
+      IN,
+    }
   }
 
   public static class Claw {
@@ -121,6 +136,12 @@ public final class Constants {
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
+    public static final double manualOutput = .2 * 12; // output in volts
+
+    public enum Direction {
+      UP,
+      DOWN,
+    }
   }
 
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
