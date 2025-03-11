@@ -15,6 +15,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,9 +50,13 @@ import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+
 import java.io.File;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import frc.robot.commands.DriveForTime;
 import swervelib.SwerveInputStream;
 
 /**
@@ -142,6 +147,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("BytingCommand", testCommand);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -1, 0, 1));
 
     // Default command for Elevator
     // elevator.setDefaultCommand(
