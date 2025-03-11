@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -35,9 +34,6 @@ public class Arm extends SubsystemBase {
 
   private double targetPos;
 
-  private PIDController pid =
-      new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
-
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(Constants.Arm.kMaxVelocity, Constants.Arm.kMaxAcceleration);
   private final ProfiledPIDController m_controller =
@@ -61,9 +57,9 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm kV", m_feedforward.getKv());
     SmartDashboard.putNumber("Arm kA", m_feedforward.getKa());
 
-    SmartDashboard.putNumber("Arm P", pid.getP());
-    SmartDashboard.putNumber("Arm I", pid.getI());
-    SmartDashboard.putNumber("Arm D", pid.getD());
+    SmartDashboard.putNumber("Arm P", m_controller.getP());
+    SmartDashboard.putNumber("Arm I", m_controller.getI());
+    SmartDashboard.putNumber("Arm D", m_controller.getD());
 
     SmartDashboard.putNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity);
     SmartDashboard.putNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration);
