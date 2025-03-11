@@ -80,18 +80,18 @@ public class Arm extends SubsystemBase {
     return targetPos;
   }
 
-  public Boolean armAtMax() {
+  public Boolean armAtExtended() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position > Constants.Arm.armEncoderUpperLimit) {
+    if (position > Constants.Arm.forewardLimit) {
       System.out.println("Upper Arm Limit Reached");
       return true;
     }
     return false;
   }
 
-  public Boolean armAtMin() {
+  public Boolean armAtZero() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position < Constants.Arm.armEncoderLowerLimit) {
+    if (position < Constants.Arm.zeroPos) {
       System.out.println("Lower Arm Limit Reached");
       return true;
     }
@@ -120,9 +120,25 @@ public class Arm extends SubsystemBase {
     desiredOutput = Constants.Arm.armSpeed;
   }
 
+  public double convertRevToRad(double pos) {
+    return ((Constants.Arm.motorOffset - pos) * Constants.Arm.radiansPerMotorRotation);
+  }
+
   public void manualOut() {
     manualMode = true;
     desiredOutput = -Constants.Arm.armSpeed;
+  }
+
+  private void setVoltage(double output) {
+    double adjusted = output;
+    if (output < 0 && armAtExtended()) {
+      adjusted =
+          m_feedforward.calculate(
+              convertRevToRad(Constants.Arm.forewardLimit), m_controller.getSetpoint().velocity);
+    } else if (output > 0 && armAtZero()) {
+      adjusted = 0;
+    }
+    motorArm.setVoltage(adjusted);
   }
 
   @Override
@@ -159,19 +175,20 @@ public class Arm extends SubsystemBase {
 
     m_controller.setGoal(targetPos);
 
-    double posff =
-        (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
-            * Constants.Arm.radiansPerMotorRotation;
-    double outff = m_feedforward.calculate(posff, m_controller.getSetpoint().velocity);
+    double outff =
+        m_feedforward.calculate(
+            convertRevToRad(motorArm.getPosition().getValueAsDouble()),
+            m_controller.getSetpoint().velocity);
     double outPID = m_controller.calculate(getPosition());
 
     if (debug) {
       SmartDashboard.putNumber("Arm-PID", outPID);
-      SmartDashboard.putNumber("Arm-PosFF", posff);
+      SmartDashboard.putNumber(
+          "Arm-PosFF", convertRevToRad(motorArm.getPosition().getValueAsDouble()));
       SmartDashboard.putNumber("Arm-FF", outff);
     }
 
-    motorArm.setVoltage(outPID + outff);
+    setVoltage(outPID + outff);
   }
 
   public void simulationPeriodic() {
