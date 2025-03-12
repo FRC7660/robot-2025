@@ -48,7 +48,9 @@ public class ArmManual extends Command {
   }
 
   @Override
-  public void execute() {}
+  public void execute() {
+    m_arm.setTargetWhileManual(m_arm.getPosition());
+  }
 
   // Called once the command ends or is interrupted.
   @Override

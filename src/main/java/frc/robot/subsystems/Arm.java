@@ -24,8 +24,8 @@ public class Arm extends SubsystemBase {
   private TalonFXSimState motorArmSim;
 
   private boolean manualMode = false;
-  private boolean tuning = false;
-  private boolean debug = false;
+  private boolean tuning = true;
+  private boolean debug = true;
 
   public Encoder encoderArm = new Encoder(1, 2);
 
@@ -47,6 +47,8 @@ public class Arm extends SubsystemBase {
 
     motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
+
+    targetPos = 0;
 
     m_feedforward =
         new ArmFeedforward(
@@ -76,13 +78,17 @@ public class Arm extends SubsystemBase {
     manualMode = false;
   }
 
+  public void setTargetWhileManual(double Pos) {
+    targetPos = Pos;
+  }
+
   public double getTarget() {
     return targetPos;
   }
 
   public Boolean armAtExtended() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position > Constants.Arm.forewardLimit) {
+    if (position < Constants.Arm.forewardLimit) {
       System.out.println("Upper Arm Limit Reached");
       return true;
     }
@@ -91,7 +97,7 @@ public class Arm extends SubsystemBase {
 
   public Boolean armAtZero() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position < Constants.Arm.zeroPos) {
+    if (position > Constants.Arm.zeroPos) {
       System.out.println("Lower Arm Limit Reached");
       return true;
     }
@@ -139,12 +145,16 @@ public class Arm extends SubsystemBase {
       adjusted = 0;
     }
     motorArm.setVoltage(adjusted);
+    SmartDashboard.putNumber("Arm-output", output);
+    SmartDashboard.putNumber("Arm-adjusted-output", adjusted);
   }
 
   @Override
   public void periodic() {
     if (manualMode) {
-      motorArm.set(desiredOutput);
+      setVoltage(desiredOutput*12);
+      //setTarget(getPosition());
+      m_controller.setGoal(getPosition());
       return;
     }
 
@@ -155,6 +165,7 @@ public class Arm extends SubsystemBase {
       SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
       SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
+      SmartDashboard.putNumber("Arm-target", targetPos);
     }
 
     if (tuning) {
