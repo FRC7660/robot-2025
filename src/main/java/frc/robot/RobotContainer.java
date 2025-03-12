@@ -209,7 +209,34 @@ public class RobotContainer {
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
     // TODO: bind x to 'return elevator and arm to home position'
-    driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
+    //driverController.x().whileTrue()
+    //This is the new x button
+
+//import java.io.IOException;
+
+//public class ControllerCommandRunner {
+  //  public static void main(String[] args) {
+    //    if (isXButtonPressed()) {
+      //      moveElevatorTo(0);
+        //    moveArmTo(0);
+        //}
+    //}
+
+    //private static boolean isXButtonPressed() {
+        // Simulate X button press detection (replace with actual controller input handling)
+      //  return true;
+    //}
+
+    //private static void moveElevatorTo(int position) {
+      //  System.out.println("Moving elevator to position: " + position);
+        // Add actual motor control logic here
+    //}
+
+    //private static void moveArmTo(int position) {
+      //  System.out.println("Moving arm to position: " + position);
+        // Add actual motor control logic here
+    //}
+//}
     driverController.y().onTrue(new SwitchVideo());
 
     driverController
