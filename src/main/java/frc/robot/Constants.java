@@ -87,7 +87,7 @@ public final class Constants {
     public static double climbSpeed = 0.50;
     public static double climbEncoderLimit = 1;
     public static int climbSwitchID = 5;
-    public static double upperLimit = 165;
+    public static double upperLimit = 270;
     public static double halfwayPosition = 80;
   }
 
