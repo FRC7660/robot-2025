@@ -196,7 +196,7 @@ public class RobotContainer {
       driverController
           .leftBumper()
           .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      //driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      // driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverController.back().whileTrue(drivebase.centerModulesCommand());
     }
@@ -231,10 +231,12 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.scorePos)); // unsafe without
+    testController
+        .a()
+        .whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.scorePos)); // unsafe without
     // elevator req.
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
-    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
+    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L4));
     testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
 
     // // Reset gyro / odometry
@@ -289,7 +291,7 @@ public class RobotContainer {
       // LEFT SIDE PRESETS
       case Constants.ButtonBox.bottomLeft:
         buttonName = "bottom left";
-        height = ElevatorState.L1;
+        height = ElevatorState.ZERO;
         left = true;
         break;
       case Constants.ButtonBox.lowerLeft:

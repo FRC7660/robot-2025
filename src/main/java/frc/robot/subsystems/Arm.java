@@ -74,12 +74,10 @@ public class Arm extends SubsystemBase {
   }
 
   public void setTarget(double Pos) {
+    m_controller.reset(getPosition());
+    m_controller.setGoal(Pos);
     targetPos = Pos;
     manualMode = false;
-  }
-
-  public void setTargetWhileManual(double Pos) {
-    targetPos = Pos;
   }
 
   public double getTarget() {
@@ -118,21 +116,25 @@ public class Arm extends SubsystemBase {
 
   public void holdCurrentPosition() {
     targetPos = getPosition();
+    m_controller.reset(targetPos);
+    m_controller.setGoal(targetPos);
     manualMode = false;
   }
 
   public void manualIn() {
     manualMode = true;
     desiredOutput = Constants.Arm.armSpeed;
-  }
-
-  public double convertRevToRad(double pos) {
-    return ((Constants.Arm.motorOffset - pos) * Constants.Arm.radiansPerMotorRotation);
+    m_controller.reset(getPosition());
   }
 
   public void manualOut() {
     manualMode = true;
     desiredOutput = -Constants.Arm.armSpeed;
+    m_controller.reset(getPosition());
+  }
+
+  public double convertRevToRad(double pos) {
+    return ((Constants.Arm.motorOffset - pos) * Constants.Arm.radiansPerMotorRotation);
   }
 
   private void setVoltage(double output) {
@@ -151,12 +153,6 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (manualMode) {
-      setVoltage(desiredOutput*12);
-      //setTarget(getPosition());
-      m_controller.setGoal(getPosition());
-      return;
-    }
 
     if (debug) {
       // This method will be called once per scheduler run
@@ -184,6 +180,10 @@ public class Arm extends SubsystemBase {
               SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
     }
 
+    if (manualMode) {
+      targetPos = getPosition();
+    }
+
     m_controller.setGoal(targetPos);
 
     double outff =
@@ -199,7 +199,11 @@ public class Arm extends SubsystemBase {
       SmartDashboard.putNumber("Arm-FF", outff);
     }
 
-    setVoltage(outPID + outff);
+    if (manualMode) {
+      setVoltage(desiredOutput * 12);
+    } else {
+      setVoltage(outPID + outff);
+    }
   }
 
   public void simulationPeriodic() {

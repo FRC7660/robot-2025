@@ -56,7 +56,7 @@ public final class Constants {
     public static final double ki = 0.025;
     public static final double kd = 0;
     public static final double scorePos = -2.8;
-    public static final double zeroPos = -0.1;
+    public static final double zeroPos = 0.0;
     public static final double safePosIn = -2.45;
     public static final double safePosOut = -3.75; // FIND PRECISE NUMBER
     public static final double reverseLimit = -450;
