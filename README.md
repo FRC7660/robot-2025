@@ -15,6 +15,7 @@
 
 ## button board
  * left 4 buttons: elevator presets with automatic arm movement
+ * bottom left button: return elevator and arm to home
  * right upper button: lower funnel
  * right lower button: climb raise
  * right bottom button: climb lower
