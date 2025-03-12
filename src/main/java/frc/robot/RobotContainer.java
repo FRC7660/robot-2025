@@ -137,6 +137,10 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  //Commands
+  Command armScorePos;
+  Command elevatorL2;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -146,12 +150,19 @@ public class RobotContainer {
     ledLive = new LEDlive();
     elevator = new Elevator();
 
+    armScorePos = new ArmGoToPos(arm, elevator, Constants.Arm.scorePos);
+    elevatorL2 = new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
     TestAuto testCommand = new TestAuto("Byting Command");
     TestAuto testEventMarker = new TestAuto("Byting Event Marker");
     // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("BytingCommand", testCommand);
+    NamedCommands.registerCommand("Arm Out", armScorePos);
+    NamedCommands.registerCommand("Elevator L2",elevatorL2);
+    NamedCommands.registerCommand("Arm Shoot Pos", armScorePos);
+    NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -258,7 +269,7 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.scorePos)); // unsafe without
+    testController.a().whileTrue(armScorePos); // unsafe without
     // elevator req.
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
     testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L1));
