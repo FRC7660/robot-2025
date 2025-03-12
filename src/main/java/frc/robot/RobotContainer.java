@@ -366,8 +366,12 @@ public class RobotContainer {
     buttonBox.button(Constants.ButtonBox.upperRight).whileTrue(new LowerFunnel(funnel, climb));
 
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
-    buttonBox.axisGreaterThan(0, 0.5).whileTrue(new PrintCommand("TODO: Raise elevator")); // TODO
-    buttonBox.axisLessThan(0, -0.5).whileTrue(new PrintCommand("TODO: Lower Elevator")); // TODO
+    buttonBox
+        .axisGreaterThan(0, 0.5)
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
+    buttonBox
+        .axisLessThan(0, -0.5)
+        .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
     buttonBox
         .axisGreaterThan(1, 0.5)
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
