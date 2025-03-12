@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -339,13 +340,23 @@ public class RobotContainer {
         left = false;
         break;
     }
-    buttonXtrigger.whileTrue(new ElevatorGoToPos(elevator, arm, height));
+    buttonXtrigger.onTrue(
+        new SequentialCommandGroup(
+            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+            new ElevatorGoToPos(elevator, arm, height)));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
 
   private void configurebuttonBox() {
-    setUpBoxButton(Constants.ButtonBox.bottomLeft);
+    // setUpBoxButton(Constants.ButtonBox.bottomLeft);
+    Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
+    buttonBLtrigger.onTrue(
+        new SequentialCommandGroup(
+            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+            new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
+            new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos)));
+
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
     setUpBoxButton(Constants.ButtonBox.topLeft);
