@@ -210,11 +210,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
     SmartDashboard.putNumber("Motor Alpha Position", getPosition());
 
-    if (manual) {
-      setVoltage(manualOutput);
-      return;
-    }
-
     if (debug) {
       SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
       SmartDashboard.putNumber("Alpha Applied", motorAlpha.getAppliedOutput());
@@ -243,7 +238,12 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("PID feedForward calculation", feedForward);
     SmartDashboard.putNumber("PID Goal", m_controller.getGoal().position);
     SmartDashboard.putNumber("Elevator Counter", counter);
-    setCalculatedMotors(output, feedForward);
+
+    if (manual) {
+      setVoltage(manualOutput);
+    } else {
+      setCalculatedMotors(output, feedForward);
+    }
   }
 
   public void simulationPeriodic() {
