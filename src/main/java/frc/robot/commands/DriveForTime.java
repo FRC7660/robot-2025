@@ -4,49 +4,35 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ArmGoToPos extends Command {
-  private final Arm m_arm;
-  private final Elevator m_elevator;
-  private final double targetPos;
-  private double limitOut, limitIn;
+public class DriveForTime extends Command {
+  private final SwerveSubsystem drive;
+  private final Timer timer = new Timer();
+  private final double speedx;
+  private final double speedy;
+  private final double time;
 
-  /** Creates a new ArmGoToPos. */
-  public ArmGoToPos(Arm arm, Elevator elevator, double Pos) { // ADD ELEVATOR TO REQUIREMENTS
+  /** Creates a new DriveForTime. */
+  public DriveForTime(SwerveSubsystem drive, double speedx, double speedy, double time) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_arm = arm;
-    targetPos = Pos;
-    m_elevator = elevator;
-    addRequirements(m_arm, m_elevator);
+    this.drive = drive;
+    this.speedx = speedx;
+    this.speedy = speedy;
+    this.time = time;
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.hold();
-
-    if (!m_elevator.isAtBottom()) {
-      limitIn = Constants.Arm.safePosIn;
-      limitOut = Constants.Arm.safePosOut;
-    } else {
-      limitIn = Constants.Arm.zeroPos;
-      limitOut = Constants.Arm.forewardLimit;
-    }
-
-    if (targetPos > limitIn) {
-      cancel();
-    }
-
-    if (targetPos < limitOut) {
-      cancel();
-    }
-
-    m_arm.setTarget(targetPos);
+    drive.drive(new ChassisSpeeds(speedx, speedy, 0));
+    timer.reset();
+    timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -56,12 +42,12 @@ public class ArmGoToPos extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    return;
+    drive.drive(new ChassisSpeeds(0, 0, 0));
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_arm.atTargetPos();
+    return timer.get() >= time;
   }
 }

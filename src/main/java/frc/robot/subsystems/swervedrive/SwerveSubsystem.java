@@ -74,7 +74,7 @@ public class SwerveSubsystem extends SubsystemBase {
     boolean blueAlliance = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
     Pose2d startingPose =
         blueAlliance
-            ? new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(0))
+            ? new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(180))
             : new Pose2d(new Translation2d(Meter.of(16), Meter.of(4)), Rotation2d.fromDegrees(0));
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being
     // created.
@@ -696,7 +696,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Translation2d getStrafeVelocity(Rotation2d currentRotation, double inputMagnitude) {
     return new Pose2d(new Translation2d(), currentRotation)
-        .transformBy(new Transform2d(inputMagnitude, 0.0, new Rotation2d()))
+        .transformBy(new Transform2d(-inputMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
 

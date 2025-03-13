@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -25,6 +24,8 @@ public class Arm extends SubsystemBase {
   private TalonFXSimState motorArmSim;
 
   private boolean manualMode = false;
+  private boolean tuning = true;
+  private boolean debug = true;
 
   public Encoder encoderArm = new Encoder(1, 2);
 
@@ -32,9 +33,6 @@ public class Arm extends SubsystemBase {
   private ArmFeedforward m_feedforward;
 
   private double targetPos;
-
-  private PIDController pid =
-      new PIDController(Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd);
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(Constants.Arm.kMaxVelocity, Constants.Arm.kMaxAcceleration);
@@ -50,6 +48,8 @@ public class Arm extends SubsystemBase {
     motorArm.setNeutralMode(NeutralModeValue.Coast);
     motorArm.setInverted(true);
 
+    targetPos = 0;
+
     m_feedforward =
         new ArmFeedforward(
             Constants.Arm.kS, Constants.Arm.kGVoltage, Constants.Arm.kV, Constants.Arm.kA);
@@ -59,9 +59,9 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm kV", m_feedforward.getKv());
     SmartDashboard.putNumber("Arm kA", m_feedforward.getKa());
 
-    SmartDashboard.putNumber("Arm P", pid.getP());
-    SmartDashboard.putNumber("Arm I", pid.getI());
-    SmartDashboard.putNumber("Arm D", pid.getD());
+    SmartDashboard.putNumber("Arm P", m_controller.getP());
+    SmartDashboard.putNumber("Arm I", m_controller.getI());
+    SmartDashboard.putNumber("Arm D", m_controller.getD());
 
     SmartDashboard.putNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity);
     SmartDashboard.putNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration);
@@ -74,6 +74,8 @@ public class Arm extends SubsystemBase {
   }
 
   public void setTarget(double Pos) {
+    m_controller.reset(getPosition());
+    m_controller.setGoal(Pos);
     targetPos = Pos;
     manualMode = false;
   }
@@ -82,18 +84,18 @@ public class Arm extends SubsystemBase {
     return targetPos;
   }
 
-  public Boolean armAtMax() {
+  public Boolean armAtExtended() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position > Constants.Arm.armEncoderUpperLimit) {
+    if (position < Constants.Arm.forewardLimit) {
       System.out.println("Upper Arm Limit Reached");
       return true;
     }
     return false;
   }
 
-  public Boolean armAtMin() {
+  public Boolean armAtZero() {
     double position = motorArm.getPosition().getValueAsDouble();
-    if (position < Constants.Arm.armEncoderLowerLimit) {
+    if (position > Constants.Arm.zeroPos) {
       System.out.println("Lower Arm Limit Reached");
       return true;
     }
@@ -114,61 +116,94 @@ public class Arm extends SubsystemBase {
 
   public void holdCurrentPosition() {
     targetPos = getPosition();
+    m_controller.reset(targetPos);
+    m_controller.setGoal(targetPos);
     manualMode = false;
   }
 
   public void manualIn() {
     manualMode = true;
     desiredOutput = Constants.Arm.armSpeed;
+    m_controller.reset(getPosition());
   }
 
   public void manualOut() {
     manualMode = true;
     desiredOutput = -Constants.Arm.armSpeed;
+    m_controller.reset(getPosition());
+  }
+
+  public double convertRevToRad(double pos) {
+    return ((Constants.Arm.motorOffset - pos) * Constants.Arm.radiansPerMotorRotation);
+  }
+
+  private void setVoltage(double output) {
+    double adjusted = output;
+    if (output < 0 && armAtExtended()) {
+      adjusted =
+          m_feedforward.calculate(
+              convertRevToRad(Constants.Arm.forewardLimit), m_controller.getSetpoint().velocity);
+    } else if (output > 0 && armAtZero()) {
+      adjusted = 0;
+    }
+    motorArm.setVoltage(adjusted);
+    SmartDashboard.putNumber("Arm-output", output);
+    SmartDashboard.putNumber("Arm-adjusted-output", adjusted);
   }
 
   @Override
   public void periodic() {
-    if (manualMode) {
-      motorArm.set(desiredOutput);
-      return;
+
+    if (debug) {
+      // This method will be called once per scheduler run
+      SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
+      SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
+      SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
+
+      SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
+      SmartDashboard.putNumber("Arm-target", targetPos);
     }
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
-    SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
+    if (tuning) {
+      m_controller.setP(SmartDashboard.getNumber("Arm P", Constants.Arm.kp));
+      m_controller.setI(SmartDashboard.getNumber("Arm I", Constants.Arm.ki));
+      m_controller.setD(SmartDashboard.getNumber("Arm D", Constants.Arm.kd));
 
-    m_controller.setP(SmartDashboard.getNumber("Arm P", Constants.Arm.kp));
-    m_controller.setI(SmartDashboard.getNumber("Arm I", Constants.Arm.ki));
-    m_controller.setD(SmartDashboard.getNumber("Arm D", Constants.Arm.kd));
+      m_feedforward.setKg(SmartDashboard.getNumber("Arm kG", Constants.Arm.kGVoltage));
+      m_feedforward.setKs(SmartDashboard.getNumber("Arm kS", Constants.Arm.kS));
+      m_feedforward.setKv(SmartDashboard.getNumber("Arm kV", Constants.Arm.kV));
+      m_feedforward.setKa(SmartDashboard.getNumber("Arm kA", Constants.Arm.kA));
 
-    m_feedforward.setKg(SmartDashboard.getNumber("Arm kG", Constants.Arm.kGVoltage));
-    m_feedforward.setKs(SmartDashboard.getNumber("Arm kS", Constants.Arm.kS));
-    m_feedforward.setKv(SmartDashboard.getNumber("Arm kV", Constants.Arm.kV));
-    m_feedforward.setKa(SmartDashboard.getNumber("Arm kA", Constants.Arm.kA));
+      m_controller.setConstraints(
+          new TrapezoidProfile.Constraints(
+              SmartDashboard.getNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity),
+              SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
+    }
 
-    m_controller.setConstraints(
-        new TrapezoidProfile.Constraints(
-            SmartDashboard.getNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity),
-            SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
+    if (manualMode) {
+      targetPos = getPosition();
+    }
 
     m_controller.setGoal(targetPos);
 
-    double posff =
-        (Constants.Arm.motorOffset - motorArm.getPosition().getValueAsDouble())
-            * Constants.Arm.radiansPerMotorRotation;
-    SmartDashboard.putNumber("Arm-PosFF", posff);
-
-    double outff = m_feedforward.calculate(posff, m_controller.getSetpoint().velocity);
-
-    SmartDashboard.putNumber("Arm-FF", outff);
-
+    double outff =
+        m_feedforward.calculate(
+            convertRevToRad(motorArm.getPosition().getValueAsDouble()),
+            m_controller.getSetpoint().velocity);
     double outPID = m_controller.calculate(getPosition());
-    SmartDashboard.putNumber("Arm-PID", outPID);
 
-    motorArm.setVoltage(outPID + outff);
+    if (debug) {
+      SmartDashboard.putNumber("Arm-PID", outPID);
+      SmartDashboard.putNumber(
+          "Arm-PosFF", convertRevToRad(motorArm.getPosition().getValueAsDouble()));
+      SmartDashboard.putNumber("Arm-FF", outff);
+    }
+
+    if (manualMode) {
+      setVoltage(desiredOutput * 12);
+    } else {
+      setVoltage(outPID + outff);
+    }
   }
 
   public void simulationPeriodic() {
