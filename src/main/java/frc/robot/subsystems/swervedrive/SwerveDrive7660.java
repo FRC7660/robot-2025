@@ -41,16 +41,18 @@ public class SwerveDrive7660 extends SwerveDrive {
     return Rotation2d.fromRadians(imuReadingCache.getValue().getZ());
   }
 
+  private boolean isRedAlliance() {
+    var alliance = DriverStation.getAlliance();
+    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+  }
+
   public void resetOdometry(Pose2d pose) {
     System.out.println("Resetting Odometry");
     odometryLock.lock();
     swerveDrivePoseEstimator.resetPosition(
         getRawYaw(),
         getModulePositions(),
-        pose.rotateBy(
-            DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
-                ? new Rotation2d(Math.PI)
-                : new Rotation2d(0)));
+        pose.rotateBy(isRedAlliance() ? new Rotation2d(0) : new Rotation2d(Math.PI)));
     odometryLock.unlock();
   }
 }
