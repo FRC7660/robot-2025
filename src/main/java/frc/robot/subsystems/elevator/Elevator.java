@@ -199,11 +199,13 @@ public class Elevator extends SubsystemBase {
   public void manualUp() {
     manual = true;
     manualOutput = Constants.Elevator.manualOutput;
+    m_controller.reset(getPosition());
   }
 
   public void manualDown() {
     manual = true;
     manualOutput = -Constants.Elevator.manualOutput;
+    m_controller.reset(getPosition());
   }
 
   @Override
