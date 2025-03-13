@@ -139,10 +139,6 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  // Commands
-  Command armToScorePos;
-  Command elevatorL2;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -152,18 +148,15 @@ public class RobotContainer {
     ledLive = new LEDlive();
     elevator = new Elevator();
 
-    armToScorePos = new ArmGoToPos(arm, elevator, Constants.Arm.scorePos);
-    elevatorL2 = new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
-
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
     TestAuto testCommand = new TestAuto("Byting Command");
     TestAuto testEventMarker = new TestAuto("Byting Event Marker");
     // NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("BytingCommand", testCommand);
-    NamedCommands.registerCommand("Arm Out", armToScorePos);
-    NamedCommands.registerCommand("Elevator L2", elevatorL2);
-    NamedCommands.registerCommand("Arm Shoot Pos", armToScorePos);
+    NamedCommands.registerCommand("Arm Out", armToScorePos());
+    NamedCommands.registerCommand("Elevator L2", elevatorL2());
+    NamedCommands.registerCommand("Arm Shoot Pos", armToScorePos());
     NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -245,7 +238,7 @@ public class RobotContainer {
         .whileTrue(
             new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
 
-    testController.a().whileTrue(armToScorePos);
+    testController.a().whileTrue(armToScorePos());
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
     testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L4));
     testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
@@ -351,7 +344,9 @@ public class RobotContainer {
         break;
     }
     buttonXtrigger.onTrue(
-        new SequentialCommandGroup(armToScorePos, new ElevatorGoToPos(elevator, arm, height)));
+        new SequentialCommandGroup(
+            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+            new ElevatorGoToPos(elevator, arm, height)));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
@@ -361,7 +356,7 @@ public class RobotContainer {
     Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
     buttonBLtrigger.onTrue(
         new SequentialCommandGroup(
-            armToScorePos,
+            armToScorePos(),
             new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
             new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos)));
 
@@ -432,5 +427,13 @@ public class RobotContainer {
 
   public void setMotorBrakeMode(boolean brake) {
     drivebase.setMotorBrake(brake);
+  }
+
+  private Command armToScorePos() {
+    return new ArmGoToPos(arm, elevator, Constants.Arm.scorePos);
+  }
+
+  private Command elevatorL2() {
+    return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
   }
 }
