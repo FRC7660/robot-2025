@@ -324,7 +324,7 @@ public class RobotContainer {
       // RIGHT SIDE PRESETS - Not Used Right Now
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
-        height = ElevatorState.L1;
+        height = ElevatorState.ZERO;
         left = false;
         break;
       case Constants.ButtonBox.lowerRight:
