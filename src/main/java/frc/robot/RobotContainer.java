@@ -140,6 +140,7 @@ public class RobotContainer {
   //Commands
   Command armScorePos;
   Command elevatorL2;
+  Command elevatorL4;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -152,6 +153,7 @@ public class RobotContainer {
 
     armScorePos = new ArmGoToPos(arm, elevator, Constants.Arm.scorePos);
     elevatorL2 = new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+    elevatorL4 = new ElevatorGoToPos(elevator, arm, ElevatorState.L4);
 
     // Set up auto routines
     // new EventTrigger("BytingEventMarker").onTrue(testEventMarker);
@@ -161,6 +163,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("BytingCommand", testCommand);
     NamedCommands.registerCommand("Arm Out", armScorePos);
     NamedCommands.registerCommand("Elevator L2",elevatorL2);
+    NamedCommands.registerCommand("Elevator L4", elevatorL4);
     NamedCommands.registerCommand("Arm Shoot Pos", armScorePos);
     NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
