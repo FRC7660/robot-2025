@@ -191,6 +191,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void hold() {
+    m_controller.reset(getPosition());
     m_controller.setGoal(motorAlphaEncoder.getPosition());
     manual = false;
   }
