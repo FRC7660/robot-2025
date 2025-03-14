@@ -447,10 +447,12 @@ public class RobotContainer {
 
   /**
    * Drives the with the given velocities robot oriented. Sets speeds to 0 on end.
+   *
    * @param vx The x component of the velocity in meters/second. Positive is forward.
    * @param vy The y component of the velocity in meters/second. Positive is to the left.
-   * @param omega The rotational component of the velocity in radians/second. Positive is counter-clockwise.
-   * @return The command to drive at the provided speeds. 
+   * @param omega The rotational component of the velocity in radians/second. Positive is
+   *     counter-clockwise.
+   * @return The command to drive at the provided speeds.
    */
   private Command driveRobotRelative(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier omega) {
     return Commands.runEnd(
