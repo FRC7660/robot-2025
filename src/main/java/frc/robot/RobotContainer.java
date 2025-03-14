@@ -369,8 +369,9 @@ public class RobotContainer {
     }
     buttonXtrigger.onTrue(
         new SequentialCommandGroup(
-            new ArmGoToPos(arm, elevator, height == Constants.ElevatorState.L4 ? Constants.Arm.scorePosL4 : Constants.Arm.scorePos),
-            new ElevatorGoToPos(elevator, arm, height)));
+            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+            new ElevatorGoToPos(elevator, arm, height),
+            new ArmGoToPos(arm, elevator, height == Constants.ElevatorState.L4 ? Constants.Arm.scorePosL4 : Constants.Arm.scorePos)));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
