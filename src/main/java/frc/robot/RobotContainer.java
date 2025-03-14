@@ -44,6 +44,7 @@ import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
+import frc.robot.commands.RemoveAlgae;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
@@ -224,6 +225,8 @@ public class RobotContainer {
     driverController.b().onTrue(new releaseCoral(claw));
     driverController.x().onTrue(goToHome());
     driverController.y().onTrue(new SwitchVideo());
+
+    driverController.rightBumper().whileTrue(new RemoveAlgae(claw));
 
     driverController
         .povUp()

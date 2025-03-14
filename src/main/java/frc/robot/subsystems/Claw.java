@@ -37,6 +37,10 @@ public class Claw extends SubsystemBase {
     motorClaw.set(Constants.Claw.clawSpeed);
   }
 
+  public void reverse() {
+    motorClaw.set(-Constants.Claw.clawSpeed);
+  }
+
   public void stop() {
     motorClaw.set(0);
   }
