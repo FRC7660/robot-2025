@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
 
     motorAlphaEncoder.setPosition(0);
-    System.out.println("Motor Position:" + motorAlphaEncoder.getPosition());
+    System.out.println("Motor Position:" + getPosition());
 
     alphaConfig.softLimit.forwardSoftLimit(Constants.Elevator.upperLimit);
     alphaConfig.softLimit.reverseSoftLimit(Constants.Elevator.lowerLimit);
@@ -115,13 +115,16 @@ public class Elevator extends SubsystemBase {
   // public void lower() {
   //   motorAlpha.set(-.5 * alphaInversion);
   // }
+  public double getPosition() {
+    return motorAlphaEncoder.getPosition();
+  }
 
   public boolean isAtBottom() {
-    return (motorAlphaEncoder.getPosition() < Constants.Elevator.lowerLimit || !bottomLimit.get());
+    return (getPosition() < Constants.Elevator.lowerLimit || !bottomLimit.get());
   }
 
   public boolean isAtTop() {
-    return (motorAlphaEncoder.getPosition() > Constants.Elevator.upperLimit);
+    return (getPosition() > Constants.Elevator.upperLimit);
   }
 
   private void setCalculatedMotors(Double output, Double feedForward) {
@@ -144,13 +147,9 @@ public class Elevator extends SubsystemBase {
     // Sprocket Diameter: 1.75667in
     // Circumfrence: 5.518737in
     Double height;
-    Double baseRotations = motorAlphaEncoder.getPosition();
+    Double baseRotations = getPosition();
     height = baseRotations * 0.91979 * 2;
     return height;
-  }
-
-  public double getPosition() {
-    return motorAlphaEncoder.getPosition();
   }
 
   public void setState(ElevatorState state) {
@@ -181,39 +180,38 @@ public class Elevator extends SubsystemBase {
         break;
     }
 
+    m_controller.reset(getPosition());
     m_controller.setGoal(goal);
     manual = false;
   }
 
   public boolean isAtGoal() {
-    return MathUtil.isNear(m_controller.getGoal().position, motorAlphaEncoder.getPosition(), 1.0);
+    return MathUtil.isNear(m_controller.getGoal().position, getPosition(), 1.0);
   }
 
   public void hold() {
-    m_controller.setGoal(motorAlphaEncoder.getPosition());
+    m_controller.reset(getPosition());
+    m_controller.setGoal(getPosition());
     manual = false;
   }
 
   public void manualUp() {
     manual = true;
     manualOutput = Constants.Elevator.manualOutput;
+    m_controller.reset(getPosition());
   }
 
   public void manualDown() {
     manual = true;
     manualOutput = -Constants.Elevator.manualOutput;
+    m_controller.reset(getPosition());
   }
 
   @Override
   public void periodic() {
 
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
-    SmartDashboard.putNumber("Motor Alpha Position", motorAlphaEncoder.getPosition());
-
-    if (manual) {
-      setVoltage(manualOutput);
-      return;
-    }
+    SmartDashboard.putNumber("Motor Alpha Position", getPosition());
 
     if (debug) {
       SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());
@@ -237,13 +235,18 @@ public class Elevator extends SubsystemBase {
       SmartDashboard.putNumber("Visual Setpoint", m_controller.getSetpoint().position);
     }
 
-    double output = m_controller.calculate(motorAlphaEncoder.getPosition());
+    double output = m_controller.calculate(getPosition());
     double feedForward = m_feedforward.calculate(m_controller.getSetpoint().velocity);
     SmartDashboard.putNumber("PID Output", output);
     SmartDashboard.putNumber("PID feedForward calculation", feedForward);
     SmartDashboard.putNumber("PID Goal", m_controller.getGoal().position);
     SmartDashboard.putNumber("Elevator Counter", counter);
-    setCalculatedMotors(output, feedForward);
+
+    if (manual) {
+      setCalculatedMotors(manualOutput, Constants.Elevator.feedForward);
+    } else {
+      setCalculatedMotors(output, feedForward);
+    }
   }
 
   public void simulationPeriodic() {

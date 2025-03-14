@@ -60,7 +60,7 @@ public final class Constants {
     public static final double safePosIn = -2.45;
     public static final double safePosOut = -10.0;
     public static final double reverseLimit = -450;
-    public static final double forewardLimit = -10;
+    public static final double forewardLimit = -14;
     public static final double testPosition = -380;
     public static final double horizontalCounts = -12.86;
     public static final double countsPerRadian = 5.83;
@@ -150,6 +150,9 @@ public final class Constants {
       new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
   public static final double DEADBAND = 0.1;
+
+  // in meters per second. value is max strafe speed.
+  public static final double strafeSpeedMultiplier = 4;
 
   public static final boolean absoluteDrive = false;
 }
