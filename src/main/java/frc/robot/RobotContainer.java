@@ -163,6 +163,7 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -1, 0, 1));
+    autoChooser.addOption("Relative drive to L4", autoDriveForL4());
 
     // Default command for Elevator
     // elevator.setDefaultCommand(
@@ -229,12 +230,9 @@ public class RobotContainer {
 
     driverController.rightBumper().whileTrue(new RemoveAlgae(claw));
     driverController
-    .leftBumper()
-      .whileTrue(
-        driveRobotRelative(
-          () -> Constants.strafeSpeedMultiplier * 0.1,
-          () -> 0,
-          () -> 0));
+        .leftBumper()
+        .whileTrue(
+            driveRobotRelative(() -> Constants.strafeSpeedMultiplier * 0.1, () -> 0, () -> 0));
 
     driverController
         .povUp()
@@ -367,11 +365,26 @@ public class RobotContainer {
         left = false;
         break;
     }
-    buttonXtrigger.onTrue(
-        new SequentialCommandGroup(
-            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
-            new ElevatorGoToPos(elevator, arm, height),
-            new ArmGoToPos(arm, elevator, height == Constants.ElevatorState.L4 ? Constants.Arm.scorePosL4 : Constants.Arm.scorePos)));
+    if (height == Constants.ElevatorState.L4){
+      buttonXtrigger.onTrue(
+          new SequentialCommandGroup(
+              new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+              new ElevatorGoToPos(elevator, arm, height),
+              new ArmGoToPos(
+                  arm,
+                  elevator,
+                  Constants.Arm.scorePosL4),
+              new DriveForTime(drivebase,0.3,0,0.3)));
+    } else {
+      buttonXtrigger.onTrue(
+          new SequentialCommandGroup(
+              new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+              new ElevatorGoToPos(elevator, arm, height),
+              new ArmGoToPos(
+                  arm,
+                  elevator,
+                  Constants.Arm.scorePos)));
+    }
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
@@ -403,10 +416,9 @@ public class RobotContainer {
         .axisLessThan(1, -0.5)
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
-    // TODO: bind x to 'return elevator and arm to home position'
     buttonBox
         .button(Constants.ButtonBox.p1)
-        .whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
+        .onTrue(new DriveForTime(drivebase,0.3,0,0.3));
 
     Trigger tp1 = buttonBox.button(Constants.ButtonBox.p1);
     tp1.onTrue(new PrintCommand("p1 Pressed"));
@@ -481,5 +493,16 @@ public class RobotContainer {
                 new ChassisSpeeds(vx.getAsDouble(), vy.getAsDouble(), omega.getAsDouble())),
         () -> drivebase.drive(new ChassisSpeeds(0, 0, 0)),
         drivebase);
+  }
+
+  private Command autoDriveForL4() {
+    return new SequentialCommandGroup(
+        new DriveForTime(drivebase, -1, 0, 1),
+        drivebase.driveToDistanceCommand(0.1, 0.1),
+        // new DriveForTime(drivebase, 0.2, 0, 0),
+        new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+        new ElevatorGoToPos(elevator, arm, Constants.ElevatorState.L4),
+        new ArmGoToPos(arm, elevator, Constants.Arm.scorePosL4),
+        new releaseCoral(claw));
   }
 }
