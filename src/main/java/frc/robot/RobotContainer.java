@@ -232,8 +232,8 @@ public class RobotContainer {
     .leftBumper()
       .whileTrue(
         driveRobotRelative(
+          () -> Constants.strafeSpeedMultiplier * 0.1,
           () -> 0,
-          () -> -Constants.strafeSpeedMultiplier * 0.4,
           () -> 0));
 
     driverController
