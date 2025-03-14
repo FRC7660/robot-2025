@@ -420,6 +420,13 @@ public class RobotContainer {
         .button(Constants.ButtonBox.p1)
         .onTrue(new DriveForTime(drivebase,0.3,0,0.3));
 
+    buttonBox
+        .button(Constants.ButtonBox.p2)
+        .onTrue(new SequentialCommandGroup(
+          new LowerClimb(climb),
+          new RaiseClimb(climb)
+        ));
+
     Trigger tp1 = buttonBox.button(Constants.ButtonBox.p1);
     tp1.onTrue(new PrintCommand("p1 Pressed"));
     tp1.onFalse(new PrintCommand("p1 Released"));
