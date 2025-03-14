@@ -158,6 +158,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("BytingCommand", testCommand);
     NamedCommands.registerCommand("Arm Out", armToScorePos());
     NamedCommands.registerCommand("Elevator L2", elevatorL2());
+    NamedCommands.registerCommand("Elevator L4", elevatorL4());
     NamedCommands.registerCommand("Arm Shoot Pos", armToScorePos());
     NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
@@ -475,6 +476,10 @@ public class RobotContainer {
 
   private Command elevatorL2() {
     return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+  }
+
+  private Command elevatorL4(){
+    return new ElevatorGoToPos(elevator, arm, ElevatorState.L4);
   }
 
   private Command goToHome() {
