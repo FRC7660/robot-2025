@@ -64,7 +64,7 @@ public class ElevatorManual extends Command {
   @Override
   public boolean isFinished() {
     if (direction == Constants.Elevator.Direction.UP) {
-      return m_elevator.getHeight() >= limitUp;
+      return m_elevator.getPosition() >= limitUp;
     }
     return m_elevator.getPosition() <= limitDown;
   }
