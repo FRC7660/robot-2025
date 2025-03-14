@@ -34,7 +34,9 @@ public class ElevatorManual extends Command {
       limitDown = Constants.Elevator.lowerLimit;
     } else {
       System.out.println("ELEVATOR MANUAL CANCELED");
+      m_elevator.hold();
       this.cancel();
+      return;
     }
 
     String dirStr = "up";
