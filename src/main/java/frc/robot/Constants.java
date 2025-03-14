@@ -153,7 +153,7 @@ public final class Constants {
   public static final double DEADBAND = 0.1;
 
   // in meters per second. value is max strafe speed.
-  public static final double strafeSpeedMultiplier = 4;
+  public static final double strafeSpeedMultiplier = 2;
 
   public static final boolean absoluteDrive = false;
 }

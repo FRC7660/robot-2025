@@ -214,11 +214,12 @@ public class RobotContainer {
     // back: two squares/view/left tiny button
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
-    driverController.back().onTrue(
-      new SequentialCommandGroup(
-        new ClimbPrepRoutine(climb, funnel),
-        new ArmGoToPos(arm, elevator, Constants.Arm.climbPos)
-      ));
+    driverController
+        .back()
+        .onTrue(
+            new SequentialCommandGroup(
+                new ClimbPrepRoutine(climb, funnel),
+                new ArmGoToPos(arm, elevator, Constants.Arm.climbPos)));
     // driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController.a().onTrue(new IntakeCoral(claw));
@@ -240,14 +241,14 @@ public class RobotContainer {
     driverController.povLeft().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
     driverController
-        .leftTrigger(0.1)
+        .leftTrigger(0.04)
         .whileTrue(
             driveRobotRelative(
                 () -> 0,
                 () -> -Constants.strafeSpeedMultiplier * driverController.getLeftTriggerAxis(),
                 () -> 0));
     driverController
-        .rightTrigger(0.1)
+        .rightTrigger(0.04)
         .whileTrue(
             driveRobotRelative(
                 () -> 0,
