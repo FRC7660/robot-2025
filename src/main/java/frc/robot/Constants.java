@@ -60,7 +60,7 @@ public final class Constants {
     public static final double safePosIn = -2.45;
     public static final double safePosOut = -10.0;
     public static final double reverseLimit = -450;
-    public static final double forewardLimit = -10;
+    public static final double forewardLimit = -14;
     public static final double testPosition = -380;
     public static final double horizontalCounts = -12.86;
     public static final double countsPerRadian = 5.83;
