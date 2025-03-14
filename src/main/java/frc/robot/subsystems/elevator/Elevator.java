@@ -243,7 +243,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Counter", counter);
 
     if (manual) {
-      setVoltage(manualOutput);
+      setCalculatedMotors(manualOutput, Constants.Elevator.feedForward);
     } else {
       setCalculatedMotors(output, feedForward);
     }
