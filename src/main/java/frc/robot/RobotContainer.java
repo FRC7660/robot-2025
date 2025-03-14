@@ -212,7 +212,13 @@ public class RobotContainer {
     // start: hamburger/menu/right tiny button
     // back: two squares/view/left tiny button
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
+
+    driverController.back().onTrue(
+      new SequentialCommandGroup(
+        new ClimbPrepRoutine(climb, funnel),
+        new ArmGoToPos(arm, elevator, Constants.Arm.climbPos)
+      ));
+    // driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));

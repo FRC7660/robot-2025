@@ -57,6 +57,7 @@ public final class Constants {
     public static final double kd = 0;
     public static final double scorePos = -2.8;
     public static final double zeroPos = 0.0;
+    public static final double climbPos = -10.0;
     public static final double safePosIn = -2.45;
     public static final double safePosOut = -10.0;
     public static final double reverseLimit = -450;
