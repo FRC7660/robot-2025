@@ -151,5 +151,8 @@ public final class Constants {
   public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
   public static final double DEADBAND = 0.1;
 
+  // in meters per second. value is max strafe speed.
+  public static final double strafeSpeedMultiplier = 4;
+
   public static final boolean absoluteDrive = false;
 }

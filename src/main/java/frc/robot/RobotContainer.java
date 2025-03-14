@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -45,7 +46,6 @@ import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
-import frc.robot.commands.driveCommands.Strafe;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
@@ -55,6 +55,7 @@ import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import swervelib.SwerveInputStream;
@@ -232,11 +233,18 @@ public class RobotContainer {
 
     driverController
         .leftTrigger(0.1)
-        .whileTrue(new Strafe(drivebase, () -> driverController.getLeftTriggerAxis() * 0.5, true));
+        .whileTrue(
+            driveRobotRelative(
+                () -> 0,
+                () -> -Constants.strafeSpeedMultiplier * driverController.getLeftTriggerAxis(),
+                () -> 0));
     driverController
         .rightTrigger(0.1)
         .whileTrue(
-            new Strafe(drivebase, () -> driverController.getRightTriggerAxis() * 0.5, false));
+            driveRobotRelative(
+                () -> 0,
+                () -> Constants.strafeSpeedMultiplier * driverController.getRightTriggerAxis(),
+                () -> 0));
 
     testController.a().whileTrue(armToScorePos());
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
@@ -435,5 +443,23 @@ public class RobotContainer {
 
   private Command elevatorL2() {
     return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+  }
+
+  /**
+   * Drives the with the given velocities robot oriented. Sets speeds to 0 on end.
+   *
+   * @param vx The x component of the velocity in meters/second. Positive is forward.
+   * @param vy The y component of the velocity in meters/second. Positive is to the left.
+   * @param omega The rotational component of the velocity in radians/second. Positive is
+   *     counter-clockwise.
+   * @return The command to drive at the provided speeds.
+   */
+  private Command driveRobotRelative(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier omega) {
+    return Commands.runEnd(
+        () ->
+            drivebase.drive(
+                new ChassisSpeeds(vx.getAsDouble(), vy.getAsDouble(), omega.getAsDouble())),
+        () -> drivebase.drive(new ChassisSpeeds(0, 0, 0)),
+        drivebase);
   }
 }
