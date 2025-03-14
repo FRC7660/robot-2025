@@ -228,6 +228,13 @@ public class RobotContainer {
     driverController.y().onTrue(new SwitchVideo());
 
     driverController.rightBumper().whileTrue(new RemoveAlgae(claw));
+    driverController
+    .leftBumper()
+      .whileTrue(
+        driveRobotRelative(
+          () -> 0,
+          () -> -Constants.strafeSpeedMultiplier * 0.4,
+          () -> 0));
 
     driverController
         .povUp()
