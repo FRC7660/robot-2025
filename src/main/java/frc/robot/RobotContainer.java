@@ -215,8 +215,7 @@ public class RobotContainer {
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
-    // TODO: bind x to 'return elevator and arm to home position'
-    driverController.x().whileTrue(new PrintCommand("Make this Work: bind elevator/arm to home"));
+    driverController.x().onTrue(goToHome());
     driverController.y().onTrue(new SwitchVideo());
 
     driverController
@@ -354,11 +353,7 @@ public class RobotContainer {
   private void configurebuttonBox() {
     // setUpBoxButton(Constants.ButtonBox.bottomLeft);
     Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
-    buttonBLtrigger.onTrue(
-        new SequentialCommandGroup(
-            armToScorePos(),
-            new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
-            new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos)));
+    buttonBLtrigger.onTrue(goToHome());
 
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
@@ -435,5 +430,12 @@ public class RobotContainer {
 
   private Command elevatorL2() {
     return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+  }
+
+  private Command goToHome() {
+    return new SequentialCommandGroup(
+        armToScorePos(),
+        new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
+        new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
   }
 }
