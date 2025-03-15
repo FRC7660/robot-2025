@@ -366,25 +366,19 @@ public class RobotContainer {
         left = false;
         break;
     }
-    if (height == Constants.ElevatorState.L4){
+    if (height == Constants.ElevatorState.L4) {
       buttonXtrigger.onTrue(
           new SequentialCommandGroup(
               new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
               new ElevatorGoToPos(elevator, arm, height),
-              new ArmGoToPos(
-                  arm,
-                  elevator,
-                  Constants.Arm.scorePosL4),
-              new DriveForTime(drivebase,0.3,0,0.3)));
+              new ArmGoToPos(arm, elevator, Constants.Arm.scorePosL4),
+              new DriveForTime(drivebase, 0.3, 0, 0.4)));
     } else {
       buttonXtrigger.onTrue(
           new SequentialCommandGroup(
               new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
               new ElevatorGoToPos(elevator, arm, height),
-              new ArmGoToPos(
-                  arm,
-                  elevator,
-                  Constants.Arm.scorePos)));
+              new ArmGoToPos(arm, elevator, Constants.Arm.scorePos)));
     }
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
@@ -417,16 +411,11 @@ public class RobotContainer {
         .axisLessThan(1, -0.5)
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
-    buttonBox
-        .button(Constants.ButtonBox.p1)
-        .onTrue(new DriveForTime(drivebase,0.3,0,0.3));
+    buttonBox.button(Constants.ButtonBox.p1).onTrue(new DriveForTime(drivebase, 0.3, 0, 0.3));
 
     buttonBox
         .button(Constants.ButtonBox.p2)
-        .onTrue(new SequentialCommandGroup(
-          new LowerClimb(climb),
-          new RaiseClimb(climb)
-        ));
+        .onTrue(new SequentialCommandGroup(new LowerClimb(climb), new RaiseClimb(climb)));
 
     Trigger tp1 = buttonBox.button(Constants.ButtonBox.p1);
     tp1.onTrue(new PrintCommand("p1 Pressed"));
@@ -478,7 +467,7 @@ public class RobotContainer {
     return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
   }
 
-  private Command elevatorL4(){
+  private Command elevatorL4() {
     return new ElevatorGoToPos(elevator, arm, ElevatorState.L4);
   }
 
