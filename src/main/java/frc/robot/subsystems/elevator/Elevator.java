@@ -59,12 +59,15 @@ public class Elevator extends SubsystemBase {
   Double eKv = 0.1;
   Double eKconstraintVel = 100.0;
   Double eKconstraintAccel = 100.0;
+  Double slowKconstraintVel = 10.0;
+  Double slowKconstraintAccel = 10.0;
 
   double manualOutput = 0.0;
 
   private boolean debug = false;
   private boolean tuning = false;
   private boolean manual = false;
+  private boolean slowMode = false;
 
   private final TrapezoidProfile.Constraints m_startingConstraints =
       new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel);
@@ -180,6 +183,15 @@ public class Elevator extends SubsystemBase {
         break;
     }
 
+    // Apply slow mode constraints if enabled
+    if (slowMode) {
+      m_controller.setConstraints(
+          new TrapezoidProfile.Constraints(slowKconstraintVel, slowKconstraintAccel));
+    } else {
+      m_controller.setConstraints(
+          new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel));
+    }
+
     m_controller.reset(getPosition());
     m_controller.setGoal(goal);
     manual = false;
@@ -197,14 +209,34 @@ public class Elevator extends SubsystemBase {
 
   public void manualUp() {
     manual = true;
-    manualOutput = Constants.Elevator.manualOutput;
+    if (slowMode) {
+      manualOutput = Constants.Elevator.slowManualOutput;
+    } else {
+      manualOutput = Constants.Elevator.manualOutput;
+    }
     m_controller.reset(getPosition());
   }
 
   public void manualDown() {
     manual = true;
-    manualOutput = -Constants.Elevator.manualOutput;
+    if (slowMode) {
+      manualOutput = -Constants.Elevator.slowManualOutput;
+    } else {
+      manualOutput = -Constants.Elevator.manualOutput;
+    }
     m_controller.reset(getPosition());
+  }
+
+  public boolean isSlowMode() {
+    return slowMode;
+  }
+
+  public void setSlowMode(boolean slow) {
+    this.slowMode = slow;
+  }
+
+  public void toggleSlowMode() {
+    this.slowMode = !this.slowMode;
   }
 
   @Override
@@ -212,6 +244,7 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putNumber("Motor Alpha Speed", motorAlpha.get());
     SmartDashboard.putNumber("Motor Alpha Position", getPosition());
+    SmartDashboard.putBoolean("Elevator Slow Mode", slowMode);
 
     if (debug) {
       SmartDashboard.putBoolean("Elevator Limit Reached", !bottomLimit.get());

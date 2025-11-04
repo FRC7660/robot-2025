@@ -230,6 +230,9 @@ public class RobotContainer {
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
     driverController.povLeft().whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.IN));
 
+    // Toggle elevator slow mode
+    driverController.rightBumper().onTrue(Commands.runOnce(() -> elevator.toggleSlowMode()));
+
     driverController
         .leftTrigger(0.1)
         .whileTrue(

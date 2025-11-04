@@ -137,6 +137,7 @@ public final class Constants {
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
     public static final double manualOutput = .2 * 12; // output in volts
+    public static final double slowManualOutput = .02 * 12; // slow mode output in volts (10%)
 
     public enum Direction {
       UP,
