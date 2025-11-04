@@ -31,6 +31,13 @@ public class Elevator extends SubsystemBase {
 
   private Integer counter = 0;
 
+  // runtime speed scale: 0.0..1.0 (1.0 = full speed). Use to make elevator slower/faster.
+  private double speedScale = 0.5; // default slow (tune as desired)
+
+  // keep base constraint values and apply speedScale when setting controller constraints
+  Double eKconstraintVelBase = 100.0;
+  Double eKconstraintAccelBase = 100.0;
+
   public final SparkFlex motorAlpha =
       new SparkFlex(Constants.Elevator.motorAlphaID, MotorType.kBrushless);
   public final SparkFlex motorBeta =
@@ -57,8 +64,6 @@ public class Elevator extends SubsystemBase {
   Double eKs = 0.0;
   Double eKg = Constants.Elevator.feedForward;
   Double eKv = 0.1;
-  Double eKconstraintVel = 100.0;
-  Double eKconstraintAccel = 100.0;
 
   double manualOutput = 0.0;
 
@@ -67,7 +72,8 @@ public class Elevator extends SubsystemBase {
   private boolean manual = false;
 
   private final TrapezoidProfile.Constraints m_startingConstraints =
-      new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel);
+    new TrapezoidProfile.Constraints(eKconstraintVelBase * speedScale,
+      eKconstraintAccelBase * speedScale);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(eKp, eKi, eKd, m_startingConstraints, 0.02);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(eKs, eKg, eKv);
@@ -83,8 +89,9 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("eKs", eKs);
     SmartDashboard.putNumber("eKg", eKg);
     SmartDashboard.putNumber("eKv", eKv);
-    SmartDashboard.putNumber("eKcVel", eKconstraintVel);
-    SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
+  SmartDashboard.putNumber("eKcVel", eKconstraintVelBase);
+  SmartDashboard.putNumber("eKcAccel", eKconstraintAccelBase);
+  SmartDashboard.putNumber("Elevator speedScale", speedScale);
 
     motorAlphaEncoder.setPosition(0);
     System.out.println("Motor Position:" + getPosition());
@@ -197,14 +204,38 @@ public class Elevator extends SubsystemBase {
 
   public void manualUp() {
     manual = true;
-    manualOutput = Constants.Elevator.manualOutput;
+    // apply the runtime speedScale to manual commands
+    manualOutput = Constants.Elevator.manualOutput * speedScale;
     m_controller.reset(getPosition());
   }
 
   public void manualDown() {
     manual = true;
-    manualOutput = -Constants.Elevator.manualOutput;
+    // apply the runtime speedScale to manual commands
+    manualOutput = -Constants.Elevator.manualOutput * speedScale;
     m_controller.reset(getPosition());
+  }
+
+  /**
+   * Set runtime elevator speed scale (0..1). This will:
+   *  - scale manual output and PID output (but keep feedforward)
+   *  - update profiled PID constraints so setState (preset moves) run faster/slower
+   */
+  public void setSpeedScale(double scale) {
+    speedScale = Math.max(0.0, Math.min(1.0, scale));
+    // update controller constraints to respect new scale
+    m_controller.setConstraints(
+        new TrapezoidProfile.Constraints(
+            eKconstraintVelBase * speedScale, eKconstraintAccelBase * speedScale));
+    SmartDashboard.putNumber("Elevator speedScale", speedScale);
+  }
+
+  public void setFast() {
+    setSpeedScale(1.0);
+  }
+
+  public void setSlow() {
+    setSpeedScale(0.5);
   }
 
   @Override
@@ -245,7 +276,8 @@ public class Elevator extends SubsystemBase {
     if (manual) {
       setCalculatedMotors(manualOutput, Constants.Elevator.feedForward);
     } else {
-      setCalculatedMotors(output, feedForward);
+      // scale PID output by runtime speedScale, keep feedforward unchanged
+      setCalculatedMotors(output * speedScale, feedForward);
     }
   }
 

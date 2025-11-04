@@ -136,7 +136,7 @@ public final class Constants {
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
-    public static final double manualOutput = .2 * 12; // output in volts
+    public static final double manualOutput = .1 * 12; // output in volts
 
     public enum Direction {
       UP,
@@ -156,3 +156,90 @@ public final class Constants {
 
   public static final boolean absoluteDrive = false;
 }
+```java
+// filepath: [Elevator.java](http://_vscodecontentref_/1)
+// ...existing code...
+public class Elevator extends SubsystemBase {
+
+  private Integer counter = 0;
+
++  // runtime speed scale: 0.0..1.0 (1.0 = full speed). Use to make elevator slower/faster.
++  private double speedScale = 0.5; // default slow (tune as desired)
++
++  // keep base constraint values and apply speedScale when setting controller constraints
++  Double eKconstraintVelBase = 100.0;
++  Double eKconstraintAccelBase = 100.0;
+-
+-  private final TrapezoidProfile.Constraints m_startingConstraints =
+-      new TrapezoidProfile.Constraints(eKconstraintVel, eKconstraintAccel);
++  private TrapezoidProfile.Constraints m_startingConstraints =
++      new TrapezoidProfile.Constraints(eKconstraintVelBase * speedScale, eKconstraintAccelBase * speedScale);
+   private final ProfiledPIDController m_controller =
+       new ProfiledPIDController(eKp, eKi, eKd, m_startingConstraints, 0.02);
+   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(eKs, eKg, eKv);
+ 
+   public Elevator() {
++    SmartDashboard.putNumber("Elevator speedScale", speedScale);
+     // Clockwise - up, Counter - down, same for both motors
+@@
+-  Double eKconstraintVel = 100.0;
+-  Double eKconstraintAccel = 100.0;
++  // (removed previous eKconstraintVel/eKconstraintAccel; see eKconstraintVelBase/eKconstraintAccelBase above)
+@@
+   public void setState(ElevatorState state) {
+@@
+     m_controller.reset(getPosition());
+     m_controller.setGoal(goal);
+     manual = false;
+   }
++
++  /**
++   * Set runtime elevator speed scale (0..1). This will:
++   *  - scale manual output and PID output (but keep feedforward)
++   *  - update profiled PID constraints so setState (preset moves) run faster/slower
++   */
++  public void setSpeedScale(double scale) {
++    speedScale = Math.max(0.0, Math.min(1.0, scale));
++    // update controller constraints to respect new scale
++    m_controller.setConstraints(
++        new TrapezoidProfile.Constraints(
++            eKconstraintVelBase * speedScale, eKconstraintAccelBase * speedScale));
++    SmartDashboard.putNumber("Elevator speedScale", speedScale);
++  }
++
++  public void setFast() {
++    setSpeedScale(1.0);
++  }
++
++  public void setSlow() {
++    // choose whatever slow default you like
++    setSpeedScale(0.5);
++  }
+@@
+   public void manualUp() {
+     manual = true;
+-    manualOutput = Constants.Elevator.manualOutput;
++    manualOutput = Constants.Elevator.manualOutput * speedScale;
+     m_controller.reset(getPosition());
+   }
+ 
+   public void manualDown() {
+     manual = true;
+-    manualOutput = -Constants.Elevator.manualOutput;
++    manualOutput = -Constants.Elevator.manualOutput * speedScale;
+     m_controller.reset(getPosition());
+   }
+@@
+-    if (manual) {
+-      setCalculatedMotors(manualOutput, Constants.Elevator.feedForward);
+-    } else {
+-      setCalculatedMotors(output, feedForward);
+-    }
++    if (manual) {
++      // Keep feedforward unscaled (so it still compensates gravity). Scale only the manual voltage.
++      setCalculatedMotors(manualOutput, Constants.Elevator.feedForward);
++    } else {
++      // scale the PID output, keep feedforward
++      setCalculatedMotors(output * speedScale, feedForward);
++    }
+   }

@@ -225,6 +225,11 @@ public class RobotContainer {
     driverController
         .povDown()
         .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.DOWN));
+  // Hold left bumper to run elevator at FAST speed; release to return to SLOW.
+  driverController
+    .leftBumper()
+    .whileTrue(Commands.run(() -> elevator.setFast(), elevator))
+    .onFalse(Commands.runOnce(() -> elevator.setSlow(), elevator));
     driverController
         .povRight()
         .whileTrue(new ArmManual(arm, elevator, Constants.Arm.Direction.OUT));
