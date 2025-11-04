@@ -136,7 +136,17 @@ public final class Constants {
     public static final int lowerlimitID = 3;
     public static final int motorAlphaID = 51;
     public static final int motorBetaID = 52;
-    public static final double manualOutput = .2 * 12; // output in volts
+    // Manual outputs (in volts) for two-speed modes
+    public static final double manualOutputSlow = .1 * 12; // slow/manual fine control
+    public static final double manualOutputFast = .2 * 12; // faster manual movement
+
+    /**
+     * Backwards-compatible alias for single-value code that referenced `manualOutput`.
+     * New code should use manualOutputSlow / manualOutputFast explicitly or call
+     * Elevator.setMode(...) to pick an operating mode.
+     */
+    @Deprecated
+    public static final double manualOutput = manualOutputSlow; // output in volts
 
     public enum Direction {
       UP,

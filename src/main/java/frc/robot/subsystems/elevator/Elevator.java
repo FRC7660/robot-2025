@@ -62,6 +62,13 @@ public class Elevator extends SubsystemBase {
 
   double manualOutput = 0.0;
 
+  public enum Mode {
+    FAST,
+    SLOW
+  }
+
+  private Mode mode = Mode.SLOW; // default to slow for fine control
+
   private boolean debug = false;
   private boolean tuning = false;
   private boolean manual = false;
@@ -85,6 +92,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("eKv", eKv);
     SmartDashboard.putNumber("eKcVel", eKconstraintVel);
     SmartDashboard.putNumber("eKcAccel", eKconstraintAccel);
+  SmartDashboard.putString("Elevator Mode", mode.toString());
 
     motorAlphaEncoder.setPosition(0);
     System.out.println("Motor Position:" + getPosition());
@@ -106,6 +114,9 @@ public class Elevator extends SubsystemBase {
       motorSim = new SparkFlexSim(motorAlpha, DCMotor.getNeo550(1));
       motorSimEncoder = motorSim.getRelativeEncoderSim();
     }
+
+    // apply constraints according to default mode
+    applyModeConstraints();
   }
 
   // public void raise() {
@@ -197,13 +208,17 @@ public class Elevator extends SubsystemBase {
 
   public void manualUp() {
     manual = true;
-    manualOutput = Constants.Elevator.manualOutput;
+    manualOutput = (mode == Mode.FAST)
+        ? Constants.Elevator.manualOutputFast
+        : Constants.Elevator.manualOutputSlow;
     m_controller.reset(getPosition());
   }
 
   public void manualDown() {
     manual = true;
-    manualOutput = -Constants.Elevator.manualOutput;
+    manualOutput = -(mode == Mode.FAST
+        ? Constants.Elevator.manualOutputFast
+        : Constants.Elevator.manualOutputSlow);
     m_controller.reset(getPosition());
   }
 
@@ -247,6 +262,43 @@ public class Elevator extends SubsystemBase {
     } else {
       setCalculatedMotors(output, feedForward);
     }
+  }
+
+  /**
+   * Set elevator control mode to FAST.
+   */
+  public void setFastMode() {
+    mode = Mode.FAST;
+    SmartDashboard.putString("Elevator Mode", mode.toString());
+    applyModeConstraints();
+  }
+
+  /**
+   * Set elevator control mode to SLOW.
+   */
+  public void setSlowMode() {
+    mode = Mode.SLOW;
+    SmartDashboard.putString("Elevator Mode", mode.toString());
+    applyModeConstraints();
+  }
+
+  public Mode getMode() {
+    return mode;
+  }
+
+  public void toggleMode() {
+    if (mode == Mode.SLOW) {
+      setFastMode();
+    } else {
+      setSlowMode();
+    }
+  }
+
+  private void applyModeConstraints() {
+    // Reduce motion profile velocity when in slow mode to make movement gentler
+    double vel = (mode == Mode.FAST) ? eKconstraintVel : eKconstraintVel * 0.5;
+    double accel = eKconstraintAccel;
+    m_controller.setConstraints(new TrapezoidProfile.Constraints(vel, accel));
   }
 
   public void simulationPeriodic() {
