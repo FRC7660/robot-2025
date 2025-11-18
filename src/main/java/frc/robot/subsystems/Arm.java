@@ -111,7 +111,7 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean isInSafeZone() {
-    return (getPosition() <= Constants.Arm.safePosIn && getPosition() >= Constants.Arm.safePosOut);
+    return true; // (getPosition() <= Constants.Arm.safePosIn && getPosition() >= Constants.Arm.safePosOut);
   }
 
   public void holdCurrentPosition() {
