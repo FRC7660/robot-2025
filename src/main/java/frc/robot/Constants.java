@@ -125,6 +125,10 @@ public final class Constants {
   public static final Double l4height = 58.5; // 60 * 0.99;
   public static final Double zeroHeight = 0.0;
 
+  public static final Double s1height = 20.0; // 60 * 0.25;
+  public static final Double s2height = 36.0; // 60 * 0.50;
+  public static final Double s3height = 52.5; // 60 * 0.75;
+
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
