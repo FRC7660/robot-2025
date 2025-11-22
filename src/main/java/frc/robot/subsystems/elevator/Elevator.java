@@ -160,13 +160,13 @@ public class Elevator extends SubsystemBase {
     System.out.println("state is " + state);
     switch (state) {
       case L1:
-        goal = Constants.l1height;
+        goal = Constants.s1height;
         break;
       case L2:
-        goal = Constants.l2height;
+        goal = Constants.s2height;
         break;
       case L3:
-        goal = Constants.l3height;
+        goal = Constants.s3height;
         break;
       case L4:
         goal = Constants.l4height;
