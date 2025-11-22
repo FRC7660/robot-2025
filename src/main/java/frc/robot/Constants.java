@@ -98,6 +98,34 @@ public final class Constants {
     public static int funnelSwitchID = 6;
   }
 
+  public static class Intake {
+    public static final int motorID = 55;
+    // PID gains for position control
+    public static final double kp = 0.5;
+    public static final double ki = 0.0;
+    public static final double kd = 0.0;
+    // Feedforward constants (no gravity since horizontal)
+    public static final double kS = 0.0;
+    public static final double kV = 0.1;
+    // Motion profile constraints
+    public static final double kMaxVelocity = 50; // rotations per second
+    public static final double kMaxAcceleration = 100; // rotations per second squared
+    public static final double kDt = 0.02; // 20ms loop time
+    // Position limits
+    public static final double lowerLimit = 0.0;
+    public static final double upperLimit = 10.0;
+    // Manual control
+    public static final double manualSpeed = 0.3;
+    // Preset positions
+    public static final double homePosition = 0.0;
+    public static final double intakePosition = 5.0;
+
+    public enum Direction {
+      FORWARD,
+      REVERSE,
+    }
+  }
+
   public static class ButtonBox {
     public static final int bottomLeft = 1;
     public static final int lowerLeft = 2;

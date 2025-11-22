@@ -51,6 +51,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -74,6 +75,7 @@ public class RobotContainer {
   private final Arm arm = new Arm();
   private final Climb climb = new Climb();
   private final Claw claw = new Claw();
+  private final Intake intake = new Intake();
 
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
