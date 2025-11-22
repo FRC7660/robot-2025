@@ -64,6 +64,9 @@ public class SwerveSubsystem extends SubsystemBase {
   /** PhotonVision class to keep an accurate odometry. */
   private Vision vision;
 
+  private static final double IMU_LOG_INTERVAL_SECONDS = 0.5;
+  private double lastImuLogTime = 0.0;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -143,6 +146,27 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+    logImuDebug();
+  }
+
+  private void logImuDebug() {
+    double now = Timer.getFPGATimestamp();
+    if (now - lastImuLogTime < IMU_LOG_INTERVAL_SECONDS) {
+      return;
+    }
+    lastImuLogTime = now;
+
+    if (swerveDrive instanceof SwerveDrive7660 drive) {
+      drive.logImuDebugLine();
+      return;
+    }
+
+    Rotation2d yaw = swerveDrive.getYaw();
+    Rotation2d pitch = swerveDrive.getPitch();
+    System.out.printf(
+        "IMU debug | yaw: %.2f deg | pitch: %.2f deg%n",
+        yaw.getDegrees(),
+        pitch.getDegrees());
   }
 
   @Override

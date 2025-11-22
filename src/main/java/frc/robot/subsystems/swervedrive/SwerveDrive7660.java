@@ -3,6 +3,7 @@ package frc.robot.subsystems.swervedrive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -54,5 +55,15 @@ public class SwerveDrive7660 extends SwerveDrive {
         getModulePositions(),
         pose.rotateBy(isRedAlliance() ? new Rotation2d(0) : new Rotation2d(Math.PI)));
     odometryLock.unlock();
+  }
+
+  /** Print IMU orientation (roll, pitch, yaw) to the console for debugging. */
+  public void logImuDebugLine() {
+    var imu = imuReadingCache.getValue();
+    System.out.printf(
+        "IMU debug | roll: %.2f deg | pitch: %.2f deg | yaw: %.2f deg%n",
+        Units.radiansToDegrees(imu.getX()),
+        Units.radiansToDegrees(imu.getY()),
+        Units.radiansToDegrees(imu.getZ()));
   }
 }
