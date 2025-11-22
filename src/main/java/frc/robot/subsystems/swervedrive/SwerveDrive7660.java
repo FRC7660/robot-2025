@@ -57,13 +57,21 @@ public class SwerveDrive7660 extends SwerveDrive {
     odometryLock.unlock();
   }
 
-  /** Print IMU orientation (roll, pitch, yaw) to the console for debugging. */
+  /** Print IMU orientation and navX yaw details to the console for debugging. */
   public void logImuDebugLine() {
     var imu = imuReadingCache.getValue();
+    double rollDeg = Units.radiansToDegrees(imu.getX());
+    double pitchDeg = Units.radiansToDegrees(imu.getY());
+    double rawYawDeg = Units.radiansToDegrees(imu.getZ());
+    double adjustedYawDeg = getYaw().getDegrees();
+    double poseYawDeg = swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getDegrees();
+    double yawErrorToPoseDeg = Math.IEEEremainder(adjustedYawDeg - poseYawDeg, 360.0);
+
     System.out.printf(
-        "IMU debug | roll: %.2f deg | pitch: %.2f deg | yaw: %.2f deg%n",
-        Units.radiansToDegrees(imu.getX()),
-        Units.radiansToDegrees(imu.getY()),
-        Units.radiansToDegrees(imu.getZ()));
+        "IMU debug | roll: %.2f deg | pitch: %.2f deg | yaw(raw): %.2f deg | yaw(adjusted): %.2f deg%n",
+        rollDeg, pitchDeg, rawYawDeg, adjustedYawDeg);
+    System.out.printf(
+        "IMU rot detail | pose yaw: %.2f deg | yaw error vs pose: %.2f deg | sim: %b%n",
+        poseYawDeg, yawErrorToPoseDeg, SwerveDriveTelemetry.isSimulation);
   }
 }
