@@ -16,6 +16,6 @@ public class ClimbPrepRoutine extends SequentialCommandGroup {
   public ClimbPrepRoutine(Climb climb, Funnel funnel) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new RaiseClimb(climb), new LowerFunnel(funnel, climb), new ClimbHalfway(climb));
+    addCommands(new RaiseClimb(climb), new LowerFunnel(funnel), new ClimbHalfway(climb));
   }
 }

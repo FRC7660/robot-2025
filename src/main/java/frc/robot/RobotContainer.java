@@ -41,9 +41,11 @@ import frc.robot.commands.DriveForTime;
 import frc.robot.commands.ElevatorGoToPos;
 import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
 import frc.robot.commands.RaiseClimb;
+import frc.robot.commands.StopFunnel;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
@@ -369,7 +371,10 @@ public class RobotContainer {
 
     buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
     buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
-    buttonBox.button(Constants.ButtonBox.upperRight).whileTrue(new LowerFunnel(funnel, climb));
+    buttonBox.button(Constants.ButtonBox.topRight).onTrue(new LowerFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.upperRight).onTrue(new LiftFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.topRight).onFalse(new StopFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.upperRight).onFalse(new StopFunnel(funnel));
 
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
     buttonBox
