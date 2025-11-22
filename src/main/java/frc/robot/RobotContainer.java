@@ -250,20 +250,6 @@ public class RobotContainer {
     testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L4));
     testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
 
-    // // Reset gyro / odometry
-    // final Runnable resetGyro =
-    //     Constants.currentMode == Constants.Mode.SIM // this is an IF statement
-    //         // simulation
-    //         ? () ->
-    //             drive.resetOdometry(
-    //                 driveSimulation
-    //                     .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
-    // during
-    //         // real
-    //         : () ->
-    //             drive.resetOdometry(
-    //                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    // driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
   private void configureSimBindings() {
