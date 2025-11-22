@@ -36,22 +36,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ArmManual;
-import frc.robot.commands.ClimbPrepRoutine;
+// import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.DriveForTime;
 import frc.robot.commands.ElevatorGoToPos;
 import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.LiftFunnel;
-import frc.robot.commands.LowerClimb;
 import frc.robot.commands.LowerFunnel;
-import frc.robot.commands.RaiseClimb;
 import frc.robot.commands.StopFunnel;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
-import frc.robot.subsystems.Climb;
+// import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -74,7 +72,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Funnel funnel = new Funnel();
   private final Arm arm = new Arm();
-  private final Climb climb = new Climb();
+  // private final Climb climb = new Climb();
   private final Claw claw = new Claw();
 
   // Controllers
@@ -214,7 +212,7 @@ public class RobotContainer {
     // start: hamburger/menu/right tiny button
     // back: two squares/view/left tiny button
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
+    // driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
@@ -369,8 +367,8 @@ public class RobotContainer {
     setUpBoxButton(Constants.ButtonBox.upperLeft);
     setUpBoxButton(Constants.ButtonBox.topLeft);
 
-    buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
-    buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
+    // buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
+    // buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
     buttonBox.button(Constants.ButtonBox.topRight).onTrue(new LowerFunnel(funnel));
     buttonBox.button(Constants.ButtonBox.upperRight).onTrue(new LiftFunnel(funnel));
     buttonBox.button(Constants.ButtonBox.topRight).onFalse(new StopFunnel(funnel));

@@ -12,7 +12,6 @@ public class StopFunnel extends Command {
   /** Creates a new LiftIndex. */
   private final Funnel funnel;
 
-
   public StopFunnel(Funnel funnel) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.funnel = funnel;

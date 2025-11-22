@@ -119,15 +119,15 @@ public final class Constants {
     ZERO
   }
 
-  public static final Double l1height = 2.0; // 60 * 0.25;
-  public static final Double l2height = 10.5; // 60 * 0.50;
-  public static final Double l3height = 28.5; // 60 * 0.75;
-  public static final Double l4height = 58.5; // 60 * 0.99;
+  public static final Double l1height = 2.0;
+  public static final Double l2height = 10.5;
+  public static final Double l3height = 28.5;
+  public static final Double l4height = 58.5;
   public static final Double zeroHeight = 0.0;
 
-  public static final Double s1height = 20.0; // 60 * 0.25;
-  public static final Double s2height = 36.0; // 60 * 0.50;
-  public static final Double s3height = 52.5; // 60 * 0.75;
+  public static final Double s1height = 20.0;
+  public static final Double s2height = 36.0;
+  public static final Double s3height = 52.5;
 
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
@@ -158,5 +158,5 @@ public final class Constants {
   // in meters per second. value is max strafe speed.
   public static final double strafeSpeedMultiplier = 4;
 
-  public static final boolean absoluteDrive = false;
+  public static final boolean absoluteDrive = true; // does NOTHING
 }
