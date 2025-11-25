@@ -287,7 +287,7 @@ public class RobotContainer {
       // LEFT SIDE PRESETS
       case Constants.ButtonBox.bottomLeft:
         buttonName = "bottom left";
-        height = ElevatorState.ZERO;
+        height = ElevatorState.L1;
         left = true;
         break;
       case Constants.ButtonBox.lowerLeft:
@@ -309,7 +309,7 @@ public class RobotContainer {
       // RIGHT SIDE PRESETS - Not Used Right Now
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
-        height = ElevatorState.ZERO;
+        height = ElevatorState.L1;
         left = false;
         break;
       case Constants.ButtonBox.lowerRight:
@@ -344,10 +344,10 @@ public class RobotContainer {
   }
 
   private void configurebuttonBox() {
-    // setUpBoxButton(Constants.ButtonBox.bottomLeft);
     Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
     buttonBLtrigger.onTrue(goToHome());
-
+    
+    setUpBoxButton(Constants.ButtonBox.bottomLeft);
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
     setUpBoxButton(Constants.ButtonBox.topLeft);
@@ -430,9 +430,9 @@ public class RobotContainer {
 
   private Command goToHome() {
     return new SequentialCommandGroup(
-        armToScorePos(),
-        new ElevatorGoToPos(elevator, ElevatorState.ZERO),
-        new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
+        //armToScorePos(),
+      new ElevatorGoToPos(elevator, ElevatorState.ZERO));
+        //new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
   }
 
   /**
