@@ -247,9 +247,8 @@ public class RobotContainer {
 
     testController.a().whileTrue(armToScorePos());
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
-    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L4));
-    testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
-
+    testController.y().whileTrue(new ElevatorGoToPos(elevator, ElevatorState.L4));
+    testController.b().whileTrue(new ElevatorGoToPos(elevator, ElevatorState.ZERO));
   }
 
   private void configureSimBindings() {
@@ -337,9 +336,9 @@ public class RobotContainer {
         break;
     }
     buttonXtrigger.onTrue(
-        new SequentialCommandGroup(
-            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
-            new ElevatorGoToPos(elevator, arm, height)));
+        // new SequentialCommandGroup(
+        // new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+        new ElevatorGoToPos(elevator, height));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
@@ -426,13 +425,13 @@ public class RobotContainer {
   }
 
   private Command elevatorL2() {
-    return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+    return new ElevatorGoToPos(elevator, ElevatorState.L2);
   }
 
   private Command goToHome() {
     return new SequentialCommandGroup(
         armToScorePos(),
-        new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
+        new ElevatorGoToPos(elevator, ElevatorState.ZERO),
         new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
   }
 

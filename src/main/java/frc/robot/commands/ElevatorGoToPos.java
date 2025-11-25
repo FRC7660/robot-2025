@@ -6,33 +6,32 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.elevator.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ElevatorGoToPos extends Command {
   Elevator m_elevator;
-  Arm m_arm;
+  // Arm m_arm;
   Constants.ElevatorState m_position;
 
   /** Creates a new ElevatorGoToPos. */
-  public ElevatorGoToPos(Elevator elevator, Arm arm, Constants.ElevatorState position) {
+  public ElevatorGoToPos(Elevator elevator, Constants.ElevatorState position) {
     m_elevator = elevator;
-    m_arm = arm;
+    // m_arm = arm;
     m_position = position;
-    addRequirements(m_elevator, m_arm);
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_arm.holdCurrentPosition();
+    // m_arm.holdCurrentPosition();
 
     System.out.println("Elevator Preset attempt: " + m_position);
-    if (!m_arm.isInSafeZone()) {
-      System.out.println("ELEVATOR PRESET CANCELED");
-      this.cancel();
-    }
+    // if (!m_arm.isInSafeZone()) {
+    //   System.out.println("ELEVATOR PRESET CANCELED");
+    //   this.cancel();
+    // }
 
     m_elevator.setState(m_position);
   }

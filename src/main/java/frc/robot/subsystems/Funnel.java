@@ -40,7 +40,7 @@ public class Funnel extends SubsystemBase {
     configWinch.idleMode(IdleMode.kBrake);
     motorWinch.configure(
         configWinch, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    //encoderWinch.setPosition(0); // improve later if time, possibly set when enabled
+    // encoderWinch.setPosition(0); // improve later if time, possibly set when enabled
 
     funnelLimit = new DigitalInput(Constants.Funnel.funnelSwitchID);
 
