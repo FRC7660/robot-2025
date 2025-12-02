@@ -90,8 +90,8 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity =
       SwerveInputStream.of(
               drivebase.getSwerveDrive(),
-              () -> driverController.getLeftY() * 1,
-              () -> driverController.getLeftX() * 1)
+              () -> -driverController.getLeftY() * 0.49,
+              () -> -driverController.getLeftX() * 0.49)
           .withControllerRotationAxis(driverController::getRightX)
           .deadband(Constants.DEADBAND)
           .scaleTranslation(0.8)
@@ -346,7 +346,7 @@ public class RobotContainer {
   private void configurebuttonBox() {
     Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
     buttonBLtrigger.onTrue(goToHome());
-    
+
     setUpBoxButton(Constants.ButtonBox.bottomLeft);
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
@@ -430,9 +430,9 @@ public class RobotContainer {
 
   private Command goToHome() {
     return new SequentialCommandGroup(
-        //armToScorePos(),
-      new ElevatorGoToPos(elevator, ElevatorState.ZERO));
-        //new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
+        // armToScorePos(),
+        new ElevatorGoToPos(elevator, ElevatorState.ZERO));
+    // new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
   }
 
   /**
