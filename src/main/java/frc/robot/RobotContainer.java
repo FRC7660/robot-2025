@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -144,6 +145,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     DriverStation.silenceJoystickConnectionWarning(Constants.currentMode == Constants.Mode.SIM);
+    SmartDashboard.putBoolean("WAPUR Mode", false);
     NamedCommands.registerCommand("Test", Commands.print("I EXIST"));
 
     ledLive = new LEDlive();
@@ -180,9 +182,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     configurebuttonBox();
 
-    Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
+    Command driveFieldOrientedDirectAngle =
+        drivebase.driveFieldOriented(() -> limitSpeed(driveDirectAngle.get()));
+    Command driveFieldOrientedAnglularVelocity =
+        drivebase.driveFieldOriented(() -> limitSpeed(driveAngularVelocity.get()));
+    Command driveRobotOrientedAngularVelocity =
+        drivebase.driveFieldOriented(() -> limitSpeed(driveRobotOriented.get()));
     Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
     Command driveFieldOrientedDirectAngleKeyboard =
         drivebase.driveFieldOriented(driveDirectAngleKeyboard);
@@ -445,6 +450,28 @@ public class RobotContainer {
         armToScorePos(),
         new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
         new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
+  }
+
+  /**
+   * Limits the chassis speed to WAPUR_MAX_SPEED when WAPUR Mode is enabled.
+   *
+   * @param speeds The input ChassisSpeeds to limit.
+   * @return The speed-limited ChassisSpeeds.
+   */
+  private ChassisSpeeds limitSpeed(ChassisSpeeds speeds) {
+    if (!SmartDashboard.getBoolean("WAPUR Mode", false)) {
+      return speeds;
+    }
+    double maxSpeed = Constants.WAPUR_MAX_SPEED;
+    double vx = speeds.vxMetersPerSecond;
+    double vy = speeds.vyMetersPerSecond;
+    double currentSpeed = Math.hypot(vx, vy);
+    if (currentSpeed > maxSpeed && currentSpeed > 0) {
+      double scale = maxSpeed / currentSpeed;
+      vx *= scale;
+      vy *= scale;
+    }
+    return new ChassisSpeeds(vx, vy, speeds.omegaRadiansPerSecond);
   }
 
   /**

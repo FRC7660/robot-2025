@@ -145,6 +145,7 @@ public final class Constants {
   }
 
   public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  public static final double WAPUR_MAX_SPEED = Units.feetToMeters(5.0); // WAPUR speed limit
   public static final double ROBOT_MASS = 125 * 0.453592;
   public static final Matter CHASSIS =
       new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
