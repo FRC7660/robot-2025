@@ -4,26 +4,23 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  public TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
+  // public TalonFX motorArm = new TalonFX(Constants.Arm.motorID);
 
-  private TalonFXSimState motorArmSim;
+  // private TalonFXSimState motorArmSim;
 
   private boolean manualMode = false;
+
   private boolean tuning = true;
   private boolean debug = true;
 
@@ -41,12 +38,12 @@ public class Arm extends SubsystemBase {
           Constants.Arm.kp, Constants.Arm.ki, Constants.Arm.kd, m_constraints, Constants.Arm.kDt);
 
   public Arm() {
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      motorArmSim = new TalonFXSimState(motorArm);
-    }
+    // if (Constants.currentMode == Constants.Mode.SIM) {
+    //   motorArmSim = new TalonFXSimState(motorArm);
+    // }
 
-    motorArm.setNeutralMode(NeutralModeValue.Coast);
-    motorArm.setInverted(true);
+    // motorArm.setNeutralMode(NeutralModeValue.Coast);
+    // motorArm.setInverted(true);
 
     targetPos = 0;
 
@@ -85,7 +82,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Boolean armAtExtended() {
-    double position = motorArm.getPosition().getValueAsDouble();
+    double position = 0; // motorArm.getPosition().getValueAsDouble();
     if (position < Constants.Arm.forewardLimit) {
       System.out.println("Upper Arm Limit Reached");
       return true;
@@ -94,7 +91,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Boolean armAtZero() {
-    double position = motorArm.getPosition().getValueAsDouble();
+    double position = -1; // motorArm.getPosition().getValueAsDouble();
     if (position > Constants.Arm.zeroPos) {
       System.out.println("Lower Arm Limit Reached");
       return true;
@@ -107,11 +104,12 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosition() {
-    return motorArm.getPosition().getValueAsDouble();
+    return 0; // motorArm.getPosition().getValueAsDouble();
   }
 
   public boolean isInSafeZone() {
-    return (getPosition() <= Constants.Arm.safePosIn && getPosition() >= Constants.Arm.safePosOut);
+    return true; // (getPosition() <= Constants.Arm.safePosIn && getPosition() >=
+    // Constants.Arm.safePosOut);
   }
 
   public void holdCurrentPosition() {
@@ -146,7 +144,7 @@ public class Arm extends SubsystemBase {
     } else if (output > 0 && armAtZero()) {
       adjusted = 0;
     }
-    motorArm.setVoltage(adjusted);
+    // motorArm.setVoltage(adjusted);
     SmartDashboard.putNumber("Arm-output", output);
     SmartDashboard.putNumber("Arm-adjusted-output", adjusted);
   }
@@ -154,62 +152,62 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
 
-    if (debug) {
-      // This method will be called once per scheduler run
-      SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
-      SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
-      SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
+    // if (debug) {
+    //   // This method will be called once per scheduler run
+    //   SmartDashboard.putNumber("Arm-Pos", motorArm.getPosition().getValueAsDouble());
+    //   SmartDashboard.putNumber("Arm-Velo", motorArm.getVelocity().getValueAsDouble());
+    //   SmartDashboard.putNumber("Arm-Encoder", encoderArm.get());
 
-      SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
-      SmartDashboard.putNumber("Arm-target", targetPos);
-    }
+    //   SmartDashboard.putNumber("Arm-setpoint", m_controller.getSetpoint().position);
+    //   SmartDashboard.putNumber("Arm-target", targetPos);
+    // }
 
-    if (tuning) {
-      m_controller.setP(SmartDashboard.getNumber("Arm P", Constants.Arm.kp));
-      m_controller.setI(SmartDashboard.getNumber("Arm I", Constants.Arm.ki));
-      m_controller.setD(SmartDashboard.getNumber("Arm D", Constants.Arm.kd));
+    // if (tuning) {
+    //   m_controller.setP(SmartDashboard.getNumber("Arm P", Constants.Arm.kp));
+    //   m_controller.setI(SmartDashboard.getNumber("Arm I", Constants.Arm.ki));
+    //   m_controller.setD(SmartDashboard.getNumber("Arm D", Constants.Arm.kd));
 
-      m_feedforward.setKg(SmartDashboard.getNumber("Arm kG", Constants.Arm.kGVoltage));
-      m_feedforward.setKs(SmartDashboard.getNumber("Arm kS", Constants.Arm.kS));
-      m_feedforward.setKv(SmartDashboard.getNumber("Arm kV", Constants.Arm.kV));
-      m_feedforward.setKa(SmartDashboard.getNumber("Arm kA", Constants.Arm.kA));
+    //   m_feedforward.setKg(SmartDashboard.getNumber("Arm kG", Constants.Arm.kGVoltage));
+    //   m_feedforward.setKs(SmartDashboard.getNumber("Arm kS", Constants.Arm.kS));
+    //   m_feedforward.setKv(SmartDashboard.getNumber("Arm kV", Constants.Arm.kV));
+    //   m_feedforward.setKa(SmartDashboard.getNumber("Arm kA", Constants.Arm.kA));
 
-      m_controller.setConstraints(
-          new TrapezoidProfile.Constraints(
-              SmartDashboard.getNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity),
-              SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
-    }
+    //   m_controller.setConstraints(
+    //       new TrapezoidProfile.Constraints(
+    //           SmartDashboard.getNumber("Arm-Max-Velo", Constants.Arm.kMaxVelocity),
+    //           SmartDashboard.getNumber("Arm-Max-Acceleration", Constants.Arm.kMaxAcceleration)));
+    // }
 
-    if (manualMode) {
-      targetPos = getPosition();
-    }
+    // if (manualMode) {
+    //   targetPos = getPosition();
+    // }
 
-    m_controller.setGoal(targetPos);
+    // m_controller.setGoal(targetPos);
 
-    double outff =
-        m_feedforward.calculate(
-            convertRevToRad(motorArm.getPosition().getValueAsDouble()),
-            m_controller.getSetpoint().velocity);
-    double outPID = m_controller.calculate(getPosition());
+    // double outff =
+    //     m_feedforward.calculate(
+    //         convertRevToRad(motorArm.getPosition().getValueAsDouble()),
+    //         m_controller.getSetpoint().velocity);
+    // double outPID = m_controller.calculate(getPosition());
 
-    if (debug) {
-      SmartDashboard.putNumber("Arm-PID", outPID);
-      SmartDashboard.putNumber(
-          "Arm-PosFF", convertRevToRad(motorArm.getPosition().getValueAsDouble()));
-      SmartDashboard.putNumber("Arm-FF", outff);
-    }
+    // if (debug) {
+    //   SmartDashboard.putNumber("Arm-PID", outPID);
+    //   SmartDashboard.putNumber(
+    //       "Arm-PosFF", convertRevToRad(motorArm.getPosition().getValueAsDouble()));
+    //   SmartDashboard.putNumber("Arm-FF", outff);
+    // }
 
-    if (manualMode) {
-      setVoltage(desiredOutput * 12);
-    } else {
-      setVoltage(outPID + outff);
-    }
+    // if (manualMode) {
+    //   setVoltage(desiredOutput * 12);
+    // } else {
+    //   setVoltage(outPID + outff);
+    // }
   }
 
   public void simulationPeriodic() {
-    motorArmSim.setSupplyVoltage(
-        RobotController
-            .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
-    // function
+    // motorArmSim.setSupplyVoltage(
+    //     RobotController
+    //         .getBatteryVoltage()); // need to fix sim capabilites, find talon version of iterate
+    // // function
   }
 }

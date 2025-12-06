@@ -36,20 +36,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorState;
 import frc.robot.commands.ArmGoToPos;
 import frc.robot.commands.ArmManual;
-import frc.robot.commands.ClimbPrepRoutine;
+// import frc.robot.commands.ClimbPrepRoutine;
 import frc.robot.commands.DriveForTime;
 import frc.robot.commands.ElevatorGoToPos;
 import frc.robot.commands.ElevatorManual;
 import frc.robot.commands.IntakeCoral;
-import frc.robot.commands.LowerClimb;
+import frc.robot.commands.LiftFunnel;
 import frc.robot.commands.LowerFunnel;
-import frc.robot.commands.RaiseClimb;
+import frc.robot.commands.StopFunnel;
 import frc.robot.commands.SwitchVideo;
 import frc.robot.commands.TestAuto;
 import frc.robot.commands.releaseCoral;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Claw;
-import frc.robot.subsystems.Climb;
+// import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.LEDsubsystem.LEDlive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -72,7 +72,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Funnel funnel = new Funnel();
   private final Arm arm = new Arm();
-  private final Climb climb = new Climb();
+  // private final Climb climb = new Climb();
   private final Claw claw = new Claw();
 
   // Controllers
@@ -90,8 +90,8 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity =
       SwerveInputStream.of(
               drivebase.getSwerveDrive(),
-              () -> driverController.getLeftY() * 1,
-              () -> driverController.getLeftX() * 1)
+              () -> -driverController.getLeftY() * 0.49,
+              () -> -driverController.getLeftX() * 0.49)
           .withControllerRotationAxis(driverController::getRightX)
           .deadband(Constants.DEADBAND)
           .scaleTranslation(0.8)
@@ -161,7 +161,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -1, 0, 1));
+    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -0.5, 0, 1));
 
     // Default command for Elevator
     // elevator.setDefaultCommand(
@@ -212,12 +212,17 @@ public class RobotContainer {
     // start: hamburger/menu/right tiny button
     // back: two squares/view/left tiny button
     driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
+    // driverController.back().onTrue(new ClimbPrepRoutine(climb, funnel));
 
     driverController.a().onTrue(new IntakeCoral(claw));
     driverController.b().onTrue(new releaseCoral(claw));
     driverController.x().onTrue(goToHome());
     driverController.y().onTrue(new SwitchVideo());
+
+    driverController.leftBumper().onTrue(new LowerFunnel(funnel));
+    driverController.rightBumper().onTrue(new LiftFunnel(funnel));
+    driverController.leftBumper().onFalse(new StopFunnel(funnel));
+    driverController.rightBumper().onFalse(new StopFunnel(funnel));
 
     driverController
         .povUp()
@@ -234,36 +239,21 @@ public class RobotContainer {
         .leftTrigger(0.1)
         .whileTrue(
             driveRobotRelative(
-                () -> 0,
                 () -> -Constants.strafeSpeedMultiplier * driverController.getLeftTriggerAxis(),
+                () -> 0,
                 () -> 0));
     driverController
         .rightTrigger(0.1)
         .whileTrue(
             driveRobotRelative(
-                () -> 0,
                 () -> Constants.strafeSpeedMultiplier * driverController.getRightTriggerAxis(),
+                () -> 0,
                 () -> 0));
 
     testController.a().whileTrue(armToScorePos());
     testController.x().whileTrue(new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
-    testController.y().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.L4));
-    testController.b().whileTrue(new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO));
-
-    // // Reset gyro / odometry
-    // final Runnable resetGyro =
-    //     Constants.currentMode == Constants.Mode.SIM // this is an IF statement
-    //         // simulation
-    //         ? () ->
-    //             drive.resetOdometry(
-    //                 driveSimulation
-    //                     .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
-    // during
-    //         // real
-    //         : () ->
-    //             drive.resetOdometry(
-    //                 new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    // driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    testController.y().whileTrue(new ElevatorGoToPos(elevator, ElevatorState.L4));
+    testController.b().whileTrue(new ElevatorGoToPos(elevator, ElevatorState.ZERO));
   }
 
   private void configureSimBindings() {
@@ -302,7 +292,7 @@ public class RobotContainer {
       // LEFT SIDE PRESETS
       case Constants.ButtonBox.bottomLeft:
         buttonName = "bottom left";
-        height = ElevatorState.ZERO;
+        height = ElevatorState.L1;
         left = true;
         break;
       case Constants.ButtonBox.lowerLeft:
@@ -324,7 +314,7 @@ public class RobotContainer {
       // RIGHT SIDE PRESETS - Not Used Right Now
       case Constants.ButtonBox.bottomRight:
         buttonName = "bottom right";
-        height = ElevatorState.ZERO;
+        height = ElevatorState.L1;
         left = false;
         break;
       case Constants.ButtonBox.lowerRight:
@@ -351,25 +341,28 @@ public class RobotContainer {
         break;
     }
     buttonXtrigger.onTrue(
-        new SequentialCommandGroup(
-            new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
-            new ElevatorGoToPos(elevator, arm, height)));
+        // new SequentialCommandGroup(
+        // new ArmGoToPos(arm, elevator, Constants.Arm.scorePos),
+        new ElevatorGoToPos(elevator, height));
     buttonXtrigger.onTrue(new PrintCommand(buttonName + " pressed (BBOX)"));
     buttonXtrigger.onFalse(new PrintCommand(buttonName + " released (BBOX)"));
   }
 
   private void configurebuttonBox() {
-    // setUpBoxButton(Constants.ButtonBox.bottomLeft);
     Trigger buttonBLtrigger = buttonBox.button(Constants.ButtonBox.bottomLeft);
     buttonBLtrigger.onTrue(goToHome());
 
+    setUpBoxButton(Constants.ButtonBox.bottomLeft);
     setUpBoxButton(Constants.ButtonBox.lowerLeft);
     setUpBoxButton(Constants.ButtonBox.upperLeft);
     setUpBoxButton(Constants.ButtonBox.topLeft);
 
-    buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
-    buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
-    buttonBox.button(Constants.ButtonBox.upperRight).whileTrue(new LowerFunnel(funnel, climb));
+    // buttonBox.button(Constants.ButtonBox.bottomRight).whileTrue(new LowerClimb(climb));
+    // buttonBox.button(Constants.ButtonBox.lowerRight).whileTrue(new RaiseClimb(climb));
+    buttonBox.button(Constants.ButtonBox.topRight).onTrue(new LowerFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.upperRight).onTrue(new LiftFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.topRight).onFalse(new StopFunnel(funnel));
+    buttonBox.button(Constants.ButtonBox.upperRight).onFalse(new StopFunnel(funnel));
 
     // Button Board's Dpad, axis 0: up/down, axis 1: right/left
     buttonBox
@@ -437,14 +430,14 @@ public class RobotContainer {
   }
 
   private Command elevatorL2() {
-    return new ElevatorGoToPos(elevator, arm, ElevatorState.L2);
+    return new ElevatorGoToPos(elevator, ElevatorState.L2);
   }
 
   private Command goToHome() {
     return new SequentialCommandGroup(
-        armToScorePos(),
-        new ElevatorGoToPos(elevator, arm, ElevatorState.ZERO),
-        new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
+        // armToScorePos(),
+        new ElevatorGoToPos(elevator, ElevatorState.ZERO));
+    // new ArmGoToPos(arm, elevator, Constants.Arm.zeroPos));
   }
 
   /**

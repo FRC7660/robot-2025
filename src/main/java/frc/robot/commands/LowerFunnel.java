@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Funnel;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -13,12 +12,9 @@ public class LowerFunnel extends Command {
   /** Creates a new LiftIndex. */
   private final Funnel funnel;
 
-  private final Climb climb;
-
-  public LowerFunnel(Funnel funnel, Climb climb) {
+  public LowerFunnel(Funnel funnel) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.funnel = funnel;
-    this.climb = climb;
     addRequirements(funnel);
   }
 
@@ -31,17 +27,13 @@ public class LowerFunnel extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (climb.isOut()) {
-      funnel.wind();
-    } else {
-      funnel.stop();
-    }
+    funnel.wind();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    funnel.hold();
+    funnel.stop();
   }
 
   // Returns true when the command should end.

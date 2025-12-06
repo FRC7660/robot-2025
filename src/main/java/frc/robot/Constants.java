@@ -93,7 +93,7 @@ public final class Constants {
 
   public static class Funnel {
     public static int winchID = 41;
-    public static double winchSpeed = 0.1; // Clockwise = positive, holds funnel down in position
+    public static double winchSpeed = 0.025; // Clockwise = positive, holds funnel down in position
     public static double limit = 1;
     public static int funnelSwitchID = 6;
   }
@@ -119,18 +119,22 @@ public final class Constants {
     ZERO
   }
 
-  public static final Double l1height = 2.0; // 60 * 0.25;
-  public static final Double l2height = 10.5; // 60 * 0.50;
-  public static final Double l3height = 28.5; // 60 * 0.75;
-  public static final Double l4height = 58.5; // 60 * 0.99;
+  public static final Double l1height = 6.0;
+  public static final Double l2height = 10.5;
+  public static final Double l3height = 28.5;
+  public static final Double l4height = 60.0;
   public static final Double zeroHeight = 0.0;
+
+  public static final Double s1height = 20.0;
+  public static final Double s2height = 36.0;
+  public static final Double s3height = 52.5;
 
   public static final Double elevatorP = 0.1;
   public static final Double elevatorI = 0.0;
   public static final Double elevatorD = 0.0;
 
   public static class Elevator {
-    public static final Double lowerLimit = 1.5;
+    public static final Double lowerLimit = 0.0;
     public static final Double upperLimit = 60.0;
     public static final Double feedForward = 0.4;
     public static final int lowerlimitID = 3;
@@ -154,5 +158,5 @@ public final class Constants {
   // in meters per second. value is max strafe speed.
   public static final double strafeSpeedMultiplier = 4;
 
-  public static final boolean absoluteDrive = false;
+  public static final boolean absoluteDrive = true; // does NOTHING
 }
