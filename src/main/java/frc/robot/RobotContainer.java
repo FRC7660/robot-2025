@@ -161,7 +161,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Coral", new releaseCoral(claw));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -1, 0, 1));
+    autoChooser.addOption("Drive Back", new DriveForTime(drivebase, -0.5, 0, 1));
 
     // Default command for Elevator
     // elevator.setDefaultCommand(
@@ -219,6 +219,11 @@ public class RobotContainer {
     driverController.x().onTrue(goToHome());
     driverController.y().onTrue(new SwitchVideo());
 
+    driverController.leftBumper().onTrue(new LowerFunnel(funnel));
+    driverController.rightBumper().onTrue(new LiftFunnel(funnel));
+    driverController.leftBumper().onFalse(new StopFunnel(funnel));
+    driverController.rightBumper().onFalse(new StopFunnel(funnel));
+
     driverController
         .povUp()
         .whileTrue(new ElevatorManual(elevator, arm, Constants.Elevator.Direction.UP));
@@ -234,15 +239,15 @@ public class RobotContainer {
         .leftTrigger(0.1)
         .whileTrue(
             driveRobotRelative(
-                () -> 0,
                 () -> -Constants.strafeSpeedMultiplier * driverController.getLeftTriggerAxis(),
+                () -> 0,
                 () -> 0));
     driverController
         .rightTrigger(0.1)
         .whileTrue(
             driveRobotRelative(
-                () -> 0,
                 () -> Constants.strafeSpeedMultiplier * driverController.getRightTriggerAxis(),
+                () -> 0,
                 () -> 0));
 
     testController.a().whileTrue(armToScorePos());
